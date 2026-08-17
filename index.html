@@ -2316,6 +2316,9 @@ class Component extends DCLogic {
     const progForC = d.programmes.find((p) => p.id === c.programmeId);
     const instForC = progForC && d.institutes.find((i) => i.id === progForC.instituteId);
     const ayForC = d.academicYears.find((y) => y.id === c.academicYearId);
+    // Everything else (attendance, PI score, APV) is in, but Final Score still can't compute because
+    // category verification isn't complete — say so, instead of a bare "—" that reads like APV never saved.
+    const verificationPending = !c.finalScore && c.apvScore != null && c.piTotal != null && c.piAttendance === "present" && c.outcome !== "ineligible";
     out.profileCandidate = {
       id: c.id, name: c.name, initials: c.name.split(" ").map((p) => p[0]).slice(0, 2).join(""),
       institute: instForC ? instForC.name : "\u2014", academicYear: ayForC ? ayForC.label : "\u2014",
@@ -2328,8 +2331,8 @@ class Component extends DCLogic {
       piScore: c.piTotal != null ? `${c.piTotal} / 40` : "\u2014",
       categoryVerif: c.verification.categoryVerification.institute ? `Eligibility Team: ${c.verification.categoryVerification.eligibilityTeam} \u00b7 Institute: ${c.verification.categoryVerification.institute}` : "\u2014",
       apvScoreValue: this.state.apvDraftId === c.id ? this.state.apvDraft : (c.apvScore != null ? c.apvScore : ""),
-      piApvScore: c.finalScore ? `${c.finalScore.piApv} / 50` : "\u2014",
-      finalScore: c.finalScore ? `${c.finalScore.final} / 50` : "\u2014", rank: c.rank || "\u2014",
+      piApvScore: c.finalScore ? `${c.finalScore.piApv} / 50` : (verificationPending ? "Pending category verification" : "\u2014"),
+      finalScore: c.finalScore ? `${c.finalScore.final} / 50` : (verificationPending ? "Pending category verification" : "\u2014"), rank: c.rank || "\u2014",
       outcome: c.meritCategory ? c.meritCategory[0].toUpperCase() + c.meritCategory.slice(1) : (c.outcome === "ineligible" ? "Ineligible" : "\u2014"),
       release: release ? release.id : "\u2014", wlNumber: c.waitingListNumber || "\u2014",
       timeline: c.timeline.slice().reverse().map((ev) => ({ label: ev.label, date: ev.date }))
