@@ -1088,6 +1088,7 @@ a:hover{color:var(--color-accent);text-decoration:underline}
             <div class="card" style="padding:var(--space-4)"><div class="card-kicker">Waiting List Range</div><div style="font-size:16px">{{ mpWaitingRange }}</div></div>
             <div class="card" style="padding:var(--space-4)"><div class="card-kicker">Rejected Range</div><div style="font-size:16px">{{ mpRejectedRange }}</div></div>
           </div>
+          <sc-if value="{{ mpAwaitingApvCount }}"><p style="font-size:12px;color:var(--color-accent-700);margin-top:0">{{ mpAwaitingApvCount }} candidate(s) in this category are PI-scored but still awaiting APV entry &mdash; they won't appear below until APV is entered on their profile (see Final Scores tab).</p></sc-if>
           <div class="card-title" style="margin-bottom:var(--space-2);font-size:16px">Pending Processing ({{ mpPendingCount }})</div>
           <table class="table" style="margin-bottom:var(--space-4)"><thead><tr><th>Rank</th><th>Applicant ID</th><th>Name</th><th style="text-align:right">PI</th><th style="text-align:right">APV</th><th style="text-align:right">PI+APV</th><th style="text-align:right">SLAT</th><th style="text-align:right">Final</th><th>Outcome</th></tr></thead><tbody>
             <sc-for list="{{ mpRows }}" as="r" hint-placeholder-count="6">
@@ -3297,11 +3298,20 @@ class Component extends DCLogic {
 
   buildFinalScores(d) {
     const pid = d.activeProgrammeId;
-    let pool = d.candidates.filter((c) => c.programmeId === pid && c.finalScore);
+    // Show every candidate the panel has finished scoring, even if APV hasn't been entered yet
+    // (a separate manual step on the candidate's Profile page) — c.finalScore only exists once
+    // both are in, so waiting on it here would silently hide PI-scored candidates with no explanation.
+    let pool = d.candidates.filter((c) => c.programmeId === pid && c.piAttendance === "present" && c.piTotal != null);
     if (this.state.fsCategory !== "ALL") pool = pool.filter((c) => c.category === this.state.fsCategory);
     return {
       categories: d.categories, fsCategory: this.state.fsCategory, onFsCategory: (e) => this.setState({ fsCategory: e.target.value }),
-      fsRows: pool.map((c) => ({ id: c.id, name: c.name, category: c.category, pi: c.finalScore.pi, apv: c.finalScore.apv, piApv: c.finalScore.piApv, slat: c.finalScore.slat, scaledSlat: "Pending confirmation", final: c.finalScore.final }))
+      fsRows: pool.map((c) => ({
+        id: c.id, name: c.name, category: c.category, pi: c.piTotal,
+        apv: c.apvScore != null ? c.apvScore : "Pending APV",
+        piApv: c.apvScore != null ? c.piTotal + c.apvScore : "—",
+        slat: c.slatScore, scaledSlat: "Pending confirmation",
+        final: c.finalScore ? c.finalScore.final : "Pending APV"
+      }))
     };
   }
 
@@ -3322,7 +3332,12 @@ class Component extends DCLogic {
     const waitRows = decided.filter((c) => c.meritCategory === "waiting");
     const rejRows = decided.filter((c) => c.meritCategory === "rejected");
     const row = (c, i) => ({ rank: i + 1, id: c.id, name: c.name, pi: c.finalScore.pi, apv: c.finalScore.apv, piApv: c.finalScore.piApv, slat: c.finalScore.slat, final: c.finalScore.final, ...this.statusTag(c.meritCategory || "pending") });
+    // Same candidates that would silently vanish from Final Scores (present, PI-scored, no APV yet) also
+    // never reach "ready-for-merit" — so they'd never enter this table either. Since a merit table can't
+    // rank a candidate with no Final Score, surface a count instead of letting them disappear unexplained.
+    const awaitingApvCount = d.candidates.filter((c) => c.programmeId === pid && c.category === cat && c.piAttendance === "present" && c.piTotal != null && c.apvScore == null).length;
     return {
+      mpAwaitingApvCount: awaitingApvCount,
       categories: d.categories, mpCategory: cat, onMpCategory: (e) => this.onMpCategory(e),
       mpIsCount: this.state.mpCriteria === "count", mpIsCutoff: this.state.mpCriteria === "cutoff",
       onMpCriteriaCount: () => this.setState({ mpCriteria: "count" }), onMpCriteriaCutoff: () => this.setState({ mpCriteria: "cutoff" }),
