@@ -828,6 +828,7 @@ a:hover{color:var(--color-accent);text-decoration:underline}
                 <td><span class="{{ p.dirTagCls }}">{{ p.dirLabel }}</span></td><td><span class="{{ p.regTagCls }}">{{ p.regLabel }}</span></td>
                 <td style="white-space:nowrap">
                   <button type="button" class="btn btn-ghost" onClick="{{ p.onView }}">View</button>
+                  <button type="button" class="btn btn-ghost" onClick="{{ p.onEdit }}">Edit</button>
                   <sc-if value="{{ p.showDirActions }}"><button type="button" class="btn btn-ghost" onClick="{{ p.onDirApprove }}">Approve</button><button type="button" class="btn btn-ghost" onClick="{{ p.onDirReject }}">Disapprove</button></sc-if>
                   <sc-if value="{{ p.showRegActions }}"><button type="button" class="btn btn-ghost" onClick="{{ p.onRegApprove }}">Approve</button><button type="button" class="btn btn-ghost" onClick="{{ p.onRegReject }}">Disapprove</button></sc-if>
                 </td>
@@ -863,6 +864,7 @@ a:hover{color:var(--color-accent);text-decoration:underline}
               <div style="grid-column:span 2"><div class="card-kicker">Remarks</div><div style="font-size:14px">{{ pdRemarks }}</div></div>
             </div>
             <div style="display:flex;gap:var(--space-2)">
+              <button type="button" class="btn btn-ghost" onClick="{{ pdOnEdit }}">Edit</button>
               <sc-if value="{{ pdShowDirActions }}"><button type="button" class="btn btn-primary" onClick="{{ pdOnDirApprove }}">Director Approve</button><button type="button" class="btn btn-secondary" onClick="{{ pdOnDirReject }}">Director Disapprove</button></sc-if>
               <sc-if value="{{ pdShowRegActions }}"><button type="button" class="btn btn-primary" onClick="{{ pdOnRegApprove }}">Registrar Approve</button><button type="button" class="btn btn-secondary" onClick="{{ pdOnRegReject }}">Registrar Disapprove</button></sc-if>
             </div>
@@ -1736,6 +1738,9 @@ class Component extends DCLogic {
   viewShortlist(id) { this.setState({ selectedShortlistId: id, page: "shortlist-detail" }); }
   viewMeritBatch(id) { this.setState({ selectedMeritBatchId: id, page: "merit-batch-detail" }); }
   viewPanelist(id) { this.setState({ selectedPanelistId: id, page: "panelist-detail" }); }
+  editPanelist(id) {
+    this.setState({ page: "panelists", pfMode: "existing" }, () => this.onPfExistingSelect({ target: { value: id } }));
+  }
   findApprovalRequest(d, subjectType, subjectId) {
     const matches = d.approvalRequests.filter((r) => r.subjectType === subjectType && r.subjectId === subjectId);
     return matches.length ? matches[matches.length - 1] : null;
@@ -2946,7 +2951,7 @@ class Component extends DCLogic {
           showRegActions: p.approval.director === "approved" && p.approval.registrar === "pending",
           onDirApprove: () => this.approvePanelistAction(p.id, "director", "approved"), onDirReject: () => this.approvePanelistAction(p.id, "director", "disapproved"),
           onRegApprove: () => this.approvePanelistAction(p.id, "registrar", "approved"), onRegReject: () => this.approvePanelistAction(p.id, "registrar", "disapproved"),
-          onView: () => this.viewPanelist(p.id)
+          onView: () => this.viewPanelist(p.id), onEdit: () => this.editPanelist(p.id)
         };
       })
     };
@@ -2968,6 +2973,7 @@ class Component extends DCLogic {
       pdShowRegActions: p.approval.director === "approved" && p.approval.registrar === "pending",
       pdOnDirApprove: () => this.approvePanelistAction(p.id, "director", "approved"), pdOnDirReject: () => this.approvePanelistAction(p.id, "director", "disapproved"),
       pdOnRegApprove: () => this.approvePanelistAction(p.id, "registrar", "approved"), pdOnRegReject: () => this.approvePanelistAction(p.id, "registrar", "disapproved"),
+      pdOnEdit: () => this.editPanelist(p.id),
       pdHasCredentials: !!p.credentials,
       pdLoginId: p.credentials ? p.credentials.loginId : "", pdPassword: p.credentials ? p.credentials.password : "",
       pdCredentialsIssuedOn: p.credentials ? this.engine.fmtDate(p.credentials.issuedOn) : ""
