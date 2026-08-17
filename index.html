@@ -418,7 +418,10 @@ a:hover{color:var(--color-accent);text-decoration:underline}
               </div>
               <div class="card" style="padding:var(--space-4)">
                 <div class="card-title" style="font-size:15px;margin-bottom:var(--space-2)">APV (Academic Profile Verification)</div>
-                <div class="field" style="margin:0;max-width:140px"><label>APV Score (out of 10)</label><input class="input" type="number" min="0" max="10" step="1" value="{{ profileCandidate.apvScoreValue }}" onChange="{{ onApvChange }}" /></div>
+                <div style="display:flex;gap:var(--space-2);align-items:flex-end">
+                  <div class="field" style="margin:0;max-width:140px"><label>APV Score (out of 10)</label><input class="input" type="number" min="0" max="10" step="1" value="{{ profileCandidate.apvScoreValue }}" onChange="{{ onApvChange }}" /></div>
+                  <button type="button" class="btn btn-primary" onClick="{{ onApvSave }}">Save</button>
+                </div>
                 <div style="margin-top:var(--space-2)">PI + APV Score: <strong>{{ profileCandidate.piApvScore }}</strong></div>
               </div>
               <div class="card" style="padding:var(--space-4)">
@@ -1445,7 +1448,7 @@ class Component extends DCLogic {
     page: "dashboard", loaded: false, data: null, toast: null,
     needsFileConnect: false, needsFileReconnect: false, reconnectFileName: "", fileName: "",
     importFileName: "", importParsed: null, importCommitted: null,
-    selectedMeritBatchId: null, selectedPanelistId: null,
+    selectedMeritBatchId: null, selectedPanelistId: null, apvDraftId: null, apvDraft: "",
     mcRequestId: null, mcReturnPage: "dashboard", mcTo: "", mcSubject: "", mcBody: "",
     popupMode: false, approvalToken: "", popupPayload: null, popupError: "",
     popupOtpSentTo: "", popupOtpValue: "", popupOtpStage: false, popupOtpEntered: "", popupDone: false, popupResultMsg: "", popupBusy: false,
@@ -2324,14 +2327,19 @@ class Component extends DCLogic {
       regTagCls: reg.tagCls, regTagLabel: reg.statusLabel, piTagCls: pi.tagCls, piTagLabel: pi.statusLabel,
       piScore: c.piTotal != null ? `${c.piTotal} / 40` : "\u2014",
       categoryVerif: c.verification.categoryVerification.institute ? `Eligibility Team: ${c.verification.categoryVerification.eligibilityTeam} \u00b7 Institute: ${c.verification.categoryVerification.institute}` : "\u2014",
-      apvScoreValue: c.apvScore != null ? c.apvScore : "",
+      apvScoreValue: this.state.apvDraftId === c.id ? this.state.apvDraft : (c.apvScore != null ? c.apvScore : ""),
       piApvScore: c.finalScore ? `${c.finalScore.piApv} / 50` : "\u2014",
       finalScore: c.finalScore ? `${c.finalScore.final} / 50` : "\u2014", rank: c.rank || "\u2014",
       outcome: c.meritCategory ? c.meritCategory[0].toUpperCase() + c.meritCategory.slice(1) : (c.outcome === "ineligible" ? "Ineligible" : "\u2014"),
       release: release ? release.id : "\u2014", wlNumber: c.waitingListNumber || "\u2014",
       timeline: c.timeline.slice().reverse().map((ev) => ({ label: ev.label, date: ev.date }))
     };
-    out.onApvChange = (e) => this.mutate((ds) => this.engine.setApvScore(ds, c.id, e.target.value));
+    out.onApvChange = (e) => this.setState({ apvDraftId: c.id, apvDraft: e.target.value });
+    out.onApvSave = () => {
+      const value = this.state.apvDraftId === c.id ? this.state.apvDraft : c.apvScore;
+      this.mutate((ds) => this.engine.setApvScore(ds, c.id, value), "APV score saved.");
+      this.setState({ apvDraftId: null, apvDraft: "" });
+    };
     return out;
   }
 

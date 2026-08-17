@@ -852,6 +852,16 @@ export function setApvScore(ds, candidateId, value) {
   recomputeOutcome(c);
 }
 
+// OPEN candidates have no category document to verify at all (see buildVerification), so they count as
+// verified by default. Everyone else needs their institute-reviewed category document marked Valid; DA
+// candidates additionally need their DA eligibility certificate marked Valid.
+function verificationComplete(c) {
+  if (c.category === "OPEN") return true;
+  if (c.verification.categoryVerification.institute !== "valid") return false;
+  if (c.category === "DA" && c.verification.daVerification !== "valid") return false;
+  return true;
+}
+
 // Re-derives merit-readiness from whichever of its inputs (category/DA document status, panelist-recorded
 // attendance, completed PI score, APV score) currently holds. Called from every function that can change any
 // one of those inputs — not just setVerification — so readiness never depends on something else happening to
@@ -861,11 +871,16 @@ function recomputeOutcome(c) {
   const cv = c.verification.categoryVerification;
   if (cv.eligibilityTeam === "invalid" || cv.institute === "invalid" || c.verification.daVerification === "invalid") {
     c.outcome = "ineligible";
-  } else if (c.piAttendance === "present" && c.piTotal != null && c.apvScore != null) {
+  } else if (c.piAttendance === "present" && c.piTotal != null && c.apvScore != null && verificationComplete(c)) {
     c.outcome = "ready-for-merit";
     const pi = c.piTotal;
     const apv = c.apvScore;
     c.finalScore = { pi, apv, piApv: pi + apv, slat: c.slatScore, scaledSlat: null, final: pi + apv };
+  } else if (!c.meritCategory) {
+    // Not ineligible, not (yet) fully ready — e.g. verification still pending. Only reset readiness for
+    // candidates merit processing hasn't already assigned a band to; a decided candidate keeps its finalScore.
+    c.outcome = null;
+    c.finalScore = null;
   }
 }
 
