@@ -3442,6 +3442,10 @@ class Component extends DCLogic {
   }
 
   onMrDateChange(batchId, field, value) {
+    // A native <input type="date"> reports value:"" while the user is still mid-typing (segments not
+    // all filled yet) — writing that back into the controlled value resets the field and wipes their
+    // keystrokes. Only commit a complete date; the in-progress DOM value is left alone otherwise.
+    if (!value) return;
     const mrDates = { ...this.state.mrDates, [batchId]: { ...this.state.mrDates[batchId], [field]: value } };
     this.setState({ mrDates });
   }
@@ -3487,8 +3491,8 @@ class Component extends DCLogic {
       mrWlCategories: d.categories, mrWlCategory: wlCat, onMrWlCategory: (e) => this.setState({ mrWlCategory: e.target.value }),
       mrWlEnabled, mrWlDisabled: !mrWlEnabled, mrWlDisabledHint: mrWlEnabled ? "" : "This category's approved merit list hasn't been released yet — release it above first.",
       mrWlCount: this.state.mrWlCount, onMrWlCountChange: (e) => this.setState({ mrWlCount: e.target.value }),
-      mrWlLastFeeDate: this.state.mrWlLastFeeDate, onMrWlLastFeeDate: (e) => this.setState({ mrWlLastFeeDate: e.target.value }),
-      mrWlNextDate: this.state.mrWlNextDate, onMrWlNextDate: (e) => this.setState({ mrWlNextDate: e.target.value }),
+      mrWlLastFeeDate: this.state.mrWlLastFeeDate, onMrWlLastFeeDate: (e) => { if (e.target.value) this.setState({ mrWlLastFeeDate: e.target.value }); },
+      mrWlNextDate: this.state.mrWlNextDate, onMrWlNextDate: (e) => { if (e.target.value) this.setState({ mrWlNextDate: e.target.value }); },
       onReleaseWaitingList: () => this.onReleaseWaitingList(),
 
       mrRows: d.meritListReleases.filter((r) => r.programmeId === pid).map((r) => ({ id: r.id, category: r.category, source: r.source, method: r.method, count: r.count, lastFeeDate: this.engine.fmtDate(r.lastFeeDate), nextDate: this.engine.fmtDate(r.nextReleaseDate) }))
