@@ -99,10 +99,15 @@ a:hover{color:var(--color-accent);text-decoration:underline}
     <div class="apsSideLink" onClick="{{ goDashboard }}" style="{{ dashboardLinkStyle }}"><i data-lucide="layout-dashboard" style="width:15px;height:15px"></i>Dashboard</div>
     <sc-if value="{{ roleIsInstitute }}"><div class="apsSideLink" onClick="{{ goWorkflow }}" style="{{ workflowLinkStyle }}"><i data-lucide="route" style="width:15px;height:15px"></i>Admission Workflow</div></sc-if>
     <sc-for list="{{ navGroups }}" as="grp" hint-placeholder-count="8">
-      <div style="margin-top:var(--space-4);padding:0 var(--space-4) var(--space-1);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;opacity:0.5">{{ grp.title }}</div>
-      <sc-for list="{{ grp.items }}" as="item" hint-placeholder-count="4">
-        <div class="apsSideLink" onClick="{{ item.onClick }}" style="{{ item.style }}">{{ item.label }}</div>
-      </sc-for>
+      <div onClick="{{ grp.onToggle }}" style="margin-top:var(--space-4);padding:0 var(--space-4) var(--space-1);font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;opacity:0.7;display:flex;align-items:center;justify-content:space-between;cursor:pointer">
+        <span>{{ grp.title }}</span>
+        <i data-lucide="{{ grp.chevron }}" style="width:13px;height:13px"></i>
+      </div>
+      <sc-if value="{{ grp.open }}">
+        <sc-for list="{{ grp.items }}" as="item" hint-placeholder-count="4">
+          <div class="apsSideLink" onClick="{{ item.onClick }}" style="{{ item.style }}">{{ item.label }}</div>
+        </sc-for>
+      </sc-if>
     </sc-for>
   </aside>
   <div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
@@ -1554,7 +1559,7 @@ const PAGE_RESTORE_FALLBACK = {
 
 class Component extends DCLogic {
   state = {
-    page: "dashboard", loaded: false, data: null, toast: null,
+    page: "dashboard", loaded: false, data: null, toast: null, navCollapsed: {},
     needsFileConnect: false, needsFileReconnect: false, reconnectFileName: "", fileName: "",
     importFileName: "", importParsed: null, importCommitted: null,
     selectedMeritBatchId: null, selectedPanelistId: null, apvDraftId: null, apvDraft: "",
@@ -2117,10 +2122,18 @@ class Component extends DCLogic {
     }
     const page = this.state.page;
     const titles = this.pageTitles()[page] || ["", ""];
-    const navGroups = this.navSpec().map((g) => ({
-      title: g.title,
-      items: g.items.map(([key, label]) => ({ label, style: linkStyle(page === key), onClick: () => this.goTo(key) }))
-    }));
+    const navGroups = this.navSpec().map((g) => {
+      const hasActive = g.items.some(([key]) => key === page);
+      // A group the user hasn't touched defaults open only while it holds the current page, so
+      // navigating there doesn't hide where you are; an explicit toggle always wins after that.
+      const open = this.state.navCollapsed[g.title] !== undefined ? !this.state.navCollapsed[g.title] : hasActive;
+      return {
+        title: g.title, open,
+        chevron: open ? "chevron-down" : "chevron-right",
+        onToggle: () => this.setState({ navCollapsed: { ...this.state.navCollapsed, [g.title]: open } }),
+        items: g.items.map(([key, label]) => ({ label, style: linkStyle(page === key), onClick: () => this.goTo(key) }))
+      };
+    });
     const base = {
       authed: true, notAuthed: false, roleIsSuperAdmin, roleIsInstitute, onLogout: () => this.onLogout(),
       loaded: this.state.loaded, notLoaded: !this.state.loaded, fileName: this.state.fileName || "", notFileConnected: !this.state.fileName,
