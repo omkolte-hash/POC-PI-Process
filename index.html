@@ -1154,30 +1154,35 @@ a:hover{color:var(--color-accent);text-decoration:underline}
         </div></sc-if>
         <sc-if value="{{ pageIsMeritReleases }}"><div>
           <div class="card elev-sm" style="padding:var(--space-4);margin-bottom:var(--space-4)">
-            <div class="card-title" style="margin-bottom:var(--space-3)">Create Merit List Release</div>
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-3);align-items:end">
-              <div class="field" style="margin:0"><label>Category</label><select class="input" value="{{ mrCategory }}" onChange="{{ onMrCategory }}">
-                <sc-for list="{{ categories }}" as="cat" hint-placeholder-count="5"><option value="{{ cat.id }}">{{ cat.label }}</option></sc-for>
+            <div class="card-title" style="margin-bottom:var(--space-3)">Approved Merit Lists Ready to Release</div>
+            <div class="field" style="margin:0 0 var(--space-3);max-width:280px"><label>Category</label><select class="input" value="{{ mrCategory }}" onChange="{{ onMrCategory }}">
+              <option value="ALL">All Categories</option>
+              <sc-for list="{{ categories }}" as="cat" hint-placeholder-count="5"><option value="{{ cat.id }}">{{ cat.label }}</option></sc-for>
+            </select></div>
+            <p style="font-size:12px;opacity:0.55;margin-top:0">Each approved merit list releases in full &mdash; set the two dates and click Release. Waiting List candidates are promoted separately, below, once a category's merit list has gone out.</p>
+            <sc-if value="{{ mrNoReleasable }}"><p style="font-size:13px;opacity:0.6">No approved merit lists are waiting to be released for this filter.</p></sc-if>
+            <table class="table"><thead><tr><th>Merit Batch</th><th>Category</th><th style="text-align:right">Candidates</th><th>Last Date to Pay Fees</th><th>Next Merit List Release Date</th><th></th></tr></thead><tbody>
+              <sc-for list="{{ mrReleasableRows }}" as="r" hint-placeholder-count="3">
+                <tr><td>{{ r.id }}</td><td>{{ r.category }}</td><td style="text-align:right">{{ r.pendingCount }}</td>
+                  <td><input class="input" type="date" value="{{ r.lastFeeDate }}" onChange="{{ r.onLastFeeDateChange }}" /></td>
+                  <td><input class="input" type="date" value="{{ r.nextReleaseDate }}" onChange="{{ r.onNextReleaseDateChange }}" /></td>
+                  <td><button type="button" class="btn btn-primary" onClick="{{ r.onRelease }}">Release</button></td>
+                </tr>
+              </sc-for>
+            </tbody></table>
+          </div>
+          <div class="card elev-sm" style="padding:var(--space-4);margin-bottom:var(--space-4)">
+            <div class="card-title" style="margin-bottom:var(--space-3)">Promote from Waiting List</div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-3);align-items:end">
+              <div class="field" style="margin:0"><label>Category</label><select class="input" value="{{ mrWlCategory }}" onChange="{{ onMrWlCategory }}">
+                <sc-for list="{{ mrWlCategories }}" as="cat" hint-placeholder-count="5"><option value="{{ cat.id }}">{{ cat.label }}</option></sc-for>
               </select></div>
-              <div class="field" style="margin:0"><label>Source</label>
-                <div class="stack" style="gap:4px">
-                  <label class="radio"><input type="radio" name="mrsrc" checked="{{ mrIsDirect }}" onChange="{{ onMrSourceDirect }}" disabled="{{ mrDirectDisabled }}" /><span class="dot"></span>Direct (Merit List)</label>
-                  <label class="radio"><input type="radio" name="mrsrc" checked="{{ mrIsWaiting }}" onChange="{{ onMrSourceWaiting }}" disabled="{{ mrWaitingDisabled }}" /><span class="dot"></span>Waiting List</label>
-                </div>
-              </div>
-              <div class="field" style="margin:0"><label>Selection Criteria</label>
-                <div class="stack" style="gap:4px">
-                  <label class="radio"><input type="radio" name="mrcrit" checked="{{ mrCritIsCount }}" onChange="{{ onMrCritCount }}" /><span class="dot"></span>No. of Candidates</label>
-                  <sc-if value="{{ mrIsDirect }}"><label class="radio"><input type="radio" name="mrcrit" checked="{{ mrCritIsCutoff }}" onChange="{{ onMrCritCutoff }}" /><span class="dot"></span>Cut Off Marks</label></sc-if>
-                </div>
-              </div>
-              <sc-if value="{{ mrCritIsCount }}"><div class="field" style="margin:0"><label>No. of Candidates</label><input class="input" type="number" value="{{ mrCount }}" onChange="{{ onMrCountChange }}" /></div></sc-if>
-              <sc-if value="{{ mrCritIsCutoff }}"><div class="field" style="margin:0"><label>Cutoff (Final Score)</label><input class="input" type="number" value="{{ mrCutoff }}" onChange="{{ onMrCutoffChange }}" /></div></sc-if>
-              <div class="field" style="margin:0"><label>Last Date to Pay Fees</label><input class="input" type="date" value="{{ mrLastFeeDate }}" onChange="{{ onMrLastFeeDate }}" /></div>
-              <div class="field" style="margin:0"><label>Next Merit List Release Date</label><input class="input" type="date" value="{{ mrNextDate }}" onChange="{{ onMrNextDate }}" /></div>
+              <div class="field" style="margin:0"><label>No. of Candidates</label><input class="input" type="number" value="{{ mrWlCount }}" onChange="{{ onMrWlCountChange }}" /></div>
+              <div class="field" style="margin:0"><label>Last Date to Pay Fees</label><input class="input" type="date" value="{{ mrWlLastFeeDate }}" onChange="{{ onMrWlLastFeeDate }}" /></div>
+              <div class="field" style="margin:0"><label>Next Merit List Release Date</label><input class="input" type="date" value="{{ mrWlNextDate }}" onChange="{{ onMrWlNextDate }}" /></div>
             </div>
-            <p style="font-size:12px;opacity:0.55">First release per category may use headcount or cutoff. Every subsequent release draws only from that category's Waiting List, by headcount.</p>
-            <button type="button" class="btn btn-primary" onClick="{{ onCreateRelease }}">Create Release</button>
+            <sc-if value="{{ mrWlDisabledHint }}"><p style="font-size:12px;color:var(--color-accent-700)">{{ mrWlDisabledHint }}</p></sc-if>
+            <button type="button" class="btn btn-primary" style="margin-top:var(--space-3)" onClick="{{ onReleaseWaitingList }}" disabled="{{ mrWlDisabled }}">Release from Waiting List</button>
           </div>
           <table class="table"><thead><tr><th>Release</th><th>Category</th><th>Source</th><th>Method</th><th style="text-align:right">Candidates</th><th>Last Fee Date</th><th>Next Release</th></tr></thead><tbody>
             <sc-for list="{{ mrRows }}" as="r" hint-placeholder-count="4">
@@ -1462,7 +1467,7 @@ class Component extends DCLogic {
     vCandidateId: "", fsCategory: "ALL", mpCategory: "OPEN", mpCriteria: "count", mpCount: "", mpCutoff: "", mpWaitingSize: "",
     cvSearch: "", cvCategoryFilter: "ALL", cvInstituteStatusFilter: "ALL",
     cvModalCandidateId: null, cvModalDocType: null, cvModalChecked: false, cvModalStatus: "",
-    maCategory: "ALL", mrCategory: "OPEN", mrCriteria: "count", mrCount: "", mrCutoff: "", mrLastFeeDate: "", mrNextDate: "", wlCategory: "ALL",
+    maCategory: "ALL", mrCategory: "ALL", mrDates: {}, mrWlCategory: "OPEN", mrWlCount: "", mrWlLastFeeDate: "", mrWlNextDate: "", wlCategory: "ALL",
     rcCategory: "ALL",
     sfStep: "form", sfAssessmentId: "",
     sfFromDate: "", sfFromTime: "", sfFromPickerOpen: false, sfFromViewMonth: "",
@@ -3436,29 +3441,56 @@ class Component extends DCLogic {
     };
   }
 
-  onCreateRelease() {
+  onMrDateChange(batchId, field, value) {
+    const mrDates = { ...this.state.mrDates, [batchId]: { ...this.state.mrDates[batchId], [field]: value } };
+    this.setState({ mrDates });
+  }
+  onReleaseBatch(batchId) {
+    const draft = this.state.mrDates[batchId] || {};
+    const res = this.mutate((ds) => this.engine.releaseMeritBatch(ds, batchId, draft.lastFeeDate, draft.nextReleaseDate),
+      (r) => r.error ? r.error : `Release ${r.release.id} created with ${r.release.count} candidate(s).`);
+    if (res && res.ok) {
+      const mrDates = { ...this.state.mrDates };
+      delete mrDates[batchId];
+      this.setState({ mrDates });
+    }
+  }
+  onReleaseWaitingList() {
     const f = this.state, pid = this.state.data.activeProgrammeId;
-    const prior = this.state.data.meritListReleases.filter((r) => r.programmeId === pid && r.category === f.mrCategory);
-    const hasDirect = prior.some((r) => r.source === "Direct");
-    const source = hasDirect ? "Waiting List" : "Direct";
-    const method = source === "Waiting List" ? "Number of Candidates" : (f.mrCriteria === "cutoff" ? "Cut Off Marks" : "Number of Candidates");
-    this.mutate((ds) => this.engine.createMeritListRelease(ds, { programmeId: pid, category: f.mrCategory, source, method, count: Number(f.mrCount), cutoff: Number(f.mrCutoff), lastFeeDate: f.mrLastFeeDate, nextReleaseDate: f.mrNextDate }),
-      (r) => `Release ${r.id} created with ${r.count} candidate(s).`);
+    this.mutate((ds) => this.engine.releaseFromWaitingList(ds, { programmeId: pid, category: f.mrWlCategory, count: Number(f.mrWlCount), lastFeeDate: f.mrWlLastFeeDate, nextReleaseDate: f.mrWlNextDate }),
+      (r) => r.error ? r.error : `Release ${r.release.id} created with ${r.release.count} candidate(s).`);
   }
   buildMeritReleases(d) {
     const pid = d.activeProgrammeId, cat = this.state.mrCategory;
-    const hasDirect = d.meritListReleases.some((r) => r.programmeId === pid && r.category === cat && r.source === "Direct");
+    let approvedBatches = d.meritBatches.filter((b) => b.programmeId === pid && b.status === "approved");
+    if (cat !== "ALL") approvedBatches = approvedBatches.filter((b) => b.category === cat);
+    const releasableRows = approvedBatches.map((b) => {
+      const pendingCount = b.candidateIds.filter((id) => { const c = d.candidates.find((x) => x.id === id); return c && !c.meritListReleaseId; }).length;
+      return { batch: b, pendingCount };
+    }).filter((r) => r.pendingCount > 0);
+
+    const wlCat = this.state.mrWlCategory;
+    const mrWlEnabled = d.meritListReleases.some((r) => r.programmeId === pid && r.category === wlCat && r.source === "Direct");
+
     return {
-      categories: d.categories, mrCategory: cat, onMrCategory: (e) => this.setState({ mrCategory: e.target.value, mrCriteria: "count" }),
-      mrIsDirect: !hasDirect, mrIsWaiting: hasDirect, mrDirectDisabled: hasDirect, mrWaitingDisabled: !hasDirect,
-      onMrSourceDirect: () => {}, onMrSourceWaiting: () => {},
-      mrCritIsCount: this.state.mrCriteria === "count" || hasDirect, mrCritIsCutoff: this.state.mrCriteria === "cutoff" && !hasDirect,
-      onMrCritCount: () => this.setState({ mrCriteria: "count" }), onMrCritCutoff: () => this.setState({ mrCriteria: "cutoff" }),
-      mrCount: this.state.mrCount, onMrCountChange: (e) => this.setState({ mrCount: e.target.value }),
-      mrCutoff: this.state.mrCutoff, onMrCutoffChange: (e) => this.setState({ mrCutoff: e.target.value }),
-      mrLastFeeDate: this.state.mrLastFeeDate, onMrLastFeeDate: (e) => this.setState({ mrLastFeeDate: e.target.value }),
-      mrNextDate: this.state.mrNextDate, onMrNextDate: (e) => this.setState({ mrNextDate: e.target.value }),
-      onCreateRelease: () => this.onCreateRelease(),
+      categories: d.categories, mrCategory: cat, onMrCategory: (e) => this.setState({ mrCategory: e.target.value }),
+      mrReleasableRows: releasableRows.map(({ batch: b, pendingCount }) => ({
+        id: b.id, category: b.category, pendingCount,
+        lastFeeDate: (this.state.mrDates[b.id] || {}).lastFeeDate || "",
+        nextReleaseDate: (this.state.mrDates[b.id] || {}).nextReleaseDate || "",
+        onLastFeeDateChange: (e) => this.onMrDateChange(b.id, "lastFeeDate", e.target.value),
+        onNextReleaseDateChange: (e) => this.onMrDateChange(b.id, "nextReleaseDate", e.target.value),
+        onRelease: () => this.onReleaseBatch(b.id)
+      })),
+      mrNoReleasable: releasableRows.length === 0,
+
+      mrWlCategories: d.categories, mrWlCategory: wlCat, onMrWlCategory: (e) => this.setState({ mrWlCategory: e.target.value }),
+      mrWlEnabled, mrWlDisabled: !mrWlEnabled, mrWlDisabledHint: mrWlEnabled ? "" : "This category's approved merit list hasn't been released yet — release it above first.",
+      mrWlCount: this.state.mrWlCount, onMrWlCountChange: (e) => this.setState({ mrWlCount: e.target.value }),
+      mrWlLastFeeDate: this.state.mrWlLastFeeDate, onMrWlLastFeeDate: (e) => this.setState({ mrWlLastFeeDate: e.target.value }),
+      mrWlNextDate: this.state.mrWlNextDate, onMrWlNextDate: (e) => this.setState({ mrWlNextDate: e.target.value }),
+      onReleaseWaitingList: () => this.onReleaseWaitingList(),
+
       mrRows: d.meritListReleases.filter((r) => r.programmeId === pid).map((r) => ({ id: r.id, category: r.category, source: r.source, method: r.method, count: r.count, lastFeeDate: this.engine.fmtDate(r.lastFeeDate), nextDate: this.engine.fmtDate(r.nextReleaseDate) }))
     };
   }

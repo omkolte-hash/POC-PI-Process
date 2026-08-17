@@ -948,25 +948,50 @@ export function approveMeritBatch(ds, batchId, level, decision, comments) {
   }
 }
 
-export function createMeritListRelease(ds, form) {
+// Releases an entire Director+SIU-approved merit batch in one shot — no partial headcount/cutoff selection.
+// Only candidates from this batch not already covered by an earlier release go out (covers the case of a
+// batch that was partially released under the old per-release-headcount flow).
+export function releaseMeritBatch(ds, batchId, lastFeeDate, nextReleaseDate) {
+  const batch = ds.meritBatches.find((b) => b.id === batchId);
+  if (!batch) return { error: "Merit batch not found." };
+  if (batch.status !== "approved") return { error: "This merit batch hasn't completed Director + SIU approval yet." };
+  if (!lastFeeDate || !nextReleaseDate) return { error: "Enter both the Last Date to Pay Fees and the Next Merit List Release Date." };
+  const candidates = batch.candidateIds.map((id) => ds.candidates.find((c) => c.id === id)).filter((c) => c && !c.meritListReleaseId);
+  if (!candidates.length) return { error: "Every candidate in this batch has already been released." };
+  const priorCount = ds.meritListReleases.filter((r) => r.programmeId === batch.programmeId && r.category === batch.category).length;
+  const date = nowISO().slice(0, 10);
+  const release = {
+    id: `MLR-${batch.programmeId}-${batch.category}-${priorCount + 1}`, releaseNumber: priorCount + 1,
+    programmeId: batch.programmeId, category: batch.category, method: "Approved Merit List", source: "Direct",
+    count: candidates.length, lastFeeDate, nextReleaseDate, createdOn: date, meritBatchId: batch.id
+  };
+  candidates.forEach((c) => { c.meritListReleaseId = release.id; c.timeline.push({ label: `Merit List Released (${release.id})`, date }); });
+  ds.meritListReleases.push(release);
+  return { ok: true, release };
+}
+
+// Promotes the next `count` candidates off a category's Waiting List into a new release, once that
+// category's approved merit list has already gone out at least once (see mrWlEnabled in buildMeritReleases) —
+// waiting-list promotion is meant to backfill seats after the initial release, not stand in for it.
+export function releaseFromWaitingList(ds, form) {
+  if (!Number.isFinite(form.count) || form.count <= 0) return { error: "Enter a valid number of candidates to release." };
+  if (!form.lastFeeDate || !form.nextReleaseDate) return { error: "Enter both the Last Date to Pay Fees and the Next Merit List Release Date." };
+  const picked = ds.candidates.filter((c) => c.programmeId === form.programmeId && c.category === form.category && c.meritCategory === "waiting" && !c.meritListReleaseId)
+    .sort((a, b) => (a.waitingListNumber > b.waitingListNumber ? 1 : -1)).slice(0, form.count);
+  if (!picked.length) return { error: "No Waiting List candidates available for this category." };
   const priorCount = ds.meritListReleases.filter((r) => r.programmeId === form.programmeId && r.category === form.category).length;
+  const date = nowISO().slice(0, 10);
   const release = {
     id: `MLR-${form.programmeId}-${form.category}-${priorCount + 1}`, releaseNumber: priorCount + 1,
-    programmeId: form.programmeId, category: form.category, method: form.method, source: form.source,
-    count: 0, lastFeeDate: form.lastFeeDate, nextReleaseDate: form.nextReleaseDate, createdOn: nowISO().slice(0, 10)
+    programmeId: form.programmeId, category: form.category, method: "Number of Candidates", source: "Waiting List",
+    count: picked.length, lastFeeDate: form.lastFeeDate, nextReleaseDate: form.nextReleaseDate, createdOn: date
   };
-  const date = release.createdOn;
-  let picked = [];
-  if (form.source === "Direct") {
-    picked = ds.candidates.filter((c) => c.programmeId === form.programmeId && c.category === form.category && c.meritCategory === "merit" && c.meritApproval.director?.status === "approved" && c.meritApproval.siu?.status === "approved" && !c.meritListReleaseId).sort((a, b) => a.rank - b.rank);
-  } else {
-    picked = ds.candidates.filter((c) => c.programmeId === form.programmeId && c.category === form.category && c.meritCategory === "waiting" && !c.meritListReleaseId).sort((a, b) => (a.waitingListNumber > b.waitingListNumber ? 1 : -1)).slice(0, form.count);
-    picked.forEach((c) => { c.meritCategory = "merit"; c.meritApproval = { director: { status: "approved", date }, siu: { status: "approved", date } }; });
-  }
-  if (form.method === "Number of Candidates" && form.source === "Direct") picked = picked.slice(0, form.count);
-  else if (form.method === "Cut Off Marks" && form.source === "Direct") picked = picked.filter((c) => c.finalScore.final >= form.cutoff);
-  picked.forEach((c) => { c.meritListReleaseId = release.id; c.timeline.push({ label: `Merit List Released (${release.id})`, date }); });
-  release.count = picked.length;
+  picked.forEach((c) => {
+    c.meritCategory = "merit";
+    c.meritApproval = { director: { status: "approved", date }, siu: { status: "approved", date } };
+    c.meritListReleaseId = release.id;
+    c.timeline.push({ label: `Merit List Released (${release.id})`, date });
+  });
   ds.meritListReleases.push(release);
-  return release;
+  return { ok: true, release };
 }
