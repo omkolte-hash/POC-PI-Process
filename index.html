@@ -900,6 +900,35 @@ a:hover{color:var(--color-accent);text-decoration:underline}
             </div>
           </sc-for>
         </div></sc-if>
+        <sc-if value="{{ pageIsBarcodeLabels }}"><div>
+          <div style="display:flex;gap:var(--space-4);margin-bottom:var(--space-4);flex-wrap:wrap;align-items:flex-end">
+            <div class="field" style="margin:0;max-width:320px"><label>Session</label><select class="input" value="{{ blSessionId }}" onChange="{{ onBlSessionChange }}">
+              <sc-for list="{{ blSessions }}" as="s" hint-placeholder-count="5"><option value="{{ s.id }}">{{ s.label }}</option></sc-for>
+            </select></div>
+            <div class="field" style="margin:0;max-width:280px"><label>Group</label><select class="input" value="{{ blGroupId }}" onChange="{{ onBlGroupChange }}">
+              <sc-for list="{{ blGroups }}" as="g" hint-placeholder-count="4"><option value="{{ g.id }}">{{ g.label }}</option></sc-for>
+            </select></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-2)">
+            <div style="font-size:13px;opacity:0.6">{{ blResultCount }} candidate(s)</div>
+            <div style="display:flex;gap:var(--space-2)">
+              <button type="button" class="btn btn-secondary" onClick="{{ onBlPrintSelected }}">Print</button>
+              <button type="button" class="btn btn-primary" onClick="{{ onBlPrintAll }}">Print All</button>
+            </div>
+          </div>
+          <table class="table"><thead><tr>
+            <th><input type="checkbox" checked="{{ blAllSelected }}" onChange="{{ onBlToggleSelectAll }}" /></th>
+            <th>S.No.</th><th>Applicant ID</th><th>Name</th><th>PI ID</th>
+          </tr></thead><tbody>
+            <sc-for list="{{ blRows }}" as="r" hint-placeholder-count="8">
+              <tr>
+                <td><input type="checkbox" checked="{{ r.checked }}" onChange="{{ r.onToggle }}" /></td>
+                <td>{{ r.sno }}</td><td>{{ r.id }}</td><td>{{ r.name }}</td><td>{{ r.piId }}</td>
+              </tr>
+            </sc-for>
+          </tbody></table>
+          <sc-if value="{{ blNoResults }}"><p style="font-size:13px;opacity:0.6">No candidates allocated to this group yet.</p></sc-if>
+        </div></sc-if>
         <sc-if value="{{ pageIsPiAttendance }}"><div>
           <p style="font-size:12px;opacity:0.6;margin-top:0">Read-only &mdash; panelists mark PI attendance from the Panelist Portal.</p>
           <div style="display:flex;gap:var(--space-3);margin-bottom:var(--space-3);flex-wrap:wrap;align-items:flex-end">
@@ -1202,6 +1231,32 @@ a:hover{color:var(--color-accent);text-decoration:underline}
             </sc-for>
           </tbody></table>
         </div></sc-if>
+        <sc-if value="{{ pageIsProvisionalLetters }}"><div>
+          <p style="font-size:12px;opacity:0.6;margin-top:0">Candidates whose Merit List has been released for this programme &mdash; select some or print all to generate their Provisional Admission Letter (with Annexure I fee details and a barcode).</p>
+          <sc-if value="{{ plNoFeeConfig }}"><div class="card elev-sm" style="padding:var(--space-4);margin-bottom:var(--space-4);border-color:var(--color-accent-700)">
+            <div style="font-size:13px;margin-bottom:var(--space-2)">This programme has no Fee Structure configured yet &mdash; letters need it for the Annexure I fee table.</div>
+            <button type="button" class="btn btn-primary" onClick="{{ onPlGoToFees }}">Set Up Fee Structure</button>
+          </div></sc-if>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-2)">
+            <div style="font-size:13px;opacity:0.6">{{ plResultCount }} candidate(s)</div>
+            <div style="display:flex;gap:var(--space-2)">
+              <button type="button" class="btn btn-secondary" onClick="{{ onPlPrintSelected }}" disabled="{{ plPrintDisabled }}">Print</button>
+              <button type="button" class="btn btn-primary" onClick="{{ onPlPrintAll }}" disabled="{{ plPrintDisabled }}">Print All</button>
+            </div>
+          </div>
+          <table class="table"><thead><tr>
+            <th><input type="checkbox" checked="{{ plAllSelected }}" onChange="{{ onPlToggleSelectAll }}" /></th>
+            <th>S.No.</th><th>Applicant ID</th><th>Name</th><th>Category</th><th>PI ID</th><th>Fee Due Date</th>
+          </tr></thead><tbody>
+            <sc-for list="{{ plRows }}" as="r" hint-placeholder-count="8">
+              <tr>
+                <td><input type="checkbox" checked="{{ r.checked }}" onChange="{{ r.onToggle }}" /></td>
+                <td>{{ r.sno }}</td><td>{{ r.id }}</td><td>{{ r.name }}</td><td>{{ r.category }}</td><td>{{ r.piId }}</td><td>{{ r.feeDueDate }}</td>
+              </tr>
+            </sc-for>
+          </tbody></table>
+          <sc-if value="{{ plNoResults }}"><p style="font-size:13px;opacity:0.6">No candidates with a released merit list yet for this programme.</p></sc-if>
+        </div></sc-if>
         <sc-if value="{{ pageIsReportsDashboard }}"><div>
           <div style="display:flex;justify-content:flex-end;gap:var(--space-2);margin-bottom:var(--space-4)">
             <button type="button" class="btn btn-secondary" onClick="{{ onExportCsv }}">Save As CSV</button>
@@ -1260,6 +1315,21 @@ a:hover{color:var(--color-accent);text-decoration:underline}
             </sc-for>
           </tbody></table>
         </div></sc-if>
+        <sc-if value="{{ pageIsPendingApprovals }}"><div>
+          <p style="font-size:12px;opacity:0.6;margin-top:0">Every Shortlist, Merit List, and Assessment Parameters approval still waiting on a Director or SIU decision, across all programmes.</p>
+          <div style="font-size:13px;opacity:0.6;margin-bottom:var(--space-3)">{{ paResultCount }} pending</div>
+          <table class="table"><thead><tr><th>Request</th><th>Type</th><th>Regarding</th><th>Level</th><th>Requested</th><th>Mail Status</th><th></th></tr></thead><tbody>
+            <sc-for list="{{ paRows }}" as="r" hint-placeholder-count="4">
+              <tr><td>{{ r.id }}</td><td>{{ r.type }}</td><td>{{ r.summary }}</td><td>{{ r.level }}</td><td>{{ r.createdOn }}</td><td>{{ r.mailStatus }}</td>
+                <td style="white-space:nowrap">
+                  <sc-if value="{{ r.showLink }}"><button type="button" class="btn btn-ghost" onClick="{{ r.onOpenLink }}">Open Approval Link&hellip;</button></sc-if>
+                  <button type="button" class="btn btn-ghost" onClick="{{ r.onView }}">View</button>
+                </td>
+              </tr>
+            </sc-for>
+          </tbody></table>
+          <sc-if value="{{ paNoResults }}"><p style="font-size:13px;opacity:0.6">Nothing pending — every sent approval has been decided.</p></sc-if>
+        </div></sc-if>
         <sc-if value="{{ pageIsSuperAdminDashboard }}"><div>
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-3);margin-bottom:var(--space-4)">
             <sc-for list="{{ spKpis }}" as="kpi" hint-placeholder-count="6">
@@ -1316,9 +1386,43 @@ a:hover{color:var(--color-accent);text-decoration:underline}
           <table class="table"><thead><tr><th>Programme</th><th>Code</th><th>Academic Years</th><th>Status</th><th></th></tr></thead><tbody>
             <sc-for list="{{ programmeRows }}" as="p" hint-placeholder-count="3">
               <tr><td>{{ p.name }}</td><td>{{ p.code }}</td><td>{{ p.academicYears }}</td><td><span class="{{ p.tagCls }}">{{ p.statusLabel }}</span></td>
-                <td><button type="button" class="btn btn-ghost" onClick="{{ p.onSelect }}">Open Academic Years</button></td></tr>
+                <td style="white-space:nowrap"><button type="button" class="btn btn-ghost" onClick="{{ p.onSelect }}">Open Academic Years</button><button type="button" class="btn btn-ghost" onClick="{{ p.onFees }}">Fee Structure</button></td></tr>
             </sc-for>
           </tbody></table>
+        </div></sc-if>
+        <sc-if value="{{ pageIsProgrammeFees }}"><div style="max-width:720px">
+          <button type="button" class="btn btn-ghost" style="margin-bottom:var(--space-4)" onClick="{{ onPgFeeBack }}"><i data-lucide="arrow-left" style="width:14px;height:14px"></i>Back to Programmes</button>
+          <sc-if value="{{ pgFeeNotFound }}"><p>Programme not found.</p></sc-if>
+          <sc-if value="{{ pgFeeFound }}"><div>
+            <div class="card-title" style="margin-bottom:var(--space-3)">Fee Structure &mdash; {{ pgFeeProgrammeName }}</div>
+            <p style="font-size:12px;opacity:0.6;margin-top:0">Feeds the Annexure I fee table on Provisional Admission Letters (Merit &rsaquo; Provisional Letters). All amounts in Rs.</p>
+            <div class="card elev-sm" style="padding:var(--space-4);margin-bottom:var(--space-4)">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4)">
+                <div class="field" style="margin:0"><label>Batch *</label><input class="input" placeholder="e.g. 2026-2030" value="{{ pgFeeBatchLabel }}" onChange="{{ onPgFeeBatchLabel }}" /></div>
+                <div class="field" style="margin:0"><label>Programme Commencement Date *</label><input class="input" type="date" value="{{ pgFeeCommencementDate }}" onChange="{{ onPgFeeCommencementDate }}" /></div>
+              </div>
+            </div>
+            <div class="card elev-sm" style="padding:var(--space-4);margin-bottom:var(--space-4)">
+              <div class="card-title" style="font-size:15px;margin-bottom:var(--space-3)">Academic Fees</div>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-4)">
+                <div class="field" style="margin:0"><label>1st Installment</label><input class="input" type="number" min="0" value="{{ pgFeeInstallment1 }}" onChange="{{ onPgFeeInstallment1 }}" /></div>
+                <div class="field" style="margin:0"><label>2nd Installment</label><input class="input" type="number" min="0" value="{{ pgFeeInstallment2 }}" onChange="{{ onPgFeeInstallment2 }}" /></div>
+                <div class="field" style="margin:0"><label>2nd Installment Due Date *</label><input class="input" type="date" value="{{ pgFeeInstallment2Due }}" onChange="{{ onPgFeeInstallment2Due }}" /></div>
+                <div class="field" style="margin:0"><label>Institute Deposit (Refundable)</label><input class="input" type="number" min="0" value="{{ pgFeeInstituteDeposit }}" onChange="{{ onPgFeeInstituteDeposit }}" /></div>
+              </div>
+              <p style="font-size:12px;opacity:0.55;margin-bottom:0">1st Installment is due at the time of Admission (the candidate's own Merit Release "Last Date to Pay Fees").</p>
+            </div>
+            <div class="card elev-sm" style="padding:var(--space-4);margin-bottom:var(--space-4)">
+              <div class="card-title" style="font-size:15px;margin-bottom:var(--space-3)">Hostel &amp; Mess (Optional)</div>
+              <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-4)">
+                <div class="field" style="margin:0"><label>Hostel Deposit (Refundable)</label><input class="input" type="number" min="0" value="{{ pgFeeHostelDeposit }}" onChange="{{ onPgFeeHostelDeposit }}" /></div>
+                <div class="field" style="margin:0"><label>Three Sharing (Per Annum)</label><input class="input" type="number" min="0" value="{{ pgFeeHostelThree }}" onChange="{{ onPgFeeHostelThree }}" /></div>
+                <div class="field" style="margin:0"><label>Four Sharing (Per Annum)</label><input class="input" type="number" min="0" value="{{ pgFeeHostelFour }}" onChange="{{ onPgFeeHostelFour }}" /></div>
+                <div class="field" style="margin:0"><label>Mess Fees (Per Annum)</label><input class="input" type="number" min="0" value="{{ pgFeeMess }}" onChange="{{ onPgFeeMess }}" /></div>
+              </div>
+            </div>
+            <button type="button" class="btn btn-primary" onClick="{{ onSavePgFee }}">Save Fee Structure</button>
+          </div></sc-if>
         </div></sc-if>
       <sc-if value="{{ notLoaded }}"><div style="opacity:0.6;padding:var(--space-6)">Loading admission cycle data&hellip;</div></sc-if>
     </main>
@@ -1468,6 +1572,9 @@ class Component extends DCLogic {
     cvSearch: "", cvCategoryFilter: "ALL", cvInstituteStatusFilter: "ALL",
     cvModalCandidateId: null, cvModalDocType: null, cvModalChecked: false, cvModalStatus: "",
     maCategory: "ALL", mrCategory: "ALL", mrDates: {}, mrWlCategory: "OPEN", mrWlCount: "", mrWlLastFeeDate: "", mrWlNextDate: "", wlCategory: "ALL",
+    blSessionId: "", blGroupId: "", blSelectedIds: [],
+    pgFeeProgrammeId: null, pgFeeDraft: null,
+    plSelectedIds: [],
     rcCategory: "ALL",
     sfStep: "form", sfAssessmentId: "",
     sfFromDate: "", sfFromTime: "", sfFromPickerOpen: false, sfFromViewMonth: "",
@@ -1924,12 +2031,12 @@ class Component extends DCLogic {
     return [
       { title: "Programmes", items: [["programmes", "Programmes"], ["academic-year", "Academic Years"], ["assessment-config", "Assessment / PI Configuration"], ["assessment-parameter", "Assessment Parameter"]] },
       { title: "Candidates", items: [["import-candidates", "Import Candidates"], ["candidate-list", "Candidates"], ["shortlist", "Shortlisting"], ["shortlist-approvals", "Approvals"]] },
-      { title: "PI Management", items: [["sessions", "Sessions"], ["sessions", "Groups"], ["candidate-allocation", "Candidate Allocation"], ["zoom-rooms", "Zoom Rooms"], ["panelists", "Panelists"], ["panelist-allocation", "Panelist Allocation"]] },
+      { title: "PI Management", items: [["sessions", "Sessions"], ["sessions", "Groups"], ["candidate-allocation", "Candidate Allocation"], ["zoom-rooms", "Zoom Rooms"], ["panelists", "Panelists"], ["panelist-allocation", "Panelist Allocation"], ["barcode-labels", "Barcode Labels"]] },
       { title: "Interview Day", items: [["pi-attendance", "PI Attendance"], ["pi-scoring", "PI Scoring"]] },
       { title: "Verification", items: [["verification", "Category Verification"]] },
-      { title: "Merit", items: [["final-scores", "Final Scores"], ["merit-processing", "Merit Processing"], ["merit-approval", "Merit Approval"], ["merit-releases", "Merit Releases"], ["waiting-list", "Waiting List"]] },
+      { title: "Merit", items: [["final-scores", "Final Scores"], ["merit-processing", "Merit Processing"], ["merit-approval", "Merit Approval"], ["merit-releases", "Merit Releases"], ["waiting-list", "Waiting List"], ["provisional-letters", "Provisional Letters"]] },
       { title: "Reports", items: [["reports-dashboard", "Dashboard"], ["reports-candidates", "Candidate Reports"], ["reports-sessions", "Session Reports"]] },
-      { title: "Approvals", items: [["sent-mail", "Sent Mail"]] }
+      { title: "Approvals", items: [["sent-mail", "Sent Mail"], ["pending-approvals", "Pending Approvals"]] }
     ];
   }
   pageTitles() {
@@ -1937,7 +2044,7 @@ class Component extends DCLogic {
       dashboard: ["Overview", "Dashboard"], workflow: ["Overview", "Admission Workflow"],
       "super-admin-dashboard": ["Overview", "Dashboard"], institutes: ["Institutes", "All Institutes"], "create-institute": ["Institutes", "Create Institute"],
       "institute-users": ["Institutes", "Institute Users"], "system-settings": ["Platform", "System Settings"], "audit-logs": ["Platform", "Audit Logs"],
-      programmes: ["Programmes", "Programmes"],
+      programmes: ["Programmes", "Programmes"], "programme-fees": ["Programmes", "Fee Structure"],
       "academic-year": ["Programmes", "Academic Years"], "assessment-config": ["Programmes", "Assessment / PI Configuration"],
       "assessment-parameter": ["Programmes", "Assessment Parameter"],
       "import-candidates": ["Candidates", "Import Candidates"], "candidate-list": ["Candidates", "Candidates"], "candidate-profile": ["Candidates", "Candidate Profile"],
@@ -1945,12 +2052,12 @@ class Component extends DCLogic {
       shortlist: ["Candidates", "Shortlisting"], "shortlist-approvals": ["Candidates", "Approvals"],
       sessions: ["PI Management", "PI Session Management"], "candidate-allocation": ["PI Management", "Candidate Allocation"],
       "zoom-rooms": ["PI Management", "Zoom Room Allocation"], panelists: ["PI Management", "Panelist Management"], "panelist-allocation": ["PI Management", "Panelist Allocation"],
-      "panelist-detail": ["PI Management", "Panelist Detail"],
+      "panelist-detail": ["PI Management", "Panelist Detail"], "barcode-labels": ["PI Management", "Barcode Labels"],
       "pi-attendance": ["Interview Day", "PI Attendance"], "pi-scoring": ["Interview Day", "PI Scoring"],
       verification: ["Verification", "Merit Readiness"],
-      "final-scores": ["Merit", "Candidate Final Score"], "merit-processing": ["Merit", "Merit Processing"], "merit-approval": ["Merit", "Merit Approval"], "merit-batch-detail": ["Merit", "Merit Batch Detail"], "merit-releases": ["Merit", "Merit List Releases"], "waiting-list": ["Merit", "Waiting List"],
+      "final-scores": ["Merit", "Candidate Final Score"], "merit-processing": ["Merit", "Merit Processing"], "merit-approval": ["Merit", "Merit Approval"], "merit-batch-detail": ["Merit", "Merit Batch Detail"], "merit-releases": ["Merit", "Merit List Releases"], "waiting-list": ["Merit", "Waiting List"], "provisional-letters": ["Merit", "Provisional Letters"],
       "reports-dashboard": ["Reports", "Reports Dashboard"], "reports-candidates": ["Reports", "Candidate Reports"], "reports-sessions": ["Reports", "Session Reports"],
-      "mail-compose": ["Approvals", "Send for Approval"], "sent-mail": ["Approvals", "Sent Mail"]
+      "mail-compose": ["Approvals", "Send for Approval"], "sent-mail": ["Approvals", "Sent Mail"], "pending-approvals": ["Approvals", "Pending Approvals"]
     };
   }
 
@@ -2051,13 +2158,16 @@ class Component extends DCLogic {
       pageIsShortlistDetail: page === "shortlist-detail",
       pageIsSessions: page === "sessions", pageIsCandidateAllocation: page === "candidate-allocation", pageIsZoomRooms: page === "zoom-rooms",
       pageIsPanelists: page === "panelists", pageIsPanelistDetail: page === "panelist-detail", pageIsPanelistAllocation: page === "panelist-allocation",
+      pageIsBarcodeLabels: page === "barcode-labels",
       pageIsPiAttendance: page === "pi-attendance", pageIsPiScoring: page === "pi-scoring",
       pageIsVerification: page === "verification", pageIsFinalScores: page === "final-scores", pageIsMeritProcessing: page === "merit-processing",
       pageIsMeritApproval: page === "merit-approval", pageIsMeritBatchDetail: page === "merit-batch-detail", pageIsMeritReleases: page === "merit-releases", pageIsWaitingList: page === "waiting-list",
+      pageIsProvisionalLetters: page === "provisional-letters",
       pageIsSuperAdminDashboard: page === "super-admin-dashboard", pageIsInstitutes: page === "institutes", pageIsInstituteUsers: page === "institute-users",
       pageIsSystemSettings: page === "system-settings", pageIsAuditLogs: page === "audit-logs", pageIsProgrammes: page === "programmes",
+      pageIsProgrammeFees: page === "programme-fees",
       pageIsReportsDashboard: page === "reports-dashboard", pageIsReportsCandidates: page === "reports-candidates", pageIsReportsSessions: page === "reports-sessions",
-      pageIsMailCompose: page === "mail-compose", pageIsSentMail: page === "sent-mail",
+      pageIsMailCompose: page === "mail-compose", pageIsSentMail: page === "sent-mail", pageIsPendingApprovals: page === "pending-approvals",
       onExportCsv: () => this.showToast("Prototype note: export would download a CSV in the real system."), onExportPdf: () => this.showToast("Prototype note: export would download a PDF in the real system.")
     });
     if (page === "dashboard") Object.assign(base, this.buildDashboard(d));
@@ -2077,6 +2187,7 @@ class Component extends DCLogic {
     if (page === "panelists") Object.assign(base, this.buildPanelists(d));
     if (page === "panelist-detail") Object.assign(base, this.buildPanelistDetail(d));
     if (page === "panelist-allocation") Object.assign(base, this.buildPanelistAllocation(d));
+    if (page === "barcode-labels") Object.assign(base, this.buildBarcodeLabels(d));
     if (page === "pi-attendance") Object.assign(base, this.buildAttendance(d));
     if (page === "pi-scoring") Object.assign(base, this.buildPiScoring(d));
     if (page === "verification") Object.assign(base, this.buildVerification(d));
@@ -2086,9 +2197,11 @@ class Component extends DCLogic {
     if (page === "merit-batch-detail") Object.assign(base, this.buildMeritBatchDetail(d));
     if (page === "merit-releases") Object.assign(base, this.buildMeritReleases(d));
     if (page === "waiting-list") Object.assign(base, this.buildWaitingList(d));
+    if (page === "provisional-letters") Object.assign(base, this.buildProvisionalLetters(d));
     if (page === "reports-dashboard") Object.assign(base, { categoryBreakdown: this.buildDashboard(d).categoryBreakdown });
     if (page === "mail-compose") Object.assign(base, this.buildMailCompose(d));
     if (page === "sent-mail") Object.assign(base, this.buildSentMail(d));
+    if (page === "pending-approvals") Object.assign(base, this.buildPendingApprovals(d));
     if (page === "reports-candidates") Object.assign(base, this.buildReportsCandidates(d));
     if (page === "reports-sessions") Object.assign(base, this.buildReportsSessions(d));
     if (page === "super-admin-dashboard") Object.assign(base, this.buildSuperAdminDashboard(d));
@@ -2096,6 +2209,7 @@ class Component extends DCLogic {
     if (page === "institute-users") Object.assign(base, this.buildInstituteUsers(d));
     if (page === "audit-logs") Object.assign(base, this.buildAuditLogs(d));
     if (page === "programmes") Object.assign(base, this.buildProgrammes(d));
+    if (page === "programme-fees") Object.assign(base, this.buildProgrammeFees(d));
     return base;
   }
 
@@ -3019,6 +3133,96 @@ class Component extends DCLogic {
     };
   }
 
+  onBlSessionChange(e) { this.setState({ blSessionId: e.target.value, blGroupId: "", blSelectedIds: [] }); }
+  onBlGroupChange(e) { this.setState({ blGroupId: e.target.value, blSelectedIds: [] }); }
+  onBlToggleSelect(id) {
+    const ids = this.state.blSelectedIds;
+    this.setState({ blSelectedIds: ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id] });
+  }
+  onBlToggleSelectAll(allIds) {
+    const ids = this.state.blSelectedIds;
+    const allSelected = allIds.length > 0 && allIds.every((id) => ids.includes(id));
+    this.setState({ blSelectedIds: allSelected ? [] : allIds });
+  }
+  onBlPrintSelected(candidates) {
+    const chosen = candidates.filter((c) => this.state.blSelectedIds.includes(c.id));
+    if (!chosen.length) { this.showToast("Select at least one candidate."); return; }
+    this.printBarcodeLabels(chosen);
+  }
+  onBlPrintAll(candidates) {
+    if (!candidates.length) { this.showToast("No candidates allocated to this group yet."); return; }
+    this.printBarcodeLabels(candidates);
+  }
+  // Opens a dedicated print tab, one label per candidate (Admissions header, PI ID, name, then a barcode
+  // encoding the Applicant ID with the Applicant ID printed underneath — scanning the barcode reads the
+  // Applicant ID). Built via createElement/textContent rather than string-concatenated HTML so a candidate
+  // name or ID containing markup can never inject into the print tab.
+  printBarcodeLabels(candidates) {
+    const w = window.open("", "_blank");
+    if (!w) { this.showToast("Pop-up blocked — allow pop-ups for this site to print labels."); return; }
+    // The embedded closing html/body tags below are escaped so their raw source text never literally
+    // spells one out — some dev-server live-reload injectors (e.g. VS Code Live Server) do a naive string
+    // search for the file's first such closing tag to splice their reload script into, and would otherwise
+    // match this JS string's fake one instead of the real document's closing tag near the end of the file.
+    w.document.write(`<!DOCTYPE html><html><head><title>Barcode Labels</title><style>
+      body { font-family: Arial, sans-serif; margin: 24px; }
+      .label { border: 1px solid #333; width: 340px; padding: 16px; text-align: center; margin-bottom: 16px; page-break-inside: avoid; }
+      .label-head { font-weight: 700; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; }
+      .label-piid { font-weight: 700; font-size: 22px; margin-bottom: 4px; }
+      .label-name { font-weight: 700; font-size: 14px; margin-bottom: 10px; }
+      .barcode { display: block; margin: 0 auto; }
+      .label-code { font-size: 12px; margin-top: 4px; }
+      .noprint { margin-bottom: 16px; }
+      @media print { .noprint { display: none; } }
+    </style><script src="https://unpkg.com/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"><\/script></head>
+    <body><div class="noprint"><button id="printBtn" type="button">Print</button></div><div id="labels"></div><\/body><\/html>`);
+    w.document.close();
+    const printBtn = w.document.getElementById("printBtn");
+    if (printBtn) printBtn.addEventListener("click", () => w.print());
+    const build = () => {
+      const root = w.document.getElementById("labels");
+      candidates.forEach((c) => {
+        const label = w.document.createElement("div"); label.className = "label";
+        const head = w.document.createElement("div"); head.className = "label-head"; head.textContent = "Admissions";
+        const piid = w.document.createElement("div"); piid.className = "label-piid"; piid.textContent = c.piId || "—";
+        const name = w.document.createElement("div"); name.className = "label-name"; name.textContent = c.name;
+        const svg = w.document.createElementNS("http://www.w3.org/2000/svg", "svg"); svg.setAttribute("class", "barcode");
+        const code = w.document.createElement("div"); code.className = "label-code"; code.textContent = c.id;
+        label.append(head, piid, name, svg, code);
+        root.appendChild(label);
+        w.JsBarcode(svg, c.id, { format: "CODE128", displayValue: false, height: 50, margin: 0 });
+      });
+    };
+    if (w.JsBarcode) build();
+    else w.addEventListener("load", build);
+  }
+  buildBarcodeLabels(d) {
+    const pid = d.activeProgrammeId;
+    const sessions = d.sessions.filter((s) => s.programmeId === pid);
+    const sid = this.state.blSessionId || (sessions[0] && sessions[0].id) || "";
+    const session = sessions.find((s) => s.id === sid);
+    const groups = session ? session.groups : [];
+    const gid = this.state.blGroupId || (groups[0] && groups[0].id) || "";
+    const group = groups.find((g) => g.id === gid);
+    const candidates = group ? group.candidateIds.map((id) => d.candidates.find((c) => c.id === id)).filter(Boolean) : [];
+    const candidateIds = candidates.map((c) => c.id);
+    return {
+      blSessions: sessions.map((s, i) => ({ id: s.id, label: `Session ${String(i + 1).padStart(2, "0")} — ${this.engine.fmtDate(s.date)}` })),
+      blSessionId: sid, onBlSessionChange: (e) => this.onBlSessionChange(e),
+      blGroups: groups.map((g) => ({ id: g.id, label: `${g.name} (${g.candidateIds.length} candidate(s))` })),
+      blGroupId: gid, onBlGroupChange: (e) => this.onBlGroupChange(e),
+      blAllSelected: candidateIds.length > 0 && candidateIds.every((id) => this.state.blSelectedIds.includes(id)),
+      onBlToggleSelectAll: () => this.onBlToggleSelectAll(candidateIds),
+      blResultCount: candidates.length, blNoResults: candidates.length === 0,
+      blRows: candidates.map((c, i) => ({
+        sno: i + 1, id: c.id, name: c.name, piId: c.piId || "—",
+        checked: this.state.blSelectedIds.includes(c.id), onToggle: () => this.onBlToggleSelect(c.id)
+      })),
+      onBlPrintSelected: () => this.onBlPrintSelected(candidates),
+      onBlPrintAll: () => this.onBlPrintAll(candidates)
+    };
+  }
+
   // Read-only: panelists mark PI attendance from the Panelist Portal (see buildPanelistPortal / onPnAttendance).
   // Same session-wise/group-wise grouping + Session/Group filter + search pattern as PI Scoring.
   onAtSessionFilterChange(e) { this.setState({ atSessionFilter: e.target.value, atGroupFilter: "ALL" }); }
@@ -3441,6 +3645,32 @@ class Component extends DCLogic {
     };
   }
 
+  // Not scoped to the active programme — same choice Sent Mail makes, since an admin wants to see
+  // every outstanding approval across programmes from one place, not just the one currently selected.
+  buildPendingApprovals(d) {
+    const subjectMeta = {
+      shortlist: { label: "Shortlist", page: "shortlist-approvals" },
+      merit: { label: "Merit List", page: "merit-approval" },
+      "assessment-params": { label: "Assessment Parameters", page: "assessment-parameter" }
+    };
+    const rows = d.approvalRequests.filter((r) => r.status === "pending-director" || r.status === "pending-siu");
+    return {
+      paResultCount: rows.length, paNoResults: rows.length === 0,
+      paRows: rows.slice().reverse().map((r) => {
+        const meta = subjectMeta[r.subjectType] || { label: r.subjectType, page: "dashboard" };
+        const mailId = r.level === "director" ? r.directorMailId : r.siuMailId;
+        const mail = mailId ? d.sentMails.find((m) => m.id === mailId) : null;
+        return {
+          id: r.id, type: meta.label, summary: r.summary, level: r.level === "director" ? "Director" : "SIU",
+          createdOn: this.engine.fmtDate(r.createdOn),
+          mailStatus: mail ? (mail.status === "pending" ? `Awaiting response — ${mail.to}` : mail.status) : "Not yet sent",
+          showLink: !!(mail && mail.status === "pending"), onOpenLink: mail ? () => this.onOpenApprovalLink(mail.token) : () => {},
+          onView: () => this.goTo(meta.page)
+        };
+      })
+    };
+  }
+
   onMrDateChange(batchId, field, value) {
     // A native <input type="date"> reports value:"" while the user is still mid-typing (segments not
     // all filled yet) — writing that back into the controlled value resets the field and wipes their
@@ -3510,6 +3740,157 @@ class Component extends DCLogic {
     };
   }
 
+  onPlToggleSelect(id) {
+    const ids = this.state.plSelectedIds;
+    this.setState({ plSelectedIds: ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id] });
+  }
+  onPlToggleSelectAll(allIds) {
+    const ids = this.state.plSelectedIds;
+    const allSelected = allIds.length > 0 && allIds.every((id) => ids.includes(id));
+    this.setState({ plSelectedIds: allSelected ? [] : allIds });
+  }
+  onPlPrintSelected(candidates) {
+    const chosen = candidates.filter((c) => this.state.plSelectedIds.includes(c.id));
+    if (!chosen.length) { this.showToast("Select at least one candidate."); return; }
+    this.printProvisionalLetters(chosen);
+  }
+  onPlPrintAll(candidates) {
+    if (!candidates.length) { this.showToast("No released merit candidates for this programme yet."); return; }
+    this.printProvisionalLetters(candidates);
+  }
+  // Two pages per candidate: the letter itself, then an Annexure I fee table sourced from the
+  // programme's fee structure (Programmes › Fee Structure) and the candidate's own merit release
+  // (for the fee due date). Built via DOM methods, not string HTML, for the same two reasons as the
+  // barcode-label print tab: candidate names/IDs are unsanitized CSV-import data, and literal closing
+  // html/body tags in a raw HTML string can confuse a dev-server's live-reload script injection.
+  printProvisionalLetters(candidates) {
+    const d = this.state.data;
+    const prog = d.programmes.find((p) => p.id === d.activeProgrammeId);
+    const inst = prog && d.institutes.find((i) => i.id === prog.instituteId);
+    const fc = (prog && prog.feeConfig) || {};
+    const w = window.open("", "_blank");
+    if (!w) { this.showToast("Pop-up blocked — allow pop-ups for this site to print letters."); return; }
+    w.document.write(`<!DOCTYPE html><html><head><title>Provisional Admission Letters</title><style>
+      body { font-family: Arial, sans-serif; margin: 0; color: #1a1a1a; }
+      .letter { padding: 32px 40px; }
+      .letter + .letter { page-break-before: always; }
+      .lhead { text-align: center; font-weight: 700; font-size: 15px; letter-spacing: 0.04em; text-decoration: underline; margin-bottom: 20px; }
+      .ldate { text-align: right; font-weight: 700; margin-bottom: 12px; }
+      .lmeta div { margin-bottom: 2px; font-size: 13px; }
+      .lmeta b { display: inline-block; min-width: 130px; }
+      .lbarcode { float: right; }
+      .lbody p { line-height: 1.5; text-align: justify; margin: 12px 0; font-size: 13px; }
+      .lsign div { font-size: 13px; }
+      .annex { page-break-before: always; margin-top: 8px; }
+      table.fee { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 13px; }
+      table.fee th, table.fee td { border: 1px solid #999; padding: 6px 10px; text-align: left; }
+      table.fee th { background: #f2f2f2; }
+      .noprint { margin: 16px 40px; }
+      @media print { .noprint { display: none; } }
+    </style><script src="https://unpkg.com/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"><\/script></head>
+    <body><div class="noprint"><button id="printBtn" type="button">Print</button></div><div id="letters"></div><\/body><\/html>`);
+    w.document.close();
+    const printBtn = w.document.getElementById("printBtn");
+    if (printBtn) printBtn.addEventListener("click", () => w.print());
+
+    const fmtDate = (s) => this.engine.fmtDate(s);
+    const fmtMoney = (n) => "Rs " + Number(n || 0).toLocaleString("en-IN");
+    const mk = (tag, opts, kids) => {
+      const ns = tag === "svg" ? "http://www.w3.org/2000/svg" : null;
+      const e = ns ? w.document.createElementNS(ns, tag) : w.document.createElement(tag);
+      Object.entries(opts || {}).forEach(([k, v]) => {
+        // SVGElement.className is a read-only SVGAnimatedString, not a plain string setter like
+        // HTMLElement's — setAttribute works uniformly for both, so use it for every attribute.
+        if (k === "class") e.setAttribute("class", v);
+        else if (k === "text") e.textContent = v;
+        else e.setAttribute(k, v);
+      });
+      (kids || []).forEach((k) => e.appendChild(k));
+      return e;
+    };
+    const feeRow = (cells, header) => mk("tr", {}, cells.map((text) => mk(header ? "th" : "td", { text })));
+
+    const build = () => {
+      const root = w.document.getElementById("letters");
+      candidates.forEach((c) => {
+        const rel = d.meritListReleases.find((r) => r.id === c.meritListReleaseId);
+        const svg = mk("svg", { class: "lbarcode" });
+        const metaRows = [
+          ["Registration ID", c.id], ["Category", c.category], ["PI ID", c.piId || "—"],
+          ["Constituent", inst ? inst.name : "—"], ["Programme", prog ? prog.name : "—"]
+        ].map(([label, value]) => mk("div", {}, [mk("b", { text: label + ":" }), w.document.createTextNode(" " + value)]));
+
+        const page1 = mk("div", { class: "letter" }, [
+          mk("div", { class: "lhead", text: "PROVISIONAL ADMISSION LETTER" }),
+          mk("div", { class: "ldate", text: "Date: " + fmtDate(rel ? rel.createdOn : "") }),
+          svg,
+          mk("div", { class: "lmeta" }, metaRows),
+          mk("p", { text: `Dear ${c.name},`, style: "margin-top:28px;clear:both" }),
+          mk("p", { text: `Congratulations! We are pleased to inform you that you have been selected for admission to the ${prog ? prog.name : ""} programme for the batch ${fc.batchLabel || "—"} at ${inst ? inst.name : ""}.` }),
+          mk("p", { text: `This admission is provisional and will be confirmed on payment of fees (as per Annexure I) on or before ${rel ? fmtDate(rel.lastFeeDate) : "—"}, subject to fulfilment of the eligibility conditions communicated by the institute.` }),
+          mk("p", { text: `Your programme commences on ${fc.commencementDate ? fmtDate(fc.commencementDate) : "—"}. Please bring all relevant self-attested / original documents for submission on the day of commencement.` }),
+          mk("p", { text: "We look forward to having you amidst us. Welcome aboard!" }),
+          mk("div", { class: "lsign", style: "margin-top:36px" }, [
+            mk("div", { text: "With Best Wishes," }),
+            mk("div", { text: `Director, ${inst ? inst.name : ""}`, style: "margin-top:32px;font-weight:700" }),
+            mk("div", { text: "*This is a computer generated letter. No signature is required.", style: "font-size:11px;opacity:0.7;margin-top:8px" })
+          ])
+        ]);
+
+        const installment1Total = fc.academicFeesInstallment1 + fc.instituteDeposit;
+        const feeTable = mk("table", { class: "fee" }, [
+          feeRow(["Particulars", "1st Installment", "2nd Installment"], true),
+          feeRow(["Academic Fees", fmtMoney(fc.academicFeesInstallment1), fmtMoney(fc.academicFeesInstallment2)]),
+          feeRow(["Institute Deposit (Refundable)", fmtMoney(fc.instituteDeposit), "—"]),
+          feeRow(["Total Fees", fmtMoney(installment1Total), fmtMoney(fc.academicFeesInstallment2)]),
+          feeRow(["Last Date / Due Date for Payment", "At the time of Admission", fc.installment2DueDate ? fmtDate(fc.installment2DueDate) : "—"])
+        ]);
+        const hostelTable = mk("table", { class: "fee" }, [
+          feeRow(["Hostel & Mess (Optional)", "Amount"], true),
+          feeRow(["Hostel Deposit (Refundable)", fmtMoney(fc.hostelDeposit)]),
+          feeRow(["Three Sharing (Per Annum)", fmtMoney(fc.hostelThreeSharing)]),
+          feeRow(["Four Sharing (Per Annum)", fmtMoney(fc.hostelFourSharing)]),
+          feeRow(["Mess Fees (Per Annum)", fmtMoney(fc.messFees)])
+        ]);
+        const annex = mk("div", { class: "letter annex" }, [
+          mk("div", { class: "lhead", text: `ANNEXURE I — FEE DETAILS (BATCH ${fc.batchLabel || ""})` }),
+          feeTable,
+          mk("p", { text: "Note: Fees shown are for Year 1 only and may be revised in subsequent years per the institute's policy. Hostel accommodation is subject to availability.", style: "font-size:12px;opacity:0.8" }),
+          hostelTable,
+          mk("p", { text: "For completion of admission formalities and payment of fees, please refer to your institute's admissions portal. Accepted payment modes and further instructions will be communicated by the institute." })
+        ]);
+
+        root.append(page1, annex);
+        w.JsBarcode(svg, c.id, { format: "CODE128", displayValue: false, height: 40, width: 1.4, margin: 0 });
+      });
+    };
+    if (w.JsBarcode) build();
+    else w.addEventListener("load", build);
+  }
+  buildProvisionalLetters(d) {
+    const pid = d.activeProgrammeId;
+    const prog = d.programmes.find((p) => p.id === pid);
+    const hasFeeConfig = !!(prog && prog.feeConfig);
+    const candidates = d.candidates.filter((c) => c.programmeId === pid && c.meritListReleaseId);
+    const candidateIds = candidates.map((c) => c.id);
+    return {
+      plNoFeeConfig: !hasFeeConfig, onPlGoToFees: () => this.openProgrammeFees(pid),
+      plAllSelected: candidateIds.length > 0 && candidateIds.every((id) => this.state.plSelectedIds.includes(id)),
+      onPlToggleSelectAll: () => this.onPlToggleSelectAll(candidateIds),
+      plResultCount: candidates.length, plNoResults: candidates.length === 0,
+      plRows: candidates.map((c, i) => {
+        const rel = d.meritListReleases.find((r) => r.id === c.meritListReleaseId);
+        return {
+          sno: i + 1, id: c.id, name: c.name, category: c.category, piId: c.piId || "—",
+          feeDueDate: rel ? this.engine.fmtDate(rel.lastFeeDate) : "—",
+          checked: this.state.plSelectedIds.includes(c.id), onToggle: () => this.onPlToggleSelect(c.id)
+        };
+      }),
+      onPlPrintSelected: () => this.onPlPrintSelected(candidates),
+      onPlPrintAll: () => this.onPlPrintAll(candidates),
+      plPrintDisabled: !hasFeeConfig || candidates.length === 0
+    };
+  }
 
   buildReportsCandidates(d) {
     const pid = d.activeProgrammeId;
@@ -3607,8 +3988,59 @@ class Component extends DCLogic {
       programmeRows: progs.map((p) => ({
         id: p.id, name: p.name, code: p.code, description: p.description, statusLabel: p.status, tagCls: "tag tag-accent",
         academicYears: d.academicYears.filter((y) => y.programmeId === p.id).map((y) => y.label).join(", "),
-        onSelect: () => this.setState({ page: "academic-year" }, () => this.mutate((ds) => { ds.activeProgrammeId = p.id; }))
+        onSelect: () => this.setState({ page: "academic-year" }, () => this.mutate((ds) => { ds.activeProgrammeId = p.id; })),
+        onFees: () => this.openProgrammeFees(p.id)
       }))
+    };
+  }
+
+  openProgrammeFees(programmeId) {
+    const p = this.state.data.programmes.find((x) => x.id === programmeId);
+    const fc = (p && p.feeConfig) || {};
+    this.setState({
+      page: "programme-fees", pgFeeProgrammeId: programmeId,
+      pgFeeDraft: {
+        batchLabel: fc.batchLabel || "", commencementDate: fc.commencementDate || "",
+        academicFeesInstallment1: fc.academicFeesInstallment1 != null ? String(fc.academicFeesInstallment1) : "",
+        academicFeesInstallment2: fc.academicFeesInstallment2 != null ? String(fc.academicFeesInstallment2) : "",
+        installment2DueDate: fc.installment2DueDate || "",
+        instituteDeposit: fc.instituteDeposit != null ? String(fc.instituteDeposit) : "",
+        hostelDeposit: fc.hostelDeposit != null ? String(fc.hostelDeposit) : "",
+        hostelThreeSharing: fc.hostelThreeSharing != null ? String(fc.hostelThreeSharing) : "",
+        hostelFourSharing: fc.hostelFourSharing != null ? String(fc.hostelFourSharing) : "",
+        messFees: fc.messFees != null ? String(fc.messFees) : ""
+      }
+    });
+  }
+  onPgFeeChange(field, value) {
+    // Same reasoning as the date inputs on Merit Releases: a native <input type="date"> reports
+    // value:"" while the user is still mid-typing, so an empty date must be ignored, not committed.
+    if ((field === "commencementDate" || field === "installment2DueDate") && !value) return;
+    this.setState({ pgFeeDraft: { ...this.state.pgFeeDraft, [field]: value } });
+  }
+  onSavePgFee() {
+    const res = this.mutate((ds) => this.engine.setProgrammeFeeConfig(ds, this.state.pgFeeProgrammeId, this.state.pgFeeDraft),
+      (r) => r.error ? r.error : "Fee structure saved.");
+    if (res && res.ok) this.setState({ page: "programmes" });
+  }
+  buildProgrammeFees(d) {
+    const p = d.programmes.find((x) => x.id === this.state.pgFeeProgrammeId);
+    if (!p) return { pgFeeFound: false, pgFeeNotFound: true, onPgFeeBack: () => this.goTo("programmes") };
+    const f = this.state.pgFeeDraft || {};
+    const field = (key) => ({ value: f[key] || "", onChange: (e) => this.onPgFeeChange(key, e.target.value) });
+    return {
+      pgFeeFound: true, pgFeeNotFound: false, pgFeeProgrammeName: p.name, onPgFeeBack: () => this.goTo("programmes"),
+      pgFeeBatchLabel: field("batchLabel").value, onPgFeeBatchLabel: field("batchLabel").onChange,
+      pgFeeCommencementDate: field("commencementDate").value, onPgFeeCommencementDate: field("commencementDate").onChange,
+      pgFeeInstallment1: field("academicFeesInstallment1").value, onPgFeeInstallment1: field("academicFeesInstallment1").onChange,
+      pgFeeInstallment2: field("academicFeesInstallment2").value, onPgFeeInstallment2: field("academicFeesInstallment2").onChange,
+      pgFeeInstallment2Due: field("installment2DueDate").value, onPgFeeInstallment2Due: field("installment2DueDate").onChange,
+      pgFeeInstituteDeposit: field("instituteDeposit").value, onPgFeeInstituteDeposit: field("instituteDeposit").onChange,
+      pgFeeHostelDeposit: field("hostelDeposit").value, onPgFeeHostelDeposit: field("hostelDeposit").onChange,
+      pgFeeHostelThree: field("hostelThreeSharing").value, onPgFeeHostelThree: field("hostelThreeSharing").onChange,
+      pgFeeHostelFour: field("hostelFourSharing").value, onPgFeeHostelFour: field("hostelFourSharing").onChange,
+      pgFeeMess: field("messFees").value, onPgFeeMess: field("messFees").onChange,
+      onSavePgFee: () => this.onSavePgFee()
     };
   }
 }

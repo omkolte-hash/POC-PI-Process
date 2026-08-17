@@ -453,6 +453,26 @@ export function createProgramme(ds, form) {
   return programme;
 }
 
+// Per-programme fee structure — feeds the Annexure I fee table on the Provisional Admission Letter.
+// Kept on the programme (not the academic year) since the reference letter frames it as "fees for
+// the [Programme] programme", and this is a POC with one fee structure per programme, not per intake.
+export function setProgrammeFeeConfig(ds, programmeId, form) {
+  const p = ds.programmes.find((x) => x.id === programmeId);
+  if (!p) return { error: "Programme not found." };
+  if (!form.batchLabel || !form.commencementDate || !form.installment2DueDate) {
+    return { error: "Batch, Commencement Date, and Installment 2 Due Date are required." };
+  }
+  const num = (v) => { const n = Number(v); return Number.isFinite(n) && n >= 0 ? n : 0; };
+  p.feeConfig = {
+    batchLabel: form.batchLabel.trim(), commencementDate: form.commencementDate,
+    academicFeesInstallment1: num(form.academicFeesInstallment1), academicFeesInstallment2: num(form.academicFeesInstallment2),
+    installment2DueDate: form.installment2DueDate, instituteDeposit: num(form.instituteDeposit),
+    hostelDeposit: num(form.hostelDeposit), hostelThreeSharing: num(form.hostelThreeSharing),
+    hostelFourSharing: num(form.hostelFourSharing), messFees: num(form.messFees)
+  };
+  return { ok: true };
+}
+
 export function createAcademicYear(ds, form) {
   const id = `AY-${Date.now()}`;
   const year = { id, programmeId: form.programmeId, label: form.label, status: form.status || "Upcoming" };
