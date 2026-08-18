@@ -1,50 +1,51 @@
-/* Classical — design-system tokens and component classes. This file is the source of truth for the system's look; retune it here and see readme.md. */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+/* Admin Portal theme — design-system tokens and component classes, retuned to match
+   Application-Admin-Portal (shadcn/ui + Tailwind slate/indigo). Source of truth for the
+   look; retune the tokens here. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-  --color-bg: #f3f2f2;
-  --color-surface: #eae9e9;
-  --color-text: #201f1d;
-  --color-accent: #b68235;
-  --color-accent-2: #ac803e;
-  --color-divider: color-mix(in srgb, #201f1d 16%, transparent);
+  --color-bg: #f1f5f9;
+  --color-surface: #ffffff;
+  --color-text: #0f172a;
+  --color-accent: #4f46e5;
+  --color-accent-2: #7c3aed;
+  --color-accent-foreground: #ffffff;
+  --color-divider: #e2e8f0;
 
-  /* Tonal ramps — generated in OKLCH on one shared lightness scale, so the
-     same step of any role matches the others in visual value. */
-  --color-neutral-100: #f8f4f4;
-  --color-neutral-200: #eae7e7;
-  --color-neutral-300: #d7d3d3;
-  --color-neutral-400: #bab6b6;
-  --color-neutral-500: #9b9797;
-  --color-neutral-600: #7d7979;
-  --color-neutral-700: #605d5d;
-  --color-neutral-800: #444141;
-  --color-neutral-900: #2d2b2b;
+  /* Tonal ramps — aligned 1:1 with Tailwind's slate / indigo / violet scales, so
+     every step matches what the admin portal itself renders. */
+  --color-neutral-100: #f8fafc;
+  --color-neutral-200: #f1f5f9;
+  --color-neutral-300: #e2e8f0;
+  --color-neutral-400: #cbd5e1;
+  --color-neutral-500: #94a3b8;
+  --color-neutral-600: #64748b;
+  --color-neutral-700: #475569;
+  --color-neutral-800: #334155;
+  --color-neutral-900: #0f172a;
 
-  --color-accent-100: #fff3e4;
-  --color-accent-200: #ffe3bf;
-  --color-accent-300: #facb8d;
-  --color-accent-400: #e1ad66;
-  --color-accent-500: #c28d41;
-  --color-accent-600: #a06f24;
-  --color-accent-700: #7d5411;
-  --color-accent-800: #5a3b0a;
-  --color-accent-900: #3a270d;
+  --color-accent-100: #e0e7ff;
+  --color-accent-200: #c7d2fe;
+  --color-accent-300: #a5b4fc;
+  --color-accent-400: #818cf8;
+  --color-accent-500: #6366f1;
+  --color-accent-600: #4f46e5;
+  --color-accent-700: #4338ca;
+  --color-accent-800: #3730a3;
+  --color-accent-900: #312e81;
 
-  --color-accent-2-100: #fff3e4;
-  --color-accent-2-200: #ffe3be;
-  --color-accent-2-300: #f5cd96;
-  --color-accent-2-400: #dbaf70;
-  --color-accent-2-500: #bc8f4e;
-  --color-accent-2-600: #9b7232;
-  --color-accent-2-700: #79561f;
-  --color-accent-2-800: #573d14;
-  --color-accent-2-900: #382810;
+  --color-accent-2-100: #ede9fe;
+  --color-accent-2-200: #ddd6fe;
+  --color-accent-2-300: #c4b5fd;
+  --color-accent-2-400: #a78bfa;
+  --color-accent-2-500: #8b5cf6;
+  --color-accent-2-600: #7c3aed;
+  --color-accent-2-700: #6d28d9;
+  --color-accent-2-800: #5b21b6;
+  --color-accent-2-900: #4c1d95;
 
   --font-heading: "Inter", system-ui, sans-serif;
-  --font-heading-weight: 600; /* review round 3: bold retired — semibold is the
-     interface headings' ceiling (they need the weight at small sizes); display
-     text goes lighter still, to the normal cut (see the deck) */
+  --font-heading-weight: 600;
   --font-body: "Inter", system-ui, sans-serif;
 
   --space-1: 4.6px;
@@ -54,15 +55,15 @@
   --space-6: 27.6px;
   --space-8: 36.8px;
 
-  --radius-sm: 2px;
-  --radius-md: 4px;
-  --radius-lg: 7px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
 
-  /* Elevation — derived from the ground: soft ink-tinted shadows on a
-     light theme, a hairline edge + ambient darkness on a dark one. */
-  --shadow-sm: 0 1px 2px color-mix(in srgb, #2d2b2b 14%, transparent);
-  --shadow-md: 0 3px 10px color-mix(in srgb, #2d2b2b 16%, transparent);
-  --shadow-lg: 0 12px 32px color-mix(in srgb, #2d2b2b 22%, transparent);
+  /* Elevation — Tailwind's own shadow-sm/md/lg formulas, so cards and dialogs read
+     exactly like the admin portal's. */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.1);
 }
 
 body {
@@ -72,8 +73,7 @@ body {
 }
 h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: var(--font-heading-weight); }
 
-.plate{filter:sepia(0.22) saturate(0.82) contrast(1.05);box-sizing:border-box;
-  border:6px solid var(--color-surface);outline:1px solid var(--color-divider)}
+.plate{box-sizing:border-box;border:6px solid var(--color-surface);outline:1px solid var(--color-divider)}
 
 /* ══════════════════════════════════════════════════════════════════════════
    Components — built with the tokens above. Plain CSS
@@ -82,20 +82,20 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: var(--font-headi
    ══════════════════════════════════════════════════════════════════════ */
 
 *, *::before, *::after { box-sizing: border-box; }
-body { margin: 0; font-size: 15px; line-height: 1.55; font-weight: 400; }
+body { margin: 0; font-size: 14px; line-height: 1.55; font-weight: 400; }
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading); font-weight: var(--font-heading-weight);
-  line-height: 1.12; letter-spacing: -0.015em; margin: 0 0 var(--space-2);
+  line-height: 1.2; letter-spacing: -0.015em; margin: 0 0 var(--space-2);
 }
-h1 { font-size: 42px; }
-h2 { font-size: 32px; }
-h3 { font-size: 25px; }
-h4 { font-size: 20px; }
-h5 { font-size: 16px; }
+h1 { font-size: 36px; }
+h2 { font-size: 28px; }
+h3 { font-size: 22px; }
+h4 { font-size: 18px; }
+h5 { font-size: 15px; }
 h6 { font-size: 13px; }
 h6 { letter-spacing: 0.08em; text-transform: uppercase; }
 p { margin: 0 0 var(--space-3); }
-a { color: var(--color-accent); text-underline-offset: 3px; }
+a { color: var(--color-accent-700); text-underline-offset: 3px; }
 img { display: block; max-width: 100%; }
 figure { margin: 0; }
 figcaption {
@@ -117,40 +117,46 @@ figcaption {
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   cursor: pointer; text-decoration: none;
-  font-family: var(--font-heading); font-weight: var(--font-heading-weight);
-  font-size: 14px; line-height: 1.2; color: var(--color-text); /* matches the .input's 14px —
-     the pair sits side by side in sign-up rows */
+  font-family: var(--font-heading); font-weight: 500;
+  font-size: 14px; line-height: 1.2; color: var(--color-text);
   background: transparent; border: 1px solid transparent;
   padding: var(--space-2) calc(var(--space-3) * 1.2);
   border-radius: var(--radius-md);
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
 }
 .btn svg { display: block; }
-.btn:disabled { opacity: 0.45; cursor: not-allowed; }
-.btn-primary { color: var(--color-accent); border-color: var(--color-accent); }
-.btn-primary:hover { background: color-mix(in srgb, var(--color-accent) 12%, transparent); }
-.btn-primary:active { background: color-mix(in srgb, var(--color-accent) 22%, transparent); }
-.btn-secondary { border-color: var(--color-divider); }
-.btn-secondary:hover { background: color-mix(in srgb, var(--color-text) 7%, transparent); }
-.btn-secondary:active { background: color-mix(in srgb, var(--color-text) 14%, transparent); }
-.btn-ghost { color: var(--color-accent); padding-inline: var(--space-1); }
-.btn-ghost:hover { background: color-mix(in srgb, var(--color-accent) 10%, transparent); }
-.btn-ghost:active { background: color-mix(in srgb, var(--color-accent) 18%, transparent); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-primary {
+  color: var(--color-accent-foreground);
+  background: var(--color-accent); border-color: var(--color-accent);
+}
+.btn-primary:hover { background: var(--color-accent-700); border-color: var(--color-accent-700); }
+.btn-primary:active { background: var(--color-accent-800); border-color: var(--color-accent-800); }
+.btn-secondary { background: var(--color-surface); border-color: var(--color-divider); }
+.btn-secondary:hover { background: var(--color-neutral-100); }
+.btn-secondary:active { background: var(--color-neutral-200); }
+.btn-ghost { color: var(--color-text); }
+.btn-ghost:hover { background: var(--color-neutral-100); }
+.btn-ghost:active { background: var(--color-neutral-200); }
 .btn-icon { width: 36px; height: 36px; padding: 0; }
 .btn-block { width: 100%; margin-top: var(--space-2); }
 
 /* — forms — */
 .field > label {
-  display: block; font-size: 12px; margin-bottom: 5px;
+  display: block; font-size: 12px; margin-bottom: 5px; font-weight: 500;
   color: color-mix(in srgb, var(--color-text) 70%, transparent);
 }
 .input {
   width: 100%; min-height: 36px; padding: 6px 10px; font: inherit;
   font-size: 14px; color: var(--color-text); caret-color: var(--color-accent);
-  background: transparent;
+  background: var(--color-surface);
   border: 1px solid var(--color-divider); border-radius: var(--radius-md);
 }
-.input:hover { border-color: color-mix(in srgb, var(--color-text) 45%, transparent); }
-.input:focus-visible { border-color: var(--color-accent); outline-offset: 0; }
+.input:hover { border-color: var(--color-neutral-400); }
+.input:focus-visible {
+  border-color: var(--color-accent); outline-offset: 0;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 20%, transparent);
+}
 textarea.input { min-height: 90px; resize: vertical; }
 .radio { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; }
 .radio input, .seg-opt input {
@@ -163,7 +169,7 @@ textarea.input { min-height: 90px; resize: vertical; }
 .radio:hover .dot { border-color: var(--color-accent); }
 .radio input:checked + .dot {
   border-color: var(--color-accent); background: var(--color-accent);
-  box-shadow: inset 0 0 0 4px var(--color-bg);
+  box-shadow: inset 0 0 0 4px var(--color-surface);
 }
 .radio input:focus-visible + .dot { outline: 2px solid var(--color-accent); outline-offset: 2px; }
 .seg {
@@ -175,18 +181,20 @@ textarea.input { min-height: 90px; resize: vertical; }
   padding: 7px 12px; font-size: 13px; cursor: pointer;
 }
 .seg-opt + .seg-opt { border-left: 1px solid var(--color-divider); }
-.seg-opt:has(input:checked) { color: var(--color-accent); box-shadow: inset 0 0 0 1px var(--color-accent); }
-.seg-opt:not(:has(input:checked)):hover { background: color-mix(in srgb, var(--color-text) 7%, transparent); }
+.seg-opt:has(input:checked) { color: var(--color-accent-700); background: var(--color-accent-100); }
+.seg-opt:not(:has(input:checked)):hover { background: var(--color-neutral-100); }
 .seg-opt:has(input:focus-visible) { outline: 2px solid var(--color-accent); outline-offset: -2px; }
 
 /* — cards — */
 .card {
   display: flex; flex-direction: column; gap: var(--space-2);
-  padding: var(--space-3); border-radius: var(--radius-md); background: transparent; border: 1px solid var(--color-divider);
+  padding: var(--space-3); border-radius: var(--radius-lg);
+  background: var(--color-surface); border: 1px solid var(--color-divider);
+  box-shadow: var(--shadow-sm);
 }
-.card-kicker { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-accent); }
+.card-kicker { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-accent-700); }
 .card-title {
-  font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+  font-family: var(--font-heading); font-weight: 600;
   font-size: 17px; line-height: 1.2;
 }
 .card-body { margin: 0; font-size: 13px; opacity: 0.8; flex: 1; }
@@ -200,23 +208,24 @@ textarea.input { min-height: 90px; resize: vertical; }
 
 /* — tags — */
 .tag {
-  display: inline-flex; align-items: center; font-size: 11px;
-  letter-spacing: 0.02em; padding: 3px 10px;
-  border-radius: calc(var(--radius-md) * 0.75);
+  display: inline-flex; align-items: center; font-size: 12px; font-weight: 600;
+  letter-spacing: 0.01em; padding: 2px 10px;
+  border-radius: 9999px; border: 1px solid transparent;
 }
-.tag-accent { background: var(--color-accent-100); color: var(--color-accent-800); }
-.tag-accent-2 { background: var(--color-accent-2-100); color: var(--color-accent-2-800); }
-.tag-neutral { background: var(--color-neutral-100); color: var(--color-neutral-800); }
-.tag-outline { border: 1px solid var(--color-accent); color: var(--color-accent); }
+.tag-accent { background: var(--color-accent-100); color: var(--color-accent-700); }
+.tag-accent-2 { background: var(--color-accent-2-100); color: var(--color-accent-2-700); }
+.tag-neutral { background: var(--color-neutral-200); color: var(--color-neutral-700); }
+.tag-outline { border-color: var(--color-accent); color: var(--color-accent-700); background: var(--color-surface); }
 
 /* — navigation — */
 .nav {
   display: flex; align-items: center; gap: var(--space-4);
   padding: var(--space-3) var(--space-4);
   border-bottom: 1px solid var(--color-divider);
+  background: var(--color-surface);
 }
 .nav-brand {
-  font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+  font-family: var(--font-heading); font-weight: 700;
   font-size: 18px; margin-right: auto;
 }
 .nav a { color: inherit; text-decoration: none; font-size: 14px; }
@@ -225,15 +234,15 @@ textarea.input { min-height: 90px; resize: vertical; }
 /* — tables — */
 .table { width: 100%; border-collapse: collapse; font-size: 14px; }
 .table th {
-  text-align: left; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
-  color: color-mix(in srgb, var(--color-text) 60%, transparent);
+  text-align: left; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-text) 55%, transparent); font-weight: 600;
   padding: var(--space-2); border-bottom: 1px solid var(--color-divider);
 }
 .table td {
   padding: var(--space-2);
   border-bottom: 1px solid var(--color-divider);
 }
-.table tbody tr:hover { background: color-mix(in srgb, var(--color-text) 4%, transparent); }
+.table tbody tr:hover { background: var(--color-neutral-100); }
 
 /* — dialog — */
 .dialog-backdrop {
@@ -247,9 +256,8 @@ textarea.input { min-height: 90px; resize: vertical; }
   background: var(--color-surface); box-shadow: var(--shadow-lg); border: 1px solid var(--color-divider);
 }
 .dialog-title {
-  font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+  font-family: var(--font-heading); font-weight: 600;
   font-size: 20px;
 }
 .dialog-body { font-size: 14px; opacity: 0.85; }
 .dialog-actions { display: flex; justify-content: flex-end; gap: var(--space-2); margin-top: var(--space-2); }
-

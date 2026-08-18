@@ -15,13 +15,13 @@
 body{margin:0}
 a{color:var(--color-accent-700);text-decoration:none}
 a:hover{color:var(--color-accent);text-decoration:underline}
-.apsSideLink,.apsSideGroup{display:flex;align-items:center;gap:10px;margin:1px 12px;padding:9px 14px;border-radius:8px;cursor:pointer;transition:background-color .15s ease}
-.apsSideLink{font-size:13px}
-.apsSideLink:hover{background:color-mix(in srgb, var(--color-text) 6%, transparent)}
-.apsSideLink:focus-visible{outline:2px solid var(--color-accent);outline-offset:2px}
-.apsSideGroup{justify-content:space-between;font-size:13px;font-weight:600;color:color-mix(in srgb, var(--color-text) 75%, transparent)}
-.apsSideGroup:hover{background:color-mix(in srgb, var(--color-text) 6%, transparent)}
-.apsSideGroup:focus-visible{outline:2px solid var(--color-accent);outline-offset:2px}
+.apsSideLink,.apsSideGroup{display:flex;align-items:center;gap:10px;cursor:pointer;transition:background-color .15s ease}
+.apsSideLink{font-size:13px;padding:8px 16px 8px 24px}
+.apsSideLink:hover{background:var(--color-neutral-100)}
+.apsSideLink:focus-visible{outline:2px solid var(--color-accent);outline-offset:-2px}
+.apsSideGroup{justify-content:space-between;font-size:13px;font-weight:600;padding:8px 20px;color:color-mix(in srgb, var(--color-text) 75%, transparent)}
+.apsSideGroup:hover{background:var(--color-neutral-100)}
+.apsSideGroup:focus-visible{outline:2px solid var(--color-accent);outline-offset:-2px}
 </style>
 </helmet>
 <div style="display:flex;height:100vh;width:100%;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);overflow:hidden">
@@ -96,7 +96,7 @@ a:hover{color:var(--color-accent);text-decoration:underline}
       </div>
     </div>
   </div></sc-if>
-  <sc-if value="{{ authed }}"><aside style="width:268px;flex:none;background:var(--color-neutral-100);border-right:1px solid var(--color-divider);overflow-y:auto;padding:var(--space-4) 0">
+  <sc-if value="{{ authed }}"><aside style="width:268px;flex:none;background:var(--color-surface);border-right:1px solid var(--color-divider);overflow-y:auto;padding:var(--space-4) 0">
     <div style="padding:0 var(--space-4) var(--space-4);border-bottom:1px solid var(--color-divider);margin-bottom:var(--space-3)">
       <div style="font-family:var(--font-heading);font-weight:var(--font-heading-weight);font-size:20px">Admission Processing</div>
       <div style="font-size:12px;opacity:0.6;margin-top:2px">{{ instituteLabel }}</div>
@@ -116,7 +116,7 @@ a:hover{color:var(--color-accent);text-decoration:underline}
     </sc-for>
   </aside>
   <div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
-    <header style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:var(--space-4);padding:var(--space-3) var(--space-6);border-bottom:1px solid var(--color-divider);background:var(--color-bg)">
+    <header style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:var(--space-4);padding:var(--space-3) var(--space-6);border-bottom:1px solid var(--color-divider);background:var(--color-surface)">
       <div>
         <div style="font-size:11px;letter-spacing:0.06em;text-transform:uppercase;opacity:0.55">{{ breadcrumbGroup }}</div>
         <div style="font-family:var(--font-heading);font-weight:var(--font-heading-weight);font-size:22px">{{ pageTitle }}</div>
@@ -1438,7 +1438,7 @@ a:hover{color:var(--color-accent);text-decoration:underline}
     </main>
   </div></sc-if>
   <sc-if value="{{ showPanelistPortal }}"><div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
-    <header style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:var(--space-4);padding:var(--space-3) var(--space-6);border-bottom:1px solid var(--color-divider);background:var(--color-bg)">
+    <header style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:var(--space-4);padding:var(--space-3) var(--space-6);border-bottom:1px solid var(--color-divider);background:var(--color-surface)">
       <div>
         <div style="font-family:var(--font-heading);font-weight:var(--font-heading-weight);font-size:18px">Panelist Portal</div>
         <div style="font-size:12px;opacity:0.6">{{ pnName }}</div>
@@ -2104,7 +2104,7 @@ class Component extends DCLogic {
     // declaration always beats a stylesheet rule regardless of specificity, so it would permanently
     // block .apsSideLink:hover from ever showing. Only the active item gets an inline background.
     const linkStyle = (active) => active
-      ? `font-weight:600;color:var(--color-accent-700);background:color-mix(in srgb, var(--color-accent) 14%, transparent)`
+      ? `font-weight:600;color:var(--color-accent-700);background:var(--color-accent-100)`
       : `font-weight:400;color:var(--color-text)`;
     const auth = this.state.auth;
     const roleIsSuperAdmin = !!(auth && auth.role === "super-admin");
