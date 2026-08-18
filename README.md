@@ -15,5 +15,7 @@ npx playwright install chromium   # first run only
 npm run test:e2e
 ```
 
-Requires Node 20+. `webServer` in `e2e/playwright.config.js` serves the *repo root* (where
-`index.html` lives) with `python3 -m http.server` automatically — no separate server to start.
+Requires Node 20+. Runs against the deployed site
+(`https://omkolte-hash.github.io/POC-PI-Process/`, set as `baseURL` in
+`e2e/playwright.config.js`) — no local server involved, so make sure GitHub Pages is serving
+whatever commit you actually want to test before running the suite.

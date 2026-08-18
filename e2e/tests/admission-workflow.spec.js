@@ -36,7 +36,7 @@ test('full admission lifecycle: programme creation through provisional letters',
 
   await test.step('Log in as institute admin', async () => {
     await mockFilePicker(page);
-    await page.goto('/index.html');
+    await page.goto('index.html');
     await openSampleFile(page);
     await loginInstitute(page);
     await expect(page.locator('main')).not.toBeEmpty();

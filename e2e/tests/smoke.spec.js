@@ -11,7 +11,7 @@ test.describe('Role sidebar smoke tests', () => {
   test('super-admin: every sidebar page renders with no console errors', async ({ page }) => {
     const errors = trackConsoleErrors(page);
     await mockFilePicker(page);
-    await page.goto('/index.html');
+    await page.goto('index.html');
     await skipFileGate(page);
     await loginSuperAdmin(page);
     await expect(page.locator('main')).not.toBeEmpty();
@@ -37,7 +37,7 @@ test.describe('Role sidebar smoke tests', () => {
   test('institute admin: every sidebar page renders with no console errors', async ({ page }) => {
     const errors = trackConsoleErrors(page);
     await mockFilePicker(page);
-    await page.goto('/index.html');
+    await page.goto('index.html');
     await openSampleFile(page);
     await loginInstitute(page);
     await expect(page.locator('main')).not.toBeEmpty();
@@ -69,7 +69,7 @@ test.describe('Role sidebar smoke tests', () => {
   test('panelist: portal loads and a session can be joined/left with no console errors', async ({ page }) => {
     const errors = trackConsoleErrors(page);
     await mockFilePicker(page);
-    await page.goto('/index.html');
+    await page.goto('index.html');
     await openSampleFile(page);
     await loginPanelist(page);
     await expect(page.locator('body')).toContainText(/Panelist|Session|Group/i);

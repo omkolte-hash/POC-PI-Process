@@ -4,7 +4,7 @@
 // with a fake handle backed by a static fixture, so "Open Existing Data File..." works the
 // same way in a real browser and in CI, and every test run starts from the same pristine data.
 
-export const SAMPLE_DATA_URL = '/sample-data/pi-merit-demo-100.json';
+export const SAMPLE_DATA_URL = 'sample-data/pi-merit-demo-100.json';
 
 // Seeded institute from sample-data/pi-merit-demo-100.json — used only to get a valid,
 // already-approved institute login. Its 100 pre-built MBA candidates are never touched by
@@ -18,8 +18,12 @@ export const SUPER_ADMIN_LOGIN = { email: 'superadmin@platform.io', password: 'S
 
 // Pre-existing, unrelated to app logic: candidate photo placeholders (`{{ pdImageDataUrl }}` /
 // `{{ pfImageDataUrl }}`) render as literal <img src> before the templating engine hydrates
-// them, 404ing once per page load. Confirmed harmless earlier in this project's history.
-const KNOWN_HARMLESS_ERROR_PATTERNS = [/pdImageDataUrl/, /pfImageDataUrl/, /404 \(File not found\)/];
+// them, 404ing 2-3 times per page load. Confirmed harmless earlier in this project's history.
+// The browser's own console message never includes the failing URL (just "...404 (...)"), and
+// different servers phrase the parenthesized part differently (Python's dev server says
+// "File not found", GitHub Pages' leaves it empty) — so this matches on the resource-load
+// 404 shape generically rather than a server-specific string.
+const KNOWN_HARMLESS_ERROR_PATTERNS = [/pdImageDataUrl/, /pfImageDataUrl/, /Failed to load resource.*404/];
 
 export function isKnownHarmless(message) {
   return KNOWN_HARMLESS_ERROR_PATTERNS.some((re) => re.test(message));
