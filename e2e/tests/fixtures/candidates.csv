@@ -1,0 +1,9 @@
+Applicant ID,Name,Gender,Category,Education Background,10th %,12th %,SLAT Score,SLAT Percentile
+E2E-OPEN-01,E2E Open Candidate 1,Female,OPEN,Commerce,88,86,95,99
+E2E-OPEN-02,E2E Open Candidate 2,Male,OPEN,Science,84,82,90,95
+E2E-OPEN-03,E2E Open Candidate 3,Female,OPEN,Arts,80,78,85,90
+E2E-OPEN-04,E2E Open Candidate 4,Male,OPEN,Commerce,76,74,80,80
+E2E-OPEN-05,E2E Open Candidate 5,Female,OPEN,Science,72,70,75,70
+E2E-OPEN-06,E2E Open Candidate 6,Male,OPEN,Arts,68,66,70,60
+E2E-SC-01,E2E SC Candidate 1,Female,SC,Commerce,78,76,82,85
+E2E-SC-02,E2E SC Candidate 2,Male,SC,Science,74,72,78,75

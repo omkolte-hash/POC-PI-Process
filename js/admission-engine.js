@@ -161,14 +161,13 @@ function placeholderDocument(candidateId, label) {
 }
 
 export function commitImportedCandidates(ds, programmeId, academicYearId, rowsData) {
-  // Applicant ID is the sole primary key candidates are looked up by everywhere in this app, so it must
-  // stay globally unique — it can't be scoped to this programme without every other `candidates.find(...)`
-  // call risking an ambiguous match. Distinguish the two "already exists" cases so the summary is honest
-  // about why a row was skipped, rather than implying it was already imported into this same programme.
-  let added = 0, existing = 0, existingOtherProgramme = 0;
+  // A candidate's real identity is (programmeId, academicYearId, Applicant ID) — the same Applicant ID
+  // can exist once per programme+academic year, as fully independent candidates. Every candidate lookup
+  // across the app matches on all three, so reusing an ID under a different programme/year is safe.
+  let added = 0, existing = 0;
   rowsData.forEach((r) => {
-    const dup = ds.candidates.find((c) => c.id === r.id);
-    if (dup) { if (dup.programmeId === programmeId) existing++; else existingOtherProgramme++; return; }
+    const dup = ds.candidates.find((c) => c.id === r.id && c.programmeId === programmeId && c.academicYearId === academicYearId);
+    if (dup) { existing++; return; }
     ds.candidates.push({
       id: r.id, name: r.name, gender: r.gender, programmeId, academicYearId,
       category: r.category, educationBackground: r.educationBackground,
@@ -189,7 +188,7 @@ export function commitImportedCandidates(ds, programmeId, academicYearId, rowsDa
     });
     added++;
   });
-  return { added, existing, existingOtherProgramme, total: rowsData.length };
+  return { added, existing, total: rowsData.length };
 }
 
 // Fills in any top-level fields missing from a JSON file saved by an older version of this app
@@ -340,7 +339,7 @@ export function confirmShortlist(ds, { programmeId, academicYearId, category, cr
   // A negative value would invert `.slice(0, value)` into "everyone but the last N", and NaN/0 has no
   // sane meaning here either — treat anything that isn't a real positive number as "select nothing".
   if (!Number.isFinite(value) || value <= 0) return { count: 0, list: null };
-  const pool = ds.candidates.filter((c) => c.programmeId === programmeId && c.category === category && c.shortlistStatus === "yet-to-shortlist");
+  const pool = ds.candidates.filter((c) => c.programmeId === programmeId && c.academicYearId === academicYearId && c.category === category && c.shortlistStatus === "yet-to-shortlist");
   pool.sort((a, b) => b.slatScore - a.slatScore);
   const selected = criteria === "count" ? pool.slice(0, value) : pool.filter((c) => c.slatScore >= value);
   if (!selected.length) return { count: 0, list: null };
@@ -364,7 +363,9 @@ export function approveShortlistList(ds, listId, level, decision, comments) {
   const list = ds.shortlists.find((l) => l.id === listId);
   if (!list) return;
   const date = nowISO().slice(0, 10);
-  const candidates = list.candidateIds.map((id) => ds.candidates.find((c) => c.id === id)).filter(Boolean);
+  const candidates = list.candidateIds
+    .map((id) => ds.candidates.find((c) => c.id === id && c.programmeId === list.programmeId && c.academicYearId === list.academicYearId))
+    .filter(Boolean);
   if (level === "director") {
     if (list.status !== "pending-director") return;
     list.approvals.director = { status: decision, date, comments };
@@ -615,9 +616,9 @@ export function rejectMail(ds, mailId) {
 }
 
 export function allocateCandidate(ds, candidateId, sessionId, groupId) {
-  const c = ds.candidates.find((x) => x.id === candidateId);
   const session = ds.sessions.find((s) => s.id === sessionId);
   const group = session && session.groups.find((g) => g.id === groupId);
+  const c = session && ds.candidates.find((x) => x.id === candidateId && x.programmeId === session.programmeId && x.academicYearId === session.academicYearId);
   if (!c || !group) return { error: "Not found." };
   if (c.shortlistStatus !== "second-level-approved") return { error: "Candidate must be Second Level Approved before allocation." };
   if (c.allocation) return { error: "Candidate already has an active Session allocation." };
@@ -651,8 +652,9 @@ export function moveCandidatesAllocation(ds, candidateIds, toSessionId, toGroupI
   const toSession = ds.sessions.find((s) => s.id === toSessionId);
   const toGroup = toSession && toSession.groups.find((g) => g.id === toGroupId);
   if (!toGroup) return { error: "Target group not found." };
+  const findCandidate = (id) => ds.candidates.find((x) => x.id === id && x.programmeId === toSession.programmeId && x.academicYearId === toSession.academicYearId);
   const moving = candidateIds.filter((id) => {
-    const c = ds.candidates.find((x) => x.id === id);
+    const c = findCandidate(id);
     return c && c.allocation && !(c.allocation.sessionId === toSessionId && c.allocation.groupId === toGroupId);
   });
   if (!moving.length) return { ok: true, moved: 0 };
@@ -660,7 +662,7 @@ export function moveCandidatesAllocation(ds, candidateIds, toSessionId, toGroupI
   if (moving.length > available) return { error: `Only ${available} slot(s) available in ${toGroup.name}.` };
   const date = nowISO().slice(0, 10);
   moving.forEach((id) => {
-    const c = ds.candidates.find((x) => x.id === id);
+    const c = findCandidate(id);
     const fromSession = ds.sessions.find((s) => s.id === c.allocation.sessionId);
     const fromGroup = fromSession && fromSession.groups.find((g) => g.id === c.allocation.groupId);
     if (fromGroup) fromGroup.candidateIds = fromGroup.candidateIds.filter((x) => x !== id);
@@ -788,8 +790,8 @@ export function approvePanelist(ds, panelistId, level, decision) {
   }
 }
 
-export function markAttendance(ds, candidateId, kind, status) {
-  const c = ds.candidates.find((x) => x.id === candidateId);
+export function markAttendance(ds, candidateId, kind, status, programmeId, academicYearId) {
+  const c = ds.candidates.find((x) => x.id === candidateId && x.programmeId === programmeId && x.academicYearId === academicYearId);
   if (!c) return;
   if (kind === "registration") { c.registrationAttendance = status; return; }
   c.piAttendance = status;
@@ -809,8 +811,8 @@ export function markAttendance(ds, candidateId, kind, status) {
 
 // Each assigned panelist submits their own score independently; piTotal is the
 // average across however many panelists have a complete score in for this candidate.
-export function submitPanelistScore(ds, candidateId, panelistId, scores) {
-  const c = ds.candidates.find((x) => x.id === candidateId);
+export function submitPanelistScore(ds, candidateId, panelistId, scores, programmeId, academicYearId) {
+  const c = ds.candidates.find((x) => x.id === candidateId && x.programmeId === programmeId && x.academicYearId === academicYearId);
   if (!c || !c.allocation) return;
   const session = ds.sessions.find((s) => s.id === c.allocation.sessionId);
   const group = session && session.groups.find((g) => g.id === c.allocation.groupId);
@@ -838,23 +840,23 @@ export function submitPanelistScore(ds, candidateId, panelistId, scores) {
   recomputeOutcome(c);
 }
 
-export function setPanelistNote(ds, candidateId, panelistId, text) {
-  const c = ds.candidates.find((x) => x.id === candidateId);
+export function setPanelistNote(ds, candidateId, panelistId, text, programmeId, academicYearId) {
+  const c = ds.candidates.find((x) => x.id === candidateId && x.programmeId === programmeId && x.academicYearId === academicYearId);
   if (!c) return;
   if (!c.piNotes) c.piNotes = {};
   c.piNotes[panelistId] = text;
 }
 
 // Called when a panelist moves past a candidate they scored, so the score can no longer be edited from the portal.
-export function lockPanelistScore(ds, candidateId, panelistId) {
-  const c = ds.candidates.find((x) => x.id === candidateId);
+export function lockPanelistScore(ds, candidateId, panelistId, programmeId, academicYearId) {
+  const c = ds.candidates.find((x) => x.id === candidateId && x.programmeId === programmeId && x.academicYearId === academicYearId);
   if (!c) return;
   if (!c.piScoreLocked) c.piScoreLocked = {};
   c.piScoreLocked[panelistId] = true;
 }
 
-export function setVerification(ds, candidateId, field, value) {
-  const c = ds.candidates.find((x) => x.id === candidateId);
+export function setVerification(ds, candidateId, field, value, programmeId, academicYearId) {
+  const c = ds.candidates.find((x) => x.id === candidateId && x.programmeId === programmeId && x.academicYearId === academicYearId);
   if (!c) return;
   if (field === "eligibilityTeam") c.verification.categoryVerification.eligibilityTeam = value;
   else if (field === "institute") c.verification.categoryVerification.institute = value;
@@ -864,8 +866,8 @@ export function setVerification(ds, candidateId, field, value) {
 
 // APV (Academic Profile Verification) is a distinct 0-10 score the admin enters directly on the
 // candidate's profile — separate from the panelist-scored PI total, combined with it for merit ranking.
-export function setApvScore(ds, candidateId, value) {
-  const c = ds.candidates.find((x) => x.id === candidateId);
+export function setApvScore(ds, candidateId, value, programmeId, academicYearId) {
+  const c = ds.candidates.find((x) => x.id === candidateId && x.programmeId === programmeId && x.academicYearId === academicYearId);
   if (!c) return;
   const n = value === "" || value == null ? NaN : Number(value);
   c.apvScore = Number.isFinite(n) ? Math.max(0, Math.min(10, n)) : null;
@@ -911,13 +913,13 @@ export function runMeritProcessing(ds, { programmeId, academicYearId, category, 
   // (the `!c.meritCategory` filter above excludes them). Refuse rather than silently reject everyone.
   if (!Number.isFinite(value) || value < 0) return { error: "Enter a valid, non-negative number." };
   if (!Number.isFinite(waitingSize) || waitingSize < 0) return { error: "Enter a valid, non-negative waiting list size." };
-  const pool = ds.candidates.filter((c) => c.programmeId === programmeId && c.category === category && c.outcome === "ready-for-merit" && !c.meritCategory);
+  const pool = ds.candidates.filter((c) => c.programmeId === programmeId && c.academicYearId === academicYearId && c.category === category && c.outcome === "ready-for-merit" && !c.meritCategory);
   pool.sort((a, b) => b.finalScore.final - a.finalScore.final);
   const meritCount = criteria === "count" ? Math.min(value, pool.length) : pool.filter((c) => c.finalScore.final >= value).length;
   // Waiting-list numbers must keep incrementing across separate processing runs for the same
   // programme+category, not restart at 001 each time — otherwise a later run collides with numbers
   // already handed out (and already possibly consumed by a Merit List Release) by an earlier run.
-  const existingWaitingCount = ds.candidates.filter((c) => c.programmeId === programmeId && c.category === category && c.meritCategory === "waiting").length;
+  const existingWaitingCount = ds.candidates.filter((c) => c.programmeId === programmeId && c.academicYearId === academicYearId && c.category === category && c.meritCategory === "waiting").length;
   const date = nowISO().slice(0, 10);
   const meritCandidates = [];
   pool.forEach((c, i) => {
@@ -944,7 +946,9 @@ export function approveMeritBatch(ds, batchId, level, decision, comments) {
   const batch = ds.meritBatches.find((b) => b.id === batchId);
   if (!batch) return;
   const date = nowISO().slice(0, 10);
-  const candidates = batch.candidateIds.map((id) => ds.candidates.find((c) => c.id === id)).filter(Boolean);
+  const candidates = batch.candidateIds
+    .map((id) => ds.candidates.find((c) => c.id === id && c.programmeId === batch.programmeId && c.academicYearId === batch.academicYearId))
+    .filter(Boolean);
   if (level === "director") {
     if (batch.status !== "pending-director") return;
     batch.approvals.director = { status: decision, date, comments };
@@ -976,7 +980,9 @@ export function releaseMeritBatch(ds, batchId, lastFeeDate, nextReleaseDate) {
   if (!batch) return { error: "Merit batch not found." };
   if (batch.status !== "approved") return { error: "This merit batch hasn't completed Director + SIU approval yet." };
   if (!lastFeeDate || !nextReleaseDate) return { error: "Enter both the Last Date to Pay Fees and the Next Merit List Release Date." };
-  const candidates = batch.candidateIds.map((id) => ds.candidates.find((c) => c.id === id)).filter((c) => c && !c.meritListReleaseId);
+  const candidates = batch.candidateIds
+    .map((id) => ds.candidates.find((c) => c.id === id && c.programmeId === batch.programmeId && c.academicYearId === batch.academicYearId))
+    .filter((c) => c && !c.meritListReleaseId);
   if (!candidates.length) return { error: "Every candidate in this batch has already been released." };
   const priorCount = ds.meritListReleases.filter((r) => r.programmeId === batch.programmeId && r.category === batch.category).length;
   const date = nowISO().slice(0, 10);
@@ -996,7 +1002,7 @@ export function releaseMeritBatch(ds, batchId, lastFeeDate, nextReleaseDate) {
 export function releaseFromWaitingList(ds, form) {
   if (!Number.isFinite(form.count) || form.count <= 0) return { error: "Enter a valid number of candidates to release." };
   if (!form.lastFeeDate || !form.nextReleaseDate) return { error: "Enter both the Last Date to Pay Fees and the Next Merit List Release Date." };
-  const picked = ds.candidates.filter((c) => c.programmeId === form.programmeId && c.category === form.category && c.meritCategory === "waiting" && !c.meritListReleaseId)
+  const picked = ds.candidates.filter((c) => c.programmeId === form.programmeId && c.academicYearId === form.academicYearId && c.category === form.category && c.meritCategory === "waiting" && !c.meritListReleaseId)
     .sort((a, b) => (a.waitingListNumber > b.waitingListNumber ? 1 : -1)).slice(0, form.count);
   if (!picked.length) return { error: "No Waiting List candidates available for this category." };
   const priorCount = ds.meritListReleases.filter((r) => r.programmeId === form.programmeId && r.category === form.category).length;
