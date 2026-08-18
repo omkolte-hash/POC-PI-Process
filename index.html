@@ -379,6 +379,7 @@ a:hover{color:var(--color-accent);text-decoration:underline}
             <div class="field" style="margin:0;max-width:260px"><label>Search by Applicant ID or Name</label><input class="input" placeholder="e.g. SLAT-10023" value="{{ profileSearch }}" onChange="{{ onProfileSearchChange }}" /></div>
             <button type="button" class="btn btn-secondary" onClick="{{ onProfileSearch }}">Search</button>
           </div>
+          <sc-if value="{{ profileNotFound }}"><p>No candidate found in the active programme/academic year.</p></sc-if>
           <sc-if value="{{ profileCandidate }}"><div>
             <div class="card elev-sm" style="padding:var(--space-4);margin-bottom:var(--space-4);display:flex;flex-direction:row;gap:var(--space-4);align-items:center">
               <div style="width:64px;height:64px;border-radius:50%;background:var(--color-accent-100);color:var(--color-accent-700);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-size:22px;flex:none">{{ profileCandidate.initials }}</div>
@@ -1893,8 +1894,8 @@ class Component extends DCLogic {
       mcBody: `Please review and approve: ${summary}.\n\n${detailText || ""}\nOpen Approvals › Sent Mail in the app and use the approval link on this mail to Approve or Reject.`
     });
   }
-  formatCandidateListForMail(d, candidateIds, scoreLabel, scoreFn) {
-    const rows = candidateIds.map((id) => d.candidates.find((c) => c.id === id)).filter(Boolean);
+  formatCandidateListForMail(d, candidateIds, programmeId, academicYearId, scoreLabel, scoreFn) {
+    const rows = candidateIds.map((id) => d.candidates.find((c) => c.id === id && c.programmeId === programmeId && c.academicYearId === academicYearId)).filter(Boolean);
     const shown = rows.slice(0, 30).map((c) => `${c.id} — ${c.name} — ${scoreLabel} ${scoreFn(c)}`);
     const more = rows.length > 30 ? `\n...and ${rows.length - 30} more (see the app for the full list).` : "";
     return `Candidates (${rows.length}):\n${shown.join("\n")}${more}\n`;
@@ -2018,7 +2019,7 @@ class Component extends DCLogic {
     const validRows = parsed.rows.filter((r) => r.valid).map((r) => r.data);
     const res = this.mutate(
       (ds) => this.engine.commitImportedCandidates(ds, pid, ayid, validRows),
-      (r) => `${r.added} new candidate${r.added === 1 ? "" : "s"} imported${r.existing ? `, ${r.existing} already in this programme (skipped)` : ""}${r.existingOtherProgramme ? `, ${r.existingOtherProgramme} Applicant ID(s) already used by a different programme (skipped — Applicant IDs must be unique across the whole system)` : ""}.`
+      (r) => `${r.added} new candidate${r.added === 1 ? "" : "s"} imported${r.existing ? `, ${r.existing} already in this programme + academic year (skipped)` : ""}.`
     );
     this.setState({ importCommitted: res, importParsed: null, importFileName: "" });
   }
@@ -2229,7 +2230,8 @@ class Component extends DCLogic {
 
   buildDashboard(d) {
     const pid = d.activeProgrammeId;
-    const cands = d.candidates.filter((c) => c.programmeId === pid);
+    const ayid = d.activeAcademicYearByProgramme[pid];
+    const cands = d.candidates.filter((c) => c.programmeId === pid && c.academicYearId === ayid);
     const count = (fn) => cands.filter(fn).length;
     const staticStats = pid === "BSCAI" ? { paid: "4,999", appeared: "3,626" } : { paid: "1,240", appeared: "860" };
     const kpis = [
@@ -2374,8 +2376,9 @@ class Component extends DCLogic {
   }
   buildImport(d) {
     const pid = d.activeProgrammeId;
-    const ayLabel = (d.academicYears.find((y) => y.id === d.activeAcademicYearByProgramme[pid]) || {}).label || "—";
-    const cands = d.candidates.filter((c) => c.programmeId === pid);
+    const ayid = d.activeAcademicYearByProgramme[pid];
+    const ayLabel = (d.academicYears.find((y) => y.id === ayid) || {}).label || "—";
+    const cands = d.candidates.filter((c) => c.programmeId === pid && c.academicYearId === ayid);
     const parsed = this.state.importParsed;
     const committed = this.state.importCommitted;
     return {
@@ -2394,7 +2397,8 @@ class Component extends DCLogic {
   }
   buildCandidateList(d) {
     const pid = d.activeProgrammeId;
-    let cands = d.candidates.filter((c) => c.programmeId === pid);
+    const ayid = d.activeAcademicYearByProgramme[pid];
+    let cands = d.candidates.filter((c) => c.programmeId === pid && c.academicYearId === ayid);
     if (this.state.clFilterCategory !== "ALL") cands = cands.filter((c) => c.category === this.state.clFilterCategory);
     if (this.state.clFilterStatus !== "ALL") cands = cands.filter((c) => c.shortlistStatus === this.state.clFilterStatus);
     if (this.state.clSearch.trim()) {
@@ -2420,13 +2424,21 @@ class Component extends DCLogic {
 
   onProfileSearch() {
     const q = this.state.profileSearch.trim().toLowerCase();
-    const c = this.state.data.candidates.find((x) => x.id.toLowerCase() === q || x.name.toLowerCase() === q || x.id.toLowerCase().includes(q));
+    const pid = this.state.data.activeProgrammeId, ayid = this.state.data.activeAcademicYearByProgramme[pid];
+    // Scoped to the active programme+year, same as every other list on this page — an Applicant ID
+    // is no longer unique on its own, so searching the whole system could match more than one candidate.
+    const c = this.state.data.candidates.find((x) => x.programmeId === pid && x.academicYearId === ayid &&
+      (x.id.toLowerCase() === q || x.name.toLowerCase() === q || x.id.toLowerCase().includes(q)));
     this.setState({ selectedCandidateId: c ? c.id : null });
-    if (!c) this.showToast("No candidate found for that search.");
+    if (!c) this.showToast("No candidate found in the active programme/academic year for that search.");
   }
   buildCandidateProfile(d) {
-    const c = d.candidates.find((x) => x.id === this.state.selectedCandidateId);
-    const out = { profileSearch: this.state.profileSearch, onProfileSearchChange: (e) => this.setState({ profileSearch: e.target.value }), onProfileSearch: () => this.onProfileSearch(), profileCandidate: null };
+    const pid = d.activeProgrammeId, ayid = d.activeAcademicYearByProgramme[pid];
+    const c = d.candidates.find((x) => x.id === this.state.selectedCandidateId && x.programmeId === pid && x.academicYearId === ayid);
+    const out = {
+      profileSearch: this.state.profileSearch, onProfileSearchChange: (e) => this.setState({ profileSearch: e.target.value }), onProfileSearch: () => this.onProfileSearch(),
+      profileCandidate: null, profileNotFound: !!this.state.selectedCandidateId && !c
+    };
     if (!c) return out;
     const session = c.allocation && d.sessions.find((s) => s.id === c.allocation.sessionId);
     const group = session && session.groups.find((g) => g.id === c.allocation.groupId);
@@ -2459,7 +2471,7 @@ class Component extends DCLogic {
     out.onApvChange = (e) => this.setState({ apvDraftId: c.id, apvDraft: e.target.value });
     out.onApvSave = () => {
       const value = this.state.apvDraftId === c.id ? this.state.apvDraft : c.apvScore;
-      this.mutate((ds) => this.engine.setApvScore(ds, c.id, value), "APV score saved.");
+      this.mutate((ds) => this.engine.setApvScore(ds, c.id, value, c.programmeId, c.academicYearId), "APV score saved.");
       this.setState({ apvDraftId: null, apvDraft: "" });
     };
     return out;
@@ -2478,7 +2490,8 @@ class Component extends DCLogic {
   }
   buildShortlist(d) {
     const pid = d.activeProgrammeId;
-    const pool = d.candidates.filter((c) => c.programmeId === pid && c.category === this.state.slCategory && c.shortlistStatus === "yet-to-shortlist").sort((a, b) => b.slatScore - a.slatScore);
+    const ayid = d.activeAcademicYearByProgramme[pid];
+    const pool = d.candidates.filter((c) => c.programmeId === pid && c.academicYearId === ayid && c.category === this.state.slCategory && c.shortlistStatus === "yet-to-shortlist").sort((a, b) => b.slatScore - a.slatScore);
     const value = this.state.slCriteria === "count" ? Number(this.state.slCount) : Number(this.state.slCutoff);
     // Mirror confirmShortlist's validation so the preview never shows an inverted/misleading selection
     // for a negative or non-numeric value (e.g. slice(0, -5) would otherwise select "everyone but the last 5").
@@ -2529,7 +2542,7 @@ class Component extends DCLogic {
           approvalTagCls: btn.tagCls, approvalTagLabel: btn.tagLabel, showSend: btn.showSend && canResend,
           onView: () => this.viewShortlist(l.id),
           onSendForApproval: () => this.onSendForApproval("shortlist", l.id, l.programmeId, l.academicYearId, `Shortlist ${l.id} \u2014 ${l.category}, ${l.candidateIds.length} candidate(s)`, "shortlist-approvals",
-            `Criteria: ${l.criteria === "count" ? `Top ${l.value} by SLAT score` : `Cutoff \u2265 ${l.value}`}\n\n${this.formatCandidateListForMail(d, l.candidateIds, "SLAT", (c) => c.slatScore)}`)
+            `Criteria: ${l.criteria === "count" ? `Top ${l.value} by SLAT score` : `Cutoff \u2265 ${l.value}`}\n\n${this.formatCandidateListForMail(d, l.candidateIds, l.programmeId, l.academicYearId, "SLAT", (c) => c.slatScore)}`)
         };
       })
     };
@@ -2549,9 +2562,9 @@ class Component extends DCLogic {
       sdSiuLabel: l.approvals.siu ? `${l.approvals.siu.status} · ${l.approvals.siu.date}` : (l.status === "pending-siu" ? "Pending" : "—"),
       sdShowSend: btn.showSend && l.status !== "rejected", sdApprovalTagLabel: btn.tagLabel,
       sdOnSendForApproval: () => this.onSendForApproval("shortlist", l.id, l.programmeId, l.academicYearId, `Shortlist ${l.id} — ${l.category}, ${l.candidateIds.length} candidate(s)`, "shortlist-detail",
-        `Criteria: ${l.criteria === "count" ? `Top ${l.value} by SLAT score` : `Cutoff ≥ ${l.value}`}\n\n${this.formatCandidateListForMail(d, l.candidateIds, "SLAT", (c) => c.slatScore)}`),
+        `Criteria: ${l.criteria === "count" ? `Top ${l.value} by SLAT score` : `Cutoff ≥ ${l.value}`}\n\n${this.formatCandidateListForMail(d, l.candidateIds, l.programmeId, l.academicYearId, "SLAT", (c) => c.slatScore)}`),
       sdCandidateRows: l.candidateIds.map((id) => {
-        const c = d.candidates.find((x) => x.id === id);
+        const c = d.candidates.find((x) => x.id === id && x.programmeId === l.programmeId && x.academicYearId === l.academicYearId);
         return c ? { id: c.id, name: c.name, category: c.category, slatScore: c.slatScore, ...this.statusTag(c.shortlistStatus), onView: () => this.viewCandidate(c.id) } : null;
       }).filter(Boolean)
     };
@@ -2795,10 +2808,10 @@ class Component extends DCLogic {
     if (!session) return null;
     const groups = session.groups.map((g) => ({
       id: g.id, name: g.name, capacity: g.capacity,
-      existingCandidates: g.candidateIds.map((id) => d.candidates.find((c) => c.id === id)).filter(Boolean),
+      existingCandidates: g.candidateIds.map((id) => d.candidates.find((c) => c.id === id && c.programmeId === session.programmeId && c.academicYearId === session.academicYearId)).filter(Boolean),
       assigned: []
     }));
-    const candidates = candidateIds.map((id) => d.candidates.find((c) => c.id === id)).filter(Boolean);
+    const candidates = candidateIds.map((id) => d.candidates.find((c) => c.id === id && c.programmeId === session.programmeId && c.academicYearId === session.academicYearId)).filter(Boolean);
     let gi = 0;
     const unplaced = [];
     candidates.forEach((c) => {
@@ -2885,10 +2898,11 @@ class Component extends DCLogic {
   }
   buildCandidateAllocation(d) {
     const pid = d.activeProgrammeId;
-    let eligible = d.candidates.filter((c) => c.programmeId === pid && c.shortlistStatus === "second-level-approved" && !c.allocation);
+    const ayid = d.activeAcademicYearByProgramme[pid];
+    let eligible = d.candidates.filter((c) => c.programmeId === pid && c.academicYearId === ayid && c.shortlistStatus === "second-level-approved" && !c.allocation);
     if (this.state.caFilterCategory !== "ALL") eligible = eligible.filter((c) => c.category === this.state.caFilterCategory);
     const eligibleIds = eligible.map((c) => c.id);
-    const relevant = d.candidates.filter((c) => c.programmeId === pid && (c.shortlistStatus === "second-level-approved" || c.allocation));
+    const relevant = d.candidates.filter((c) => c.programmeId === pid && c.academicYearId === ayid && (c.shortlistStatus === "second-level-approved" || c.allocation));
     const sessions = d.sessions.filter((s) => s.programmeId === pid);
     const selectedSession = sessions.find((s) => s.id === this.state.caSessionId);
     const selCount = this.state.caSelectedIds.length;
@@ -2922,7 +2936,7 @@ class Component extends DCLogic {
     if (selectedSession && !this.state.aaMode) {
       base.caLiveGroups = selectedSession.groups.map((g) => ({
         id: g.id, name: g.name, capacity: g.capacity, filled: g.candidateIds.length,
-        cards: g.candidateIds.map((id) => d.candidates.find((c) => c.id === id)).filter(Boolean).map(draggableCard)
+        cards: g.candidateIds.map((id) => d.candidates.find((c) => c.id === id && c.programmeId === selectedSession.programmeId && c.academicYearId === selectedSession.academicYearId)).filter(Boolean).map(draggableCard)
       }));
     }
     if (this.state.aaMode && this.state.aaPreview) {
@@ -3204,7 +3218,7 @@ class Component extends DCLogic {
     const groups = session ? session.groups : [];
     const gid = this.state.blGroupId || (groups[0] && groups[0].id) || "";
     const group = groups.find((g) => g.id === gid);
-    const candidates = group ? group.candidateIds.map((id) => d.candidates.find((c) => c.id === id)).filter(Boolean) : [];
+    const candidates = group && session ? group.candidateIds.map((id) => d.candidates.find((c) => c.id === id && c.programmeId === session.programmeId && c.academicYearId === session.academicYearId)).filter(Boolean) : [];
     const candidateIds = candidates.map((c) => c.id);
     return {
       blSessions: sessions.map((s, i) => ({ id: s.id, label: `Session ${String(i + 1).padStart(2, "0")} — ${this.engine.fmtDate(s.date)}` })),
@@ -3343,25 +3357,35 @@ class Component extends DCLogic {
   // ---------- Panelist Portal ----------
   onPnJoin(sessionId, groupId) { this.setState({ pnJoinedSessionId: sessionId, pnJoinedGroupId: groupId, pnCandidateIndex: 0, pnPanelCollapsed: false }); }
   onPnLeave() { this.setState({ pnJoinedSessionId: null, pnJoinedGroupId: null, pnCandidateIndex: 0, pnPanelCollapsed: false }); }
+  // The joined session is the scope every candidate lookup below needs — a candidate's Applicant ID
+  // alone isn't unique across programmes/academic years, so every mutation must be scoped to it too.
+  pnScope() {
+    const session = this.state.data.sessions.find((s) => s.id === this.state.pnJoinedSessionId);
+    return session ? { programmeId: session.programmeId, academicYearId: session.academicYearId } : { programmeId: null, academicYearId: null };
+  }
   onPnNext(candidateId, panelistId, total) {
-    const cand = this.state.data.candidates.find((x) => x.id === candidateId);
+    const { programmeId, academicYearId } = this.pnScope();
+    const cand = this.state.data.candidates.find((x) => x.id === candidateId && x.programmeId === programmeId && x.academicYearId === academicYearId);
     if (cand && cand.piAttendance === "present") {
-      this.mutate((ds) => this.engine.lockPanelistScore(ds, candidateId, panelistId));
+      this.mutate((ds) => this.engine.lockPanelistScore(ds, candidateId, panelistId, programmeId, academicYearId));
     }
     this.setState({ pnCandidateIndex: Math.min(this.state.pnCandidateIndex + 1, total) });
   }
   onPnToggleCollapse() { this.setState({ pnPanelCollapsed: !this.state.pnPanelCollapsed }); }
   onPnAttendance(candidateId, status) {
-    this.mutate((ds) => this.engine.markAttendance(ds, candidateId, "pi", status), `PI attendance marked ${status}.`);
+    const { programmeId, academicYearId } = this.pnScope();
+    this.mutate((ds) => this.engine.markAttendance(ds, candidateId, "pi", status, programmeId, academicYearId), `PI attendance marked ${status}.`);
   }
   onPnScoreField(candidateId, panelistId, fieldKey, val) {
-    const c = this.state.data.candidates.find((x) => x.id === candidateId);
+    const { programmeId, academicYearId } = this.pnScope();
+    const c = this.state.data.candidates.find((x) => x.id === candidateId && x.programmeId === programmeId && x.academicYearId === academicYearId);
     const current = (c.piScores && c.piScores[panelistId]) || {};
     const updated = { ...current, [fieldKey]: val === "" ? null : Number(val) };
-    this.mutate((ds) => this.engine.submitPanelistScore(ds, candidateId, panelistId, updated));
+    this.mutate((ds) => this.engine.submitPanelistScore(ds, candidateId, panelistId, updated, programmeId, academicYearId));
   }
   onPnNotes(candidateId, panelistId, text) {
-    this.mutate((ds) => this.engine.setPanelistNote(ds, candidateId, panelistId, text));
+    const { programmeId, academicYearId } = this.pnScope();
+    this.mutate((ds) => this.engine.setPanelistNote(ds, candidateId, panelistId, text, programmeId, academicYearId));
   }
   buildPanelistPortal(d) {
     const s = this.state;
@@ -3459,7 +3483,8 @@ class Component extends DCLogic {
     const { cvModalCandidateId, cvModalDocType, cvModalStatus } = this.state;
     if (!cvModalStatus) { this.showToast("Select a document status."); return; }
     const field = cvModalDocType === "da" ? "da" : "institute";
-    this.mutate((ds) => this.engine.setVerification(ds, cvModalCandidateId, field, cvModalStatus), "Document status saved.");
+    const pid = this.state.data.activeProgrammeId, ayid = this.state.data.activeAcademicYearByProgramme[pid];
+    this.mutate((ds) => this.engine.setVerification(ds, cvModalCandidateId, field, cvModalStatus, pid, ayid), "Document status saved.");
     this.onCvCloseModal();
   }
   // Modeled on the institute's real Category Document Status screen: a filterable list of every candidate
@@ -3467,12 +3492,13 @@ class Component extends DCLogic {
   // each row's "View"/"DA Eligible" opening a document upload + Valid/InValid review modal.
   buildVerification(d) {
     const pid = d.activeProgrammeId;
+    const ayid = d.activeAcademicYearByProgramme[pid];
     const search = (this.state.cvSearch || "").trim().toLowerCase();
     const catFilter = this.state.cvCategoryFilter || "ALL";
     const instFilter = this.state.cvInstituteStatusFilter || "ALL";
 
     // OPEN category has no category document to verify at all, so it never belongs on this list.
-    let pool = d.candidates.filter((c) => c.programmeId === pid && c.category !== "OPEN");
+    let pool = d.candidates.filter((c) => c.programmeId === pid && c.academicYearId === ayid && c.category !== "OPEN");
     if (search) pool = pool.filter((c) => c.id.toLowerCase().includes(search) || c.name.toLowerCase().includes(search));
     if (catFilter !== "ALL") pool = pool.filter((c) => c.category === catFilter);
     if (instFilter !== "ALL") pool = pool.filter((c) => (c.verification.categoryVerification.institute || "pending") === instFilter);
@@ -3490,7 +3516,7 @@ class Component extends DCLogic {
       };
     });
 
-    const mc = this.state.cvModalCandidateId ? d.candidates.find((x) => x.id === this.state.cvModalCandidateId) : null;
+    const mc = this.state.cvModalCandidateId ? d.candidates.find((x) => x.id === this.state.cvModalCandidateId && x.programmeId === pid && x.academicYearId === ayid) : null;
     let cvModal = null;
     if (mc) {
       const docType = this.state.cvModalDocType;
@@ -3518,10 +3544,11 @@ class Component extends DCLogic {
 
   buildFinalScores(d) {
     const pid = d.activeProgrammeId;
+    const ayid = d.activeAcademicYearByProgramme[pid];
     // Show every candidate the panel has finished scoring, even if APV hasn't been entered yet
     // (a separate manual step on the candidate's Profile page) — c.finalScore only exists once
     // both are in, so waiting on it here would silently hide PI-scored candidates with no explanation.
-    let pool = d.candidates.filter((c) => c.programmeId === pid && c.piAttendance === "present" && c.piTotal != null);
+    let pool = d.candidates.filter((c) => c.programmeId === pid && c.academicYearId === ayid && c.piAttendance === "present" && c.piTotal != null);
     if (this.state.fsCategory !== "ALL") pool = pool.filter((c) => c.category === this.state.fsCategory);
     return {
       categories: d.categories, fsCategory: this.state.fsCategory, onFsCategory: (e) => this.setState({ fsCategory: e.target.value }),
@@ -3544,8 +3571,8 @@ class Component extends DCLogic {
     }), (r) => r.error ? r.error : `Merit processing complete: ${r.merit} Merit, ${r.waiting} Waiting, ${r.rejected} Rejected.${r.batch ? ` Batch ${r.batch.id} created for approval.` : ""}`);
   }
   buildMeritProcessing(d) {
-    const pid = d.activeProgrammeId, cat = this.state.mpCategory;
-    const all = d.candidates.filter((c) => c.programmeId === pid && c.category === cat && c.outcome === "ready-for-merit").sort((a, b) => b.finalScore.final - a.finalScore.final);
+    const pid = d.activeProgrammeId, ayid = d.activeAcademicYearByProgramme[pid], cat = this.state.mpCategory;
+    const all = d.candidates.filter((c) => c.programmeId === pid && c.academicYearId === ayid && c.category === cat && c.outcome === "ready-for-merit").sort((a, b) => b.finalScore.final - a.finalScore.final);
     const pending = all.filter((c) => !c.meritCategory);
     const decided = all.filter((c) => c.meritCategory);
     const meritRows = decided.filter((c) => c.meritCategory === "merit");
@@ -3555,7 +3582,7 @@ class Component extends DCLogic {
     // Same candidates that would silently vanish from Final Scores (present, PI-scored, no APV yet) also
     // never reach "ready-for-merit" — so they'd never enter this table either. Since a merit table can't
     // rank a candidate with no Final Score, surface a count instead of letting them disappear unexplained.
-    const awaitingApvCount = d.candidates.filter((c) => c.programmeId === pid && c.category === cat && c.piAttendance === "present" && c.piTotal != null && c.apvScore == null).length;
+    const awaitingApvCount = d.candidates.filter((c) => c.programmeId === pid && c.academicYearId === ayid && c.category === cat && c.piAttendance === "present" && c.piTotal != null && c.apvScore == null).length;
     return {
       mpAwaitingApvCount: awaitingApvCount,
       categories: d.categories, mpCategory: cat, onMpCategory: (e) => this.onMpCategory(e),
@@ -3591,7 +3618,7 @@ class Component extends DCLogic {
           approvalTagCls: btn.tagCls, approvalTagLabel: btn.tagLabel, showSend: btn.showSend && canResend,
           onView: () => this.viewMeritBatch(b.id),
           onSendForApproval: () => this.onSendForApproval("merit", b.id, b.programmeId, b.academicYearId, `Merit List ${b.id} \u2014 ${b.category}, ${b.candidateIds.length} candidate(s)`, "merit-approval",
-            this.formatCandidateListForMail(d, b.candidateIds, "Final Score", (c) => c.finalScore ? c.finalScore.final : "\u2014"))
+            this.formatCandidateListForMail(d, b.candidateIds, b.programmeId, b.academicYearId, "Final Score", (c) => c.finalScore ? c.finalScore.final : "\u2014"))
         };
       })
     };
@@ -3610,9 +3637,9 @@ class Component extends DCLogic {
       mbSiuLabel: b.approvals.siu ? `${b.approvals.siu.status} \u00b7 ${b.approvals.siu.date}` : (b.status === "pending-siu" ? "Pending" : "\u2014"),
       mbShowSend: btn.showSend && b.status !== "rejected", mbApprovalTagLabel: btn.tagLabel,
       mbOnSendForApproval: () => this.onSendForApproval("merit", b.id, b.programmeId, b.academicYearId, `Merit List ${b.id} \u2014 ${b.category}, ${b.candidateIds.length} candidate(s)`, "merit-batch-detail",
-        this.formatCandidateListForMail(d, b.candidateIds, "Final Score", (c) => c.finalScore ? c.finalScore.final : "\u2014")),
+        this.formatCandidateListForMail(d, b.candidateIds, b.programmeId, b.academicYearId, "Final Score", (c) => c.finalScore ? c.finalScore.final : "\u2014")),
       mbCandidateRows: b.candidateIds.map((id) => {
-        const c = d.candidates.find((x) => x.id === id);
+        const c = d.candidates.find((x) => x.id === id && x.programmeId === b.programmeId && x.academicYearId === b.academicYearId);
         return c ? { id: c.id, name: c.name, category: c.category, final: c.finalScore ? c.finalScore.final : "\u2014", onView: () => this.viewCandidate(c.id) } : null;
       }).filter(Boolean)
     };
@@ -3690,8 +3717,8 @@ class Component extends DCLogic {
     }
   }
   onReleaseWaitingList() {
-    const f = this.state, pid = this.state.data.activeProgrammeId;
-    this.mutate((ds) => this.engine.releaseFromWaitingList(ds, { programmeId: pid, category: f.mrWlCategory, count: Number(f.mrWlCount), lastFeeDate: f.mrWlLastFeeDate, nextReleaseDate: f.mrWlNextDate }),
+    const f = this.state, pid = this.state.data.activeProgrammeId, ayid = this.state.data.activeAcademicYearByProgramme[pid];
+    this.mutate((ds) => this.engine.releaseFromWaitingList(ds, { programmeId: pid, academicYearId: ayid, category: f.mrWlCategory, count: Number(f.mrWlCount), lastFeeDate: f.mrWlLastFeeDate, nextReleaseDate: f.mrWlNextDate }),
       (r) => r.error ? r.error : `Release ${r.release.id} created with ${r.release.count} candidate(s).`);
   }
   buildMeritReleases(d) {
@@ -3699,7 +3726,7 @@ class Component extends DCLogic {
     let approvedBatches = d.meritBatches.filter((b) => b.programmeId === pid && b.status === "approved");
     if (cat !== "ALL") approvedBatches = approvedBatches.filter((b) => b.category === cat);
     const releasableRows = approvedBatches.map((b) => {
-      const pendingCount = b.candidateIds.filter((id) => { const c = d.candidates.find((x) => x.id === id); return c && !c.meritListReleaseId; }).length;
+      const pendingCount = b.candidateIds.filter((id) => { const c = d.candidates.find((x) => x.id === id && x.programmeId === b.programmeId && x.academicYearId === b.academicYearId); return c && !c.meritListReleaseId; }).length;
       return { batch: b, pendingCount };
     }).filter((r) => r.pendingCount > 0);
 
@@ -3731,7 +3758,8 @@ class Component extends DCLogic {
 
   buildWaitingList(d) {
     const pid = d.activeProgrammeId;
-    let pool = d.candidates.filter((c) => c.programmeId === pid && c.meritCategory === "waiting");
+    const ayid = d.activeAcademicYearByProgramme[pid];
+    let pool = d.candidates.filter((c) => c.programmeId === pid && c.academicYearId === ayid && c.meritCategory === "waiting");
     if (this.state.wlCategory !== "ALL") pool = pool.filter((c) => c.category === this.state.wlCategory);
     pool.sort((a, b) => (a.waitingListNumber > b.waitingListNumber ? 1 : -1));
     return {
@@ -3869,9 +3897,10 @@ class Component extends DCLogic {
   }
   buildProvisionalLetters(d) {
     const pid = d.activeProgrammeId;
+    const ayid = d.activeAcademicYearByProgramme[pid];
     const prog = d.programmes.find((p) => p.id === pid);
     const hasFeeConfig = !!(prog && prog.feeConfig);
-    const candidates = d.candidates.filter((c) => c.programmeId === pid && c.meritListReleaseId);
+    const candidates = d.candidates.filter((c) => c.programmeId === pid && c.academicYearId === ayid && c.meritListReleaseId);
     const candidateIds = candidates.map((c) => c.id);
     return {
       plNoFeeConfig: !hasFeeConfig, onPlGoToFees: () => this.openProgrammeFees(pid),
@@ -3894,7 +3923,8 @@ class Component extends DCLogic {
 
   buildReportsCandidates(d) {
     const pid = d.activeProgrammeId;
-    let pool = d.candidates.filter((c) => c.programmeId === pid);
+    const ayid = d.activeAcademicYearByProgramme[pid];
+    let pool = d.candidates.filter((c) => c.programmeId === pid && c.academicYearId === ayid);
     if (this.state.rcCategory !== "ALL") pool = pool.filter((c) => c.category === this.state.rcCategory);
     return {
       categories: d.categories, rcCategory: this.state.rcCategory, onRcCategory: (e) => this.setState({ rcCategory: e.target.value }),
