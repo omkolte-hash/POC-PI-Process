@@ -171,8 +171,8 @@ a:hover{color:var(--color-accent);text-decoration:underline}
           </div>
         </div></sc-if>
       </sc-if>
-        <sc-if value="{{ pageIsAcademicYear }}"><div style="max-width:820px">
-          <div class="card elev-sm" style="padding:var(--space-4);margin-bottom:var(--space-4);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:var(--space-4)">
+        <sc-if value="{{ pageIsAcademicYear }}"><div>
+          <div class="card elev-sm" style="padding:var(--space-4);margin-bottom:var(--space-4);display:flex;flex-direction:row;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:var(--space-4)">
             <div>
               <div class="card-kicker">Active Academic Year</div>
               <div style="font-family:var(--font-heading);font-size:34px;font-weight:400">{{ activeYearLabel }}</div>
@@ -194,7 +194,7 @@ a:hover{color:var(--color-accent);text-decoration:underline}
             </tbody>
           </table>
         </div></sc-if>
-        <sc-if value="{{ pageIsAssessmentConfig }}"><div style="max-width:1120px">
+        <sc-if value="{{ pageIsAssessmentConfig }}"><div>
           <div class="card elev-sm" style="padding:var(--space-4);margin-bottom:var(--space-4)">
             <div class="card-title" style="margin-bottom:var(--space-3)">{{ afSubmitLabel }} Assessment <span style="opacity:0.5;font-weight:400;font-size:12px">&mdash; all fields marked * are mandatory</span></div>
             <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-4);margin-bottom:var(--space-4)">
@@ -251,7 +251,7 @@ a:hover{color:var(--color-accent);text-decoration:underline}
             </tbody></table>
           </div>
         </div></sc-if>
-        <sc-if value="{{ pageIsAssessmentParameter }}"><div style="max-width:1120px">
+        <sc-if value="{{ pageIsAssessmentParameter }}"><div>
           <div class="card elev-sm" style="padding:var(--space-4);margin-bottom:var(--space-4)">
             <div class="field" style="margin:0;max-width:520px"><label>Programme *</label><select class="input" value="{{ apProgrammeId }}" onChange="{{ onApProgrammeChange }}">
               <sc-for list="{{ apProgrammeOptions }}" as="pr" hint-placeholder-count="2"><option value="{{ pr.id }}" selected="{{ pr.selected }}">{{ pr.name }}</option></sc-for>
@@ -308,7 +308,7 @@ a:hover{color:var(--color-accent);text-decoration:underline}
             </div>
           </div>
         </div></sc-if>
-        <sc-if value="{{ pageIsImport }}"><div style="max-width:820px">
+        <sc-if value="{{ pageIsImport }}"><div>
           <div class="card elev-sm" style="padding:var(--space-4);margin-bottom:var(--space-4)">
             <p style="opacity:0.75;margin-top:0">Upload a CSV of candidates for <strong>{{ activeProgrammeName }}</strong> &middot; {{ importActiveYearLabel }}. Required columns: Applicant ID, Name, Gender, Category, Education Background, 10th %, 12th %, SLAT Score, SLAT Percentile. Imported candidates start as <strong>Yet to Shortlist</strong>.</p>
             <div style="display:flex;gap:var(--space-3);align-items:center;flex-wrap:wrap">
@@ -374,13 +374,13 @@ a:hover{color:var(--color-accent);text-decoration:underline}
             </sc-for>
           </tbody></table>
         </div></sc-if>
-        <sc-if value="{{ pageIsCandidateProfile }}"><div style="max-width:880px">
+        <sc-if value="{{ pageIsCandidateProfile }}"><div>
           <div style="display:flex;gap:var(--space-3);margin-bottom:var(--space-4);align-items:flex-end">
             <div class="field" style="margin:0;max-width:260px"><label>Search by Applicant ID or Name</label><input class="input" placeholder="e.g. SLAT-10023" value="{{ profileSearch }}" onChange="{{ onProfileSearchChange }}" /></div>
             <button type="button" class="btn btn-secondary" onClick="{{ onProfileSearch }}">Search</button>
           </div>
           <sc-if value="{{ profileCandidate }}"><div>
-            <div class="card elev-sm" style="padding:var(--space-4);margin-bottom:var(--space-4);display:flex;gap:var(--space-4);align-items:center">
+            <div class="card elev-sm" style="padding:var(--space-4);margin-bottom:var(--space-4);display:flex;flex-direction:row;gap:var(--space-4);align-items:center">
               <div style="width:64px;height:64px;border-radius:50%;background:var(--color-accent-100);color:var(--color-accent-700);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-size:22px;flex:none">{{ profileCandidate.initials }}</div>
               <div style="flex:1">
                 <div style="font-family:var(--font-heading);font-size:24px">{{ profileCandidate.name }}</div>
@@ -436,7 +436,7 @@ a:hover{color:var(--color-accent);text-decoration:underline}
             </div>
           </div></sc-if>
         </div></sc-if>
-        <sc-if value="{{ pageIsShortlist }}"><div style="max-width:900px">
+        <sc-if value="{{ pageIsShortlist }}"><div>
           <div class="card elev-sm" style="padding:var(--space-4);margin-bottom:var(--space-4)">
             <p style="opacity:0.7;margin-top:0;font-size:13px">Shortlisting runs one Reservation Category at a time &mdash; there is deliberately no "All Categories" option.</p>
             <div style="display:flex;gap:var(--space-6);flex-wrap:wrap">
@@ -748,7 +748,7 @@ a:hover{color:var(--color-accent);text-decoration:underline}
           </sc-for>
         </div></sc-if>
         <sc-if value="{{ pageIsPanelists }}"><div>
-          <div class="card elev-sm" style="padding:var(--space-4);margin-bottom:var(--space-4);max-width:1100px">
+          <div class="card elev-sm" style="padding:var(--space-4);margin-bottom:var(--space-4)">
             <div class="card-title" style="margin-bottom:var(--space-3)">Panelist Creation</div>
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-4)">
               <div class="field" style="margin:0"><label>Salutation *</label><select class="input" value="{{ pfSalutation }}" onChange="{{ onPfSalutation }}">
@@ -835,7 +835,7 @@ a:hover{color:var(--color-accent);text-decoration:underline}
         <sc-if value="{{ pageIsPanelistDetail }}"><div>
           <button type="button" class="btn btn-ghost" style="margin-bottom:var(--space-4)" onClick="{{ onBackToPanelists }}"><i data-lucide="arrow-left" style="width:14px;height:14px"></i>Back to Panelists</button>
           <sc-if value="{{ pdNotFound }}"><p>Panelist not found.</p></sc-if>
-          <sc-if value="{{ pdFound }}"><div class="card elev-sm" style="padding:var(--space-4);max-width:820px">
+          <sc-if value="{{ pdFound }}"><div class="card elev-sm" style="padding:var(--space-4)">
             <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:var(--space-4);margin-bottom:var(--space-4)">
               <div style="display:flex;gap:var(--space-4);align-items:center">
                 <sc-if value="{{ pdHasImage }}"><img src="{{ pdImageDataUrl }}" style="width:72px;height:72px;object-fit:cover;border-radius:50%" /></sc-if>
@@ -1286,7 +1286,7 @@ a:hover{color:var(--color-accent);text-decoration:underline}
             </sc-for>
           </tbody></table>
         </div></sc-if>
-        <sc-if value="{{ pageIsMailCompose }}"><div style="max-width:640px">
+        <sc-if value="{{ pageIsMailCompose }}"><div>
           <sc-if value="{{ mcFound }}"><div>
             <div class="card elev-sm" style="padding:var(--space-4)">
               <div class="card-title" style="margin-bottom:var(--space-1)">{{ mcLevelLabel }}</div>
@@ -1362,7 +1362,7 @@ a:hover{color:var(--color-accent);text-decoration:underline}
             <sc-for list="{{ iuRows }}" as="r" hint-placeholder-count="3"><tr><td>{{ r.name }}</td><td>{{ r.adminName }}</td><td><code>{{ r.adminEmail }}</code></td><td><code>{{ r.password }}</code></td><td><span class="{{ r.tagCls }}">{{ r.statusLabel }}</span></td></tr></sc-for>
           </tbody></table>
         </div></sc-if>
-        <sc-if value="{{ pageIsSystemSettings }}"><div class="card elev-sm" style="padding:var(--space-4);max-width:560px">
+        <sc-if value="{{ pageIsSystemSettings }}"><div class="card elev-sm" style="padding:var(--space-4)">
           <p style="margin-top:0">Platform-wide configuration (branding, notification templates, integrations) is out of scope for this prototype \u2014 shown here as a placeholder screen in the Super Admin navigation.</p>
         </div></sc-if>
         <sc-if value="{{ pageIsAuditLogs }}"><div>
@@ -1387,7 +1387,7 @@ a:hover{color:var(--color-accent);text-decoration:underline}
             </sc-for>
           </tbody></table>
         </div></sc-if>
-        <sc-if value="{{ pageIsProgrammeFees }}"><div style="max-width:720px">
+        <sc-if value="{{ pageIsProgrammeFees }}"><div>
           <button type="button" class="btn btn-ghost" style="margin-bottom:var(--space-4)" onClick="{{ onPgFeeBack }}"><i data-lucide="arrow-left" style="width:14px;height:14px"></i>Back to Programmes</button>
           <sc-if value="{{ pgFeeNotFound }}"><p>Programme not found.</p></sc-if>
           <sc-if value="{{ pgFeeFound }}"><div>
@@ -1551,7 +1551,7 @@ const PAGE_RESTORE_FALLBACK = {
 
 class Component extends DCLogic {
   state = {
-    page: "dashboard", loaded: false, data: null, toast: null, navCollapsed: {},
+    page: "dashboard", loaded: false, data: null, toast: null, openNavGroup: null,
     needsFileConnect: false, needsFileReconnect: false, reconnectFileName: "", fileName: "",
     importFileName: "", importParsed: null, importCommitted: null,
     selectedMeritBatchId: null, selectedPanelistId: null, apvDraftId: null, apvDraft: "",
@@ -1633,7 +1633,13 @@ class Component extends DCLogic {
     } catch (err) { /* sessionStorage unavailable (e.g. private browsing) — session just won't survive a reload */ }
   }
 
-  goTo(page) { this.setState({ page }); }
+  goTo(page, extra, cb) {
+    const group = (this.pageTitles()[page] || [])[0];
+    // Accordion nav: navigating into a page opens its group and collapses whichever
+    // other group was open, same as an explicit click on the group header.
+    const openNavGroup = group ? group : this.state.openNavGroup;
+    this.setState({ page, openNavGroup, ...extra }, cb);
+  }
   showToast(msg) {
     this.setState({ toast: msg });
     clearTimeout(this._toastTimer);
@@ -1847,12 +1853,12 @@ class Component extends DCLogic {
     const m = (this.engine && this.engine.STATUS_META[key]) || { label: key, cls: "tag-neutral" };
     return { tagCls: `tag ${m.cls}`, statusLabel: m.label };
   }
-  viewCandidate(id) { this.setState({ selectedCandidateId: id, page: "candidate-profile" }); }
-  viewShortlist(id) { this.setState({ selectedShortlistId: id, page: "shortlist-detail" }); }
-  viewMeritBatch(id) { this.setState({ selectedMeritBatchId: id, page: "merit-batch-detail" }); }
-  viewPanelist(id) { this.setState({ selectedPanelistId: id, page: "panelist-detail" }); }
+  viewCandidate(id) { this.goTo("candidate-profile", { selectedCandidateId: id }); }
+  viewShortlist(id) { this.goTo("shortlist-detail", { selectedShortlistId: id }); }
+  viewMeritBatch(id) { this.goTo("merit-batch-detail", { selectedMeritBatchId: id }); }
+  viewPanelist(id) { this.goTo("panelist-detail", { selectedPanelistId: id }); }
   editPanelist(id) {
-    this.setState({ page: "panelists", pfMode: "existing" }, () => this.onPfExistingSelect({ target: { value: id } }));
+    this.goTo("panelists", { pfMode: "existing" }, () => this.onPfExistingSelect({ target: { value: id } }));
   }
   findApprovalRequest(d, subjectType, subjectId) {
     const matches = d.approvalRequests.filter((r) => r.subjectType === subjectType && r.subjectId === subjectId);
@@ -1881,11 +1887,10 @@ class Component extends DCLogic {
       req = this.mutate((ds) => this.engine.createApprovalRequest(ds, { subjectType, subjectId, programmeId, academicYearId, summary }));
     }
     const level = req.level;
-    this.setState({
+    this.goTo("mail-compose", {
       mcRequestId: req.id, mcReturnPage: returnPage,
       mcTo: "", mcSubject: `Approval needed — ${summary} (${level === "director" ? "Director" : "SIU"} level)`,
-      mcBody: `Please review and approve: ${summary}.\n\n${detailText || ""}\nOpen Approvals › Sent Mail in the app and use the approval link on this mail to Approve or Reject.`,
-      page: "mail-compose"
+      mcBody: `Please review and approve: ${summary}.\n\n${detailText || ""}\nOpen Approvals › Sent Mail in the app and use the approval link on this mail to Approve or Reject.`
     });
   }
   formatCandidateListForMail(d, candidateIds, scoreLabel, scoreFn) {
@@ -1899,9 +1904,9 @@ class Component extends DCLogic {
     if (!mcTo.trim()) { this.showToast("Enter a recipient email."); return; }
     const res = this.mutate((ds) => this.engine.sendApprovalMail(ds, mcRequestId, { to: mcTo, subject: mcSubject, body: mcBody }),
       (r) => r.error ? r.error : "Mail sent — open it from Approvals › Sent Mail.");
-    if (res && res.ok) this.setState({ page: "sent-mail" });
+    if (res && res.ok) this.goTo("sent-mail");
   }
-  onMcCancel() { this.setState({ page: this.state.mcReturnPage }); }
+  onMcCancel() { this.goTo(this.state.mcReturnPage); }
   onOpenApprovalLink(token) {
     const url = `${window.location.origin}${window.location.pathname}?approval=${token}`;
     window.open(url, "_blank");
@@ -2121,13 +2126,13 @@ class Component extends DCLogic {
     const titles = this.pageTitles()[page] || ["", ""];
     const navGroups = this.navSpec().map((g) => {
       const hasActive = g.items.some(([key]) => key === page);
-      // A group the user hasn't touched defaults open only while it holds the current page, so
-      // navigating there doesn't hide where you are; an explicit toggle always wins after that.
-      const open = this.state.navCollapsed[g.title] !== undefined ? !this.state.navCollapsed[g.title] : hasActive;
+      // Accordion: at most one group open at a time. Before the user has ever
+      // touched the menu, the group holding the current page opens by default.
+      const open = this.state.openNavGroup !== null ? this.state.openNavGroup === g.title : hasActive;
       return {
         title: g.title, open,
         chevron: open ? "chevron-down" : "chevron-right",
-        onToggle: () => this.setState({ navCollapsed: { ...this.state.navCollapsed, [g.title]: open } }),
+        onToggle: () => this.setState({ openNavGroup: open ? "" : g.title }),
         items: g.items.map(([key, label, icon]) => ({ label, icon, style: linkStyle(page === key), onClick: () => this.goTo(key) }))
       };
     });
@@ -3983,7 +3988,7 @@ class Component extends DCLogic {
       programmeRows: progs.map((p) => ({
         id: p.id, name: p.name, code: p.code, description: p.description, statusLabel: p.status, tagCls: "tag tag-accent",
         academicYears: d.academicYears.filter((y) => y.programmeId === p.id).map((y) => y.label).join(", "),
-        onSelect: () => this.setState({ page: "academic-year" }, () => this.mutate((ds) => { ds.activeProgrammeId = p.id; })),
+        onSelect: () => this.goTo("academic-year", null, () => this.mutate((ds) => { ds.activeProgrammeId = p.id; })),
         onFees: () => this.openProgrammeFees(p.id)
       }))
     };
@@ -3992,8 +3997,8 @@ class Component extends DCLogic {
   openProgrammeFees(programmeId) {
     const p = this.state.data.programmes.find((x) => x.id === programmeId);
     const fc = (p && p.feeConfig) || {};
-    this.setState({
-      page: "programme-fees", pgFeeProgrammeId: programmeId,
+    this.goTo("programme-fees", {
+      pgFeeProgrammeId: programmeId,
       pgFeeDraft: {
         batchLabel: fc.batchLabel || "", commencementDate: fc.commencementDate || "",
         academicFeesInstallment1: fc.academicFeesInstallment1 != null ? String(fc.academicFeesInstallment1) : "",
@@ -4016,7 +4021,7 @@ class Component extends DCLogic {
   onSavePgFee() {
     const res = this.mutate((ds) => this.engine.setProgrammeFeeConfig(ds, this.state.pgFeeProgrammeId, this.state.pgFeeDraft),
       (r) => r.error ? r.error : "Fee structure saved.");
-    if (res && res.ok) this.setState({ page: "programmes" });
+    if (res && res.ok) this.goTo("programmes");
   }
   buildProgrammeFees(d) {
     const p = d.programmes.find((x) => x.id === this.state.pgFeeProgrammeId);
