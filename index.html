@@ -988,26 +988,30 @@ a:hover{color:var(--color-accent);text-decoration:underline}
           </sc-for>
           <sc-if value="{{ scNoResults }}"><p style="font-size:13px;opacity:0.6">No candidates match the current filters.</p></sc-if>
 
-          <sc-if value="{{ scCandidate }}"><div class="card elev-sm" id="pi-scoring-detail" style="padding:var(--space-4);margin-top:var(--space-4)">
-            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:var(--space-3)">
-              <div style="font-size:13px"><strong>{{ scCandidate.id }}</strong> &middot; {{ scCandidate.name }} &middot; {{ scCandidate.programme }} &middot; {{ scCandidate.category }} &middot; {{ scCandidate.session }} &middot; {{ scCandidate.group }} &middot; Zoom Room: {{ scCandidate.zoomRoom }}</div>
-              <button type="button" class="btn btn-ghost" onClick="{{ onScCloseDetail }}">Close</button>
-            </div>
-            <sc-if value="{{ scPanelForms.length }}"><div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4)">
-              <sc-for list="{{ scPanelForms }}" as="pf" hint-placeholder-count="4">
-                <div class="card elev-sm" style="padding:var(--space-4)">
-                  <div class="card-title" style="margin-bottom:var(--space-3)">{{ pf.label }}</div>
-                  <sc-for list="{{ pf.fields }}" as="f" hint-placeholder-count="4">
-                    <div class="field"><label>{{ f.name }} (/{{ f.max }})</label><div style="font-size:14px">{{ f.value }}</div></div>
+          <sc-if value="{{ scCandidate }}"><div class="dialog-backdrop">
+            <div class="dialog" id="pi-scoring-detail" style="width:min(900px,100%)">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                <div style="font-size:13px"><strong>{{ scCandidate.id }}</strong> &middot; {{ scCandidate.name }} &middot; {{ scCandidate.programme }} &middot; {{ scCandidate.category }} &middot; {{ scCandidate.session }} &middot; {{ scCandidate.group }} &middot; Zoom Room: {{ scCandidate.zoomRoom }}</div>
+                <button type="button" class="btn btn-ghost" onClick="{{ onScCloseDetail }}">Close</button>
+              </div>
+              <div class="dialog-body">
+                <sc-if value="{{ scPanelForms.length }}"><div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4)">
+                  <sc-for list="{{ scPanelForms }}" as="pf" hint-placeholder-count="4">
+                    <div class="card elev-sm" style="padding:var(--space-4)">
+                      <div class="card-title" style="margin-bottom:var(--space-3)">{{ pf.label }}</div>
+                      <sc-for list="{{ pf.fields }}" as="f" hint-placeholder-count="4">
+                        <div class="field"><label>{{ f.name }} (/{{ f.max }})</label><div style="font-size:14px">{{ f.value }}</div></div>
+                      </sc-for>
+                      <div style="font-size:13px;opacity:0.7">Panelist Total: <strong>{{ pf.total }}</strong> / {{ pf.maxTotal }}</div>
+                    </div>
                   </sc-for>
-                  <div style="font-size:13px;opacity:0.7">Panelist Total: <strong>{{ pf.total }}</strong> / {{ pf.maxTotal }}</div>
+                </div></sc-if>
+                <sc-if value="{{ scNoPanelForms }}"><p style="font-size:13px;opacity:0.6">No panelists have been assigned to this candidate's group yet.</p></sc-if>
+                <div class="card" style="padding:var(--space-4);margin-top:var(--space-4)">
+                  <div class="card-kicker">PI Total (average of panelists)</div>
+                  <div style="font-size:28px">{{ scPiTotal }}</div>
                 </div>
-              </sc-for>
-            </div></sc-if>
-            <sc-if value="{{ scNoPanelForms }}"><p style="font-size:13px;opacity:0.6">No panelists have been assigned to this candidate's group yet.</p></sc-if>
-            <div class="card" style="padding:var(--space-4);margin-top:var(--space-4)">
-              <div class="card-kicker">PI Total (average of panelists)</div>
-              <div style="font-size:28px">{{ scPiTotal }}</div>
+              </div>
             </div>
           </div></sc-if>
         </div></sc-if>
@@ -3285,14 +3289,7 @@ class Component extends DCLogic {
             id: c.id, name: c.name, category: c.category, attCls: att.tagCls, attLabel: att.statusLabel,
             piTotal: c.piTotal != null ? `${c.piTotal} / ${maxTotal}` : "\u2014",
             rowStyle: c.id === this.state.scCandidateId ? "background:color-mix(in srgb, var(--color-accent) 10%, transparent)" : "",
-            onView: () => {
-              this.setState({ scCandidateId: c.id });
-              // The detail card renders below the full session/group list, which can run to
-              // thousands of px — without this, clicking View looks like nothing happened.
-              requestAnimationFrame(() => requestAnimationFrame(() => {
-                document.getElementById("pi-scoring-detail")?.scrollIntoView({ behavior: "smooth", block: "start" });
-              }));
-            }
+            onView: () => this.setState({ scCandidateId: c.id })
           };
         });
         return { id: group.id, name: group.name, rows };
