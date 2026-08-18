@@ -136,10 +136,15 @@ a:hover{color:var(--color-accent);text-decoration:underline}
     <main style="flex:1;overflow-y:auto;padding:var(--space-6)">
       <sc-if value="{{ loaded }}" hint-placeholder-val="{{ false }}">
         <sc-if value="{{ pageIsDashboard }}"><div>
-          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:var(--space-3);margin-bottom:var(--space-6)">
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:var(--space-3);margin-bottom:var(--space-6)">
             <sc-for list="{{ kpis }}" as="kpi" hint-placeholder-count="10">
-              <div class="card" style="padding:var(--space-4)">
-                <div class="card-kicker">{{ kpi.label }}</div>
+              <div class="card elev-sm" style="padding:var(--space-4)">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-2)">
+                  <div class="card-kicker" style="line-height:1.4">{{ kpi.label }}</div>
+                  <div style="{{ kpi.badgeStyle }}">
+                    <i data-lucide="{{ kpi.icon }}" style="width:15px;height:15px"></i>
+                  </div>
+                </div>
                 <div style="font-family:var(--font-heading);font-weight:400;font-size:30px;font-variant-numeric:tabular-nums">{{ kpi.value }}</div>
               </div>
             </sc-for>
@@ -149,11 +154,11 @@ a:hover{color:var(--color-accent);text-decoration:underline}
             <div style="display:flex;align-items:stretch;gap:var(--space-2);flex-wrap:wrap">
               <sc-for list="{{ funnel }}" as="step" hint-placeholder-count="7">
                 <div style="display:flex;align-items:center;gap:var(--space-2)">
-                  <div style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:var(--space-3) var(--space-4);min-width:120px;text-align:center">
-                    <div style="font-family:var(--font-heading);font-size:26px;font-variant-numeric:tabular-nums">{{ step.value }}</div>
+                  <div style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:var(--space-3) var(--space-4);min-width:120px;text-align:center;background:var(--color-neutral-100)">
+                    <div style="font-family:var(--font-heading);color:var(--color-accent-700);font-size:26px;font-variant-numeric:tabular-nums">{{ step.value }}</div>
                     <div style="font-size:12px;opacity:0.65">{{ step.label }}</div>
                   </div>
-                  <sc-if value="{{ step.hasArrow }}"><i data-lucide="chevron-right" style="width:16px;height:16px;opacity:0.4"></i></sc-if>
+                  <sc-if value="{{ step.hasArrow }}"><i data-lucide="chevron-right" style="width:16px;height:16px;opacity:0.4;flex:none"></i></sc-if>
                 </div>
               </sc-for>
             </div>
@@ -161,10 +166,10 @@ a:hover{color:var(--color-accent);text-decoration:underline}
           <div class="card elev-sm" style="padding:var(--space-4)">
             <div class="card-title" style="margin-bottom:var(--space-3)">Category Breakdown</div>
             <table class="table">
-              <thead><tr><th>Category</th><th>Total</th><th>Shortlisted</th><th>Approved (L2)</th><th>Merit</th><th>Waiting</th><th>Rejected</th><th>Ineligible</th></tr></thead>
+              <thead><tr><th>Category</th><th style="text-align:right">Total</th><th style="text-align:right">Shortlisted</th><th style="text-align:right">Approved (L2)</th><th style="text-align:right">Merit</th><th style="text-align:right">Waiting</th><th style="text-align:right">Rejected</th><th style="text-align:right">Ineligible</th></tr></thead>
               <tbody>
                 <sc-for list="{{ categoryBreakdown }}" as="row" hint-placeholder-count="5">
-                  <tr><td>{{ row.label }}</td><td>{{ row.total }}</td><td>{{ row.shortlisted }}</td><td>{{ row.approved }}</td><td>{{ row.merit }}</td><td>{{ row.waiting }}</td><td>{{ row.rejected }}</td><td>{{ row.ineligible }}</td></tr>
+                  <tr><td>{{ row.label }}</td><td style="text-align:right">{{ row.total }}</td><td style="text-align:right">{{ row.shortlisted }}</td><td style="text-align:right">{{ row.approved }}</td><td style="text-align:right">{{ row.merit }}</td><td style="text-align:right">{{ row.waiting }}</td><td style="text-align:right">{{ row.rejected }}</td><td style="text-align:right">{{ row.ineligible }}</td></tr>
                 </sc-for>
               </tbody>
             </table>
@@ -2232,20 +2237,29 @@ class Component extends DCLogic {
     const cands = d.candidates.filter((c) => c.programmeId === pid);
     const count = (fn) => cands.filter(fn).length;
     const staticStats = pid === "BSCAI" ? { paid: "4,999", appeared: "3,626" } : { paid: "1,240", appeared: "860" };
+    const tones = {
+      accent: { bg: "var(--color-accent-100)", fg: "var(--color-accent-700)" },
+      "accent-2": { bg: "var(--color-accent-2-100)", fg: "var(--color-accent-2-700)" },
+      neutral: { bg: "var(--color-neutral-200)", fg: "var(--color-neutral-700)" }
+    };
+    const kpi = (label, value, icon, tone) => ({
+      label, value, icon,
+      badgeStyle: `width:30px;height:30px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;flex:none;background:${tones[tone].bg};color:${tones[tone].fg}`
+    });
     const kpis = [
-      { label: "SLAT Candidates (seeded)", value: cands.length },
-      { label: "Paid (SLAT, univ. system)", value: staticStats.paid },
-      { label: "Appeared (SLAT)", value: staticStats.appeared },
-      { label: "Yet to be Shortlisted", value: count((c) => c.shortlistStatus === "yet-to-shortlist") },
-      { label: "Shortlisted", value: count((c) => c.shortlistStatus === "shortlisted") },
-      { label: "First Level Approved", value: count((c) => c.shortlistStatus === "first-level-approved") },
-      { label: "Second Level Approved", value: count((c) => c.shortlistStatus === "second-level-approved") },
-      { label: "Allocated for PI", value: count((c) => !!c.allocation) },
-      { label: "PI Appeared", value: count((c) => c.piAttendance === "present") },
-      { label: "Merit Listed", value: count((c) => c.meritCategory === "merit") },
-      { label: "Waiting List", value: count((c) => c.meritCategory === "waiting") },
-      { label: "Rejected", value: count((c) => c.meritCategory === "rejected") },
-      { label: "Ineligible", value: count((c) => c.outcome === "ineligible") }
+      kpi("SLAT Candidates (seeded)", cands.length, "users", "accent"),
+      kpi("Paid (SLAT, univ. system)", staticStats.paid, "wallet", "accent"),
+      kpi("Appeared (SLAT)", staticStats.appeared, "file-check", "accent"),
+      kpi("Yet to be Shortlisted", count((c) => c.shortlistStatus === "yet-to-shortlist"), "clock", "neutral"),
+      kpi("Shortlisted", count((c) => c.shortlistStatus === "shortlisted"), "filter", "accent"),
+      kpi("First Level Approved", count((c) => c.shortlistStatus === "first-level-approved"), "check", "accent"),
+      kpi("Second Level Approved", count((c) => c.shortlistStatus === "second-level-approved"), "check-check", "accent"),
+      kpi("Allocated for PI", count((c) => !!c.allocation), "shuffle", "accent"),
+      kpi("PI Appeared", count((c) => c.piAttendance === "present"), "video", "accent"),
+      kpi("Merit Listed", count((c) => c.meritCategory === "merit"), "award", "accent-2"),
+      kpi("Waiting List", count((c) => c.meritCategory === "waiting"), "list-ordered", "neutral"),
+      kpi("Rejected", count((c) => c.meritCategory === "rejected"), "x-circle", "neutral"),
+      kpi("Ineligible", count((c) => c.outcome === "ineligible"), "ban", "neutral")
     ];
     const funnelDef = [
       ["Imported", cands.length], ["Shortlisted", count((c) => c.shortlistStatus !== "yet-to-shortlist" && c.shortlistStatus !== "rejected-list")],
