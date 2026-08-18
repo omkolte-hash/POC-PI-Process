@@ -988,7 +988,7 @@ a:hover{color:var(--color-accent);text-decoration:underline}
           </sc-for>
           <sc-if value="{{ scNoResults }}"><p style="font-size:13px;opacity:0.6">No candidates match the current filters.</p></sc-if>
 
-          <sc-if value="{{ scCandidate }}"><div class="card elev-sm" style="padding:var(--space-4);margin-top:var(--space-4)">
+          <sc-if value="{{ scCandidate }}"><div class="card elev-sm" id="pi-scoring-detail" style="padding:var(--space-4);margin-top:var(--space-4)">
             <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:var(--space-3)">
               <div style="font-size:13px"><strong>{{ scCandidate.id }}</strong> &middot; {{ scCandidate.name }} &middot; {{ scCandidate.programme }} &middot; {{ scCandidate.category }} &middot; {{ scCandidate.session }} &middot; {{ scCandidate.group }} &middot; Zoom Room: {{ scCandidate.zoomRoom }}</div>
               <button type="button" class="btn btn-ghost" onClick="{{ onScCloseDetail }}">Close</button>
@@ -3285,7 +3285,14 @@ class Component extends DCLogic {
             id: c.id, name: c.name, category: c.category, attCls: att.tagCls, attLabel: att.statusLabel,
             piTotal: c.piTotal != null ? `${c.piTotal} / ${maxTotal}` : "\u2014",
             rowStyle: c.id === this.state.scCandidateId ? "background:color-mix(in srgb, var(--color-accent) 10%, transparent)" : "",
-            onView: () => this.setState({ scCandidateId: c.id })
+            onView: () => {
+              this.setState({ scCandidateId: c.id });
+              // The detail card renders below the full session/group list, which can run to
+              // thousands of px — without this, clicking View looks like nothing happened.
+              requestAnimationFrame(() => requestAnimationFrame(() => {
+                document.getElementById("pi-scoring-detail")?.scrollIntoView({ behavior: "smooth", block: "start" });
+              }));
+            }
           };
         });
         return { id: group.id, name: group.name, rows };
