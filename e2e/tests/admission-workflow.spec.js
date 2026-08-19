@@ -24,8 +24,28 @@ async function selectProgramme(page) {
 }
 const OPEN_IDS = ['E2E-OPEN-01', 'E2E-OPEN-02', 'E2E-OPEN-03', 'E2E-OPEN-04', 'E2E-OPEN-05', 'E2E-OPEN-06'];
 const SC_IDS = ['E2E-SC-01', 'E2E-SC-02'];
-const RUBRIC_SCORE = 8; // out of 10, per rubric field; deterministic, no need to vary per candidate.
-const APV_SCORE = 8; // out of 10.
+const APV_SCORE = 8; // out of 10, same for every candidate — PI alone already separates them.
+
+// A single per-field rubric score (out of 10, all 4 fields get the same value) per candidate,
+// strictly decreasing so PI totals — and therefore Final = PI + APV — never tie. That makes the
+// Merit Processing band (Merit/Waiting/Rejected) for each candidate a known, assertable fact
+// rather than an artifact of stable-sort tie-breaking on identical scores.
+const RUBRIC_SCORE_BY_ID = {
+  'E2E-OPEN-01': 10, // PI 40, Final 48
+  'E2E-OPEN-02': 9,  // PI 36, Final 44
+  'E2E-OPEN-03': 8,  // PI 32, Final 40
+  'E2E-OPEN-04': 7,  // PI 28, Final 36
+  'E2E-OPEN-05': 6,  // PI 24, Final 32
+  'E2E-OPEN-06': 5,  // PI 20, Final 28
+};
+const PI_TOTAL_BY_ID = Object.fromEntries(Object.entries(RUBRIC_SCORE_BY_ID).map(([id, s]) => [id, s * 4]));
+// Merit Headcount 4 / Waiting 1 against the strictly-decreasing finals above: top 4 -> Merit,
+// next 1 -> Waiting, the rest -> Rejected.
+const EXPECTED_OUTCOME_BY_ID = {
+  'E2E-OPEN-01': 'Merit', 'E2E-OPEN-02': 'Merit', 'E2E-OPEN-03': 'Merit', 'E2E-OPEN-04': 'Merit',
+  'E2E-OPEN-05': 'Waiting',
+  'E2E-OPEN-06': 'Rejected',
+};
 
 test.describe.configure({ mode: 'serial' });
 
@@ -226,10 +246,15 @@ test('full admission lifecycle: programme creation through provisional letters',
         if (i === 0) {
           await page.locator('button:has-text("Present")').click();
         }
+        // Read the candidate's own Applicant ID off the page rather than assuming queue order
+        // matches OPEN_IDS — the score entered must match the candidate actually on screen.
+        const candidateId = (await page.locator('.card strong').first().innerText()).trim();
+        const score = RUBRIC_SCORE_BY_ID[candidateId];
+        expect(score, `no expected rubric score for candidate "${candidateId}"`).toBeTruthy();
         const fields = page.locator('.field input[type="number"]');
         const count = await fields.count();
         for (let f = 0; f < count; f++) {
-          await fields.nth(f).fill(String(RUBRIC_SCORE));
+          await fields.nth(f).fill(String(score));
         }
         await page.locator('button:has-text("Next Candidate")').click();
         await page.waitForTimeout(250);
@@ -250,6 +275,7 @@ test('full admission lifecycle: programme creation through provisional letters',
       const row = page.locator('tr', { hasText: id });
       await row.locator('button:has-text("View")').click();
       await page.waitForTimeout(300);
+      await expect(page.locator('body')).toContainText(`${PI_TOTAL_BY_ID[id]} / 40`); // PI score, as entered
       const apvField = fieldByLabel(page, 'APV Score').locator('input');
       if (await apvField.count()) {
         await apvField.fill(String(APV_SCORE));
@@ -266,7 +292,8 @@ test('full admission lifecycle: programme creation through provisional letters',
     await fieldByLabel(page, 'Merit Headcount').locator('input').fill('4');
     await fieldByLabel(page, 'Waiting List Size').locator('input').fill('1');
     await page.locator('button:has-text("Run Merit Processing")').click();
-    await expect(page.locator('.toast-pop')).toContainText('Merit processing complete');
+    // Exact split, not just "it ran": 6 strictly-decreasing finals, headcount 4 + waiting 1.
+    await expect(page.locator('.toast-pop')).toContainText('4 Merit, 1 Waiting, 1 Rejected');
   });
 
   await test.step('Approve the merit batch (Director, then SIU)', async () => {
@@ -313,11 +340,23 @@ test('full admission lifecycle: programme creation through provisional letters',
     await popup.close();
   });
 
-  await test.step('Reports render for this programme', async () => {
+  await test.step('Reports reflect the actual scores and outcomes entered earlier', async () => {
     await gotoNav(page, 'Reports', 'Candidate Reports');
-    await expect(page.locator('table')).toContainText('E2E-OPEN-01');
+    for (const id of OPEN_IDS) {
+      const row = page.locator('tr', { hasText: id });
+      await expect(row, `${id} row`).toContainText(String(PI_TOTAL_BY_ID[id]));
+      await expect(row, `${id} outcome`).toContainText(EXPECTED_OUTCOME_BY_ID[id]);
+    }
+
     await gotoNav(page, 'Reports', 'Session Reports');
-    await expect(page.locator('main')).not.toBeEmpty();
+    const sessionRow = page.locator('table tbody tr').first();
+    await expect(sessionRow).toBeVisible();
+    const cells = await sessionRow.locator('td').allInnerTexts();
+    // Session label, Date, Allocated, Present, Absent, Not Marked — all 6 allocated, all marked present.
+    expect(cells[2], 'Allocated').toBe('6');
+    expect(cells[3], 'Present').toBe('6');
+    expect(cells[4], 'Absent').toBe('0');
+    expect(cells[5], 'Not Marked').toBe('0');
   });
 
   expect(errors, `console/page errors seen during the full journey:\n${errors.join('\n')}`).toEqual([]);
