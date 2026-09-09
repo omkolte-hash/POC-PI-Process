@@ -1,0 +1,419 @@
+<!-- ==FEATURE_ID== EPIC-201 -->
+<!-- ==EPIC_TITLE== Document Collection -->
+<!-- ==NAV_GROUP== Documents -->
+<!-- ==NAV_ITEMS_JSON== [["document-collection","Document Collection","folder-open"]] -->
+<!-- ==PAGE_TITLES_JSON== {"document-collection":["Documents","Document Collection"]} -->
+<!-- ==RENDERVALS_JSON== {"pageIsDocumentCollection":"page === \"document-collection\""} -->
+<!-- ==BUILD_CALLS_START== -->
+    if (page === "document-collection") Object.assign(base, this.buildDocumentCollection(d));
+<!-- ==BUILD_CALLS_END== -->
+<!-- ==HTML_START== -->
+<sc-if value="{{ pageIsDocumentCollection }}">
+<div style="padding:24px;max-width:1200px">
+
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <h4 style="margin:0;font-family:var(--font-heading);font-weight:var(--font-heading-weight)">Document Collection</h4>
+  </div>
+
+  <!-- Tabs -->
+  <ul class="nav nav-tabs mb-4">
+    <li class="nav-item">
+      <button class="nav-link" onclick="{{ onDocTabTypes }}" style="{{ docTabTypesStyle }}">Document Types</button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" onclick="{{ onDocTabLog }}" style="{{ docTabLogStyle }}">Submission Log</button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" onclick="{{ onDocTabCompleteness }}" style="{{ docTabCompletenessStyle }}">Candidate Completeness</button>
+    </li>
+  </ul>
+
+  <!-- TAB 1: Document Types -->
+  <sc-if value="{{ docTabIsTypes }}">
+    <div>
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h5 class="mb-0 fw-semibold">Document Types</h5>
+        <button type="button" class="btn btn-primary btn-sm" onclick="{{ onToggleAddDocTypeForm }}">
+          <i data-lucide="plus" style="width:14px;height:14px"></i> Add Document Type
+        </button>
+      </div>
+
+      <!-- Add form -->
+      <sc-if value="{{ docTypeFormVisible }}">
+        <div style="background:#f8f9fa;border:1px solid #dee2e6;border-radius:8px;padding:16px;margin-bottom:16px">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label fw-medium" style="font-size:13px">Type Name <span class="text-danger">*</span></label>
+              <input type="text" id="doc-type-name" class="form-control form-control-sm" placeholder="e.g. Migration Certificate">
+            </div>
+            <div class="col-md-2">
+              <label class="form-label fw-medium" style="font-size:13px">Required</label>
+              <div class="form-check mt-1">
+                <input class="form-check-input" type="checkbox" id="doc-type-required">
+                <label class="form-check-label" for="doc-type-required" style="font-size:13px">Required</label>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label fw-medium" style="font-size:13px">Accepted Formats</label>
+              <div class="d-flex gap-3 flex-wrap mt-1">
+                <div class="form-check"><input class="form-check-input" type="checkbox" id="fmt-pdf" value="PDF"><label class="form-check-label" for="fmt-pdf" style="font-size:13px">PDF</label></div>
+                <div class="form-check"><input class="form-check-input" type="checkbox" id="fmt-jpg" value="JPG"><label class="form-check-label" for="fmt-jpg" style="font-size:13px">JPG</label></div>
+                <div class="form-check"><input class="form-check-input" type="checkbox" id="fmt-png" value="PNG"><label class="form-check-label" for="fmt-png" style="font-size:13px">PNG</label></div>
+                <div class="form-check"><input class="form-check-input" type="checkbox" id="fmt-docx" value="DOCX"><label class="form-check-label" for="fmt-docx" style="font-size:13px">DOCX</label></div>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label fw-medium" style="font-size:13px">Max Size (MB)</label>
+              <input type="number" id="doc-type-maxmb" class="form-control form-control-sm" min="1" max="50" value="5">
+            </div>
+            <div class="col-md-1">
+              <label class="form-label fw-medium" style="font-size:13px">Status</label>
+              <select id="doc-type-status" class="form-select form-select-sm">
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+            </div>
+          </div>
+          <div class="mt-3 d-flex gap-2">
+            <button type="button" class="btn btn-primary btn-sm" onclick="{{ onAddDocType }}">Save</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="{{ onToggleAddDocTypeForm }}">Cancel</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <div style="background:var(--color-surface);border:1px solid var(--color-divider);border-radius:8px;overflow:hidden">
+        <table class="table table-hover table-sm mb-0">
+          <thead style="background:#f1f3f5;font-size:12px;text-transform:uppercase;letter-spacing:.04em">
+            <tr>
+              <th class="px-3 py-2">Type Name</th>
+              <th class="px-3 py-2">Required</th>
+              <th class="px-3 py-2">Formats</th>
+              <th class="px-3 py-2">Max Size</th>
+              <th class="px-3 py-2">Status</th>
+              <th class="px-3 py-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody style="font-size:13px">
+            <sc-for list="{{ docTypes }}" as="dt">
+              <tr>
+                <td class="px-3 py-2 fw-medium">{{ dt.name }}</td>
+                <td class="px-3 py-2">
+                  <sc-if value="{{ dt.required }}"><span class="badge bg-danger">Required</span></sc-if>
+                  <sc-if value="{{ dt.notRequired }}"><span class="badge bg-secondary">Optional</span></sc-if>
+                </td>
+                <td class="px-3 py-2" style="font-family:monospace;font-size:12px">{{ dt.formats }}</td>
+                <td class="px-3 py-2">{{ dt.maxMb }} MB</td>
+                <td class="px-3 py-2">
+                  <sc-if value="{{ dt.isActive }}"><span class="badge bg-success">Active</span></sc-if>
+                  <sc-if value="{{ dt.isInactive }}"><span class="badge bg-secondary">Inactive</span></sc-if>
+                </td>
+                <td class="px-3 py-2">
+                  <button type="button" class="btn btn-ghost btn-sm" onclick="{{ dt.onToggleStatus }}" style="font-size:11px;padding:2px 8px">
+                    <i data-lucide="{{ dt.toggleIcon }}" style="width:12px;height:12px"></i> {{ dt.toggleLabel }}
+                  </button>
+                </td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- TAB 2: Submission Log -->
+  <sc-if value="{{ docTabIsLog }}">
+    <div>
+      <div class="d-flex gap-2 mb-3" style="flex-wrap:wrap">
+        <select class="form-select form-select-sm" style="max-width:220px" onchange="{{ onDocSubTypeFilter }}">
+          <option value="">All Document Types</option>
+          <sc-for list="{{ docTypeFilterOptions }}" as="opt">
+            <sc-if value="{{ opt.selected }}"><option value="{{ opt.name }}" selected>{{ opt.name }}</option></sc-if>
+            <sc-if value="{{ opt.notSelected }}"><option value="{{ opt.name }}">{{ opt.name }}</option></sc-if>
+          </sc-for>
+        </select>
+        <select class="form-select form-select-sm" style="max-width:160px" onchange="{{ onDocSubStatusFilter }}">
+          <option value="">All Statuses</option>
+          <option value="Accepted">Accepted</option>
+          <option value="Rejected">Rejected</option>
+          <option value="Pending">Pending</option>
+        </select>
+        <div style="font-size:13px;opacity:0.6;align-self:center;margin-left:4px">{{ docSubFilteredCount }} record(s)</div>
+      </div>
+
+      <div style="background:var(--color-surface);border:1px solid var(--color-divider);border-radius:8px;overflow:hidden">
+        <table class="table table-hover table-sm mb-0">
+          <thead style="background:#f1f3f5;font-size:12px;text-transform:uppercase;letter-spacing:.04em">
+            <tr>
+              <th class="px-3 py-2">Timestamp</th>
+              <th class="px-3 py-2">Candidate</th>
+              <th class="px-3 py-2">App No</th>
+              <th class="px-3 py-2">Doc Type</th>
+              <th class="px-3 py-2">Status</th>
+              <th class="px-3 py-2">Rejection Reason</th>
+              <th class="px-3 py-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody style="font-size:13px">
+            <sc-if value="{{ docSubNoRows }}">
+              <tr><td colspan="7" style="text-align:center;opacity:0.5;padding:32px">No submissions match the selected filters.</td></tr>
+            </sc-if>
+            <sc-for list="{{ docSubmissions }}" as="sub">
+              <tr>
+                <td class="px-3 py-2" style="font-size:12px;opacity:0.7;white-space:nowrap">{{ sub.ts }}</td>
+                <td class="px-3 py-2 fw-medium">{{ sub.candidate }}</td>
+                <td class="px-3 py-2" style="font-family:monospace;font-size:12px">{{ sub.appNo }}</td>
+                <td class="px-3 py-2">{{ sub.docType }}</td>
+                <td class="px-3 py-2">
+                  <sc-if value="{{ sub.isAccepted }}"><span class="badge bg-success">Accepted</span></sc-if>
+                  <sc-if value="{{ sub.isRejected }}"><span class="badge bg-danger">Rejected</span></sc-if>
+                  <sc-if value="{{ sub.isPending }}"><span class="badge bg-warning text-dark">Pending</span></sc-if>
+                </td>
+                <td class="px-3 py-2" style="font-size:12px;color:#6c757d;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ sub.rejectionReason }}</td>
+                <td class="px-3 py-2">
+                  <sc-if value="{{ sub.canAct }}">
+                    <div class="d-flex gap-1">
+                      <button type="button" class="btn btn-outline-success btn-sm" onclick="{{ sub.onAccept }}" style="font-size:11px;padding:2px 8px">Accept</button>
+                      <button type="button" class="btn btn-outline-danger btn-sm" onclick="{{ sub.onReject }}" style="font-size:11px;padding:2px 8px">Reject</button>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ sub.cannotAct }}"><span style="color:#adb5bd;font-size:12px">—</span></sc-if>
+                </td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- TAB 3: Candidate Completeness -->
+  <sc-if value="{{ docTabIsCompleteness }}">
+    <div>
+      <div style="background:var(--color-surface);border:1px solid var(--color-divider);border-radius:8px;overflow:hidden">
+        <table class="table table-hover table-sm mb-0">
+          <thead style="background:#f1f3f5;font-size:12px;text-transform:uppercase;letter-spacing:.04em">
+            <tr>
+              <th class="px-3 py-2">Candidate Name</th>
+              <th class="px-3 py-2">App No</th>
+              <th class="px-3 py-2 text-center">10th Cert</th>
+              <th class="px-3 py-2 text-center">12th Cert</th>
+              <th class="px-3 py-2 text-center">ID Proof</th>
+              <th class="px-3 py-2 text-center">Photo</th>
+              <th class="px-3 py-2 text-center">Overall</th>
+              <th class="px-3 py-2"></th>
+            </tr>
+          </thead>
+          <tbody style="font-size:13px">
+            <sc-for list="{{ docCandidates }}" as="cand">
+              <tr>
+                <td class="px-3 py-2 fw-medium">{{ cand.name }}</td>
+                <td class="px-3 py-2" style="font-family:monospace;font-size:12px">{{ cand.appNo }}</td>
+                <td class="px-3 py-2 text-center">
+                  <sc-if value="{{ cand.has10th }}"><i data-lucide="circle-check" style="width:16px;height:16px;color:#198754"></i></sc-if>
+                  <sc-if value="{{ cand.no10th }}"><i data-lucide="circle-x" style="width:16px;height:16px;color:#dc3545"></i></sc-if>
+                </td>
+                <td class="px-3 py-2 text-center">
+                  <sc-if value="{{ cand.has12th }}"><i data-lucide="circle-check" style="width:16px;height:16px;color:#198754"></i></sc-if>
+                  <sc-if value="{{ cand.no12th }}"><i data-lucide="circle-x" style="width:16px;height:16px;color:#dc3545"></i></sc-if>
+                </td>
+                <td class="px-3 py-2 text-center">
+                  <sc-if value="{{ cand.hasId }}"><i data-lucide="circle-check" style="width:16px;height:16px;color:#198754"></i></sc-if>
+                  <sc-if value="{{ cand.noId }}"><i data-lucide="circle-x" style="width:16px;height:16px;color:#dc3545"></i></sc-if>
+                </td>
+                <td class="px-3 py-2 text-center">
+                  <sc-if value="{{ cand.hasPhoto }}"><i data-lucide="circle-check" style="width:16px;height:16px;color:#198754"></i></sc-if>
+                  <sc-if value="{{ cand.noPhoto }}"><i data-lucide="circle-x" style="width:16px;height:16px;color:#adb5bd"></i></sc-if>
+                </td>
+                <td class="px-3 py-2 text-center"><span class="{{ cand.overallCls }}">{{ cand.overallLabel }}</span></td>
+                <td class="px-3 py-2">
+                  <button type="button" class="btn btn-ghost btn-sm" onclick="{{ cand.onSendReminder }}" style="font-size:11px;padding:2px 8px;white-space:nowrap">
+                    <i data-lucide="bell" style="width:12px;height:12px"></i> Remind
+                  </button>
+                </td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</sc-if>
+<!-- ==HTML_END== -->
+<!-- ==JS_START== -->
+  buildDocumentCollection(d) {
+    // ponytail: tab state in localStorage geta_doc_active_tab; all sub-state keyed geta_doc_*
+    const TAB_KEY  = 'geta_doc_active_tab';
+    const TYPES_KEY = 'geta_doc_types';
+    const SUBS_KEY  = 'geta_doc_submissions';
+    const CANDS_KEY = 'geta_doc_candidates';
+
+    const DEFAULT_TYPES = [
+      { id: 1, name: "10th Certificate",      required: true,  formats: "PDF,JPG",     maxMb: 5, status: "Active" },
+      { id: 2, name: "12th Certificate",      required: true,  formats: "PDF,JPG",     maxMb: 5, status: "Active" },
+      { id: 3, name: "Government ID Proof",   required: true,  formats: "PDF,JPG,PNG", maxMb: 2, status: "Active" },
+      { id: 4, name: "Passport Photo",        required: false, formats: "JPG,PNG",     maxMb: 1, status: "Active" },
+      { id: 5, name: "Recommendation Letter", required: false, formats: "PDF,DOCX",    maxMb: 3, status: "Inactive" }
+    ];
+
+    const DEFAULT_SUBS = [
+      { id: "s01",  ts: "2026-09-01 09:12", candidate: "Aarav Mehta",      appNo: "APP-2026-001", docType: "10th Certificate",      status: "Accepted",  rejectionReason: "" },
+      { id: "s02",  ts: "2026-09-01 09:45", candidate: "Priya Sharma",     appNo: "APP-2026-002", docType: "12th Certificate",      status: "Accepted",  rejectionReason: "" },
+      { id: "s03",  ts: "2026-09-01 10:30", candidate: "Rahul Gupta",      appNo: "APP-2026-003", docType: "Government ID Proof",   status: "Rejected",  rejectionReason: "Document blurry, unable to verify details" },
+      { id: "s04",  ts: "2026-09-01 11:00", candidate: "Sneha Patel",      appNo: "APP-2026-004", docType: "Passport Photo",        status: "Pending",   rejectionReason: "" },
+      { id: "s05",  ts: "2026-09-02 08:55", candidate: "Vikram Nair",      appNo: "APP-2026-005", docType: "10th Certificate",      status: "Accepted",  rejectionReason: "" },
+      { id: "s06",  ts: "2026-09-02 09:20", candidate: "Ananya Iyer",      appNo: "APP-2026-006", docType: "12th Certificate",      status: "Rejected",  rejectionReason: "File size exceeds limit, reupload as compressed PDF" },
+      { id: "s07",  ts: "2026-09-02 10:10", candidate: "Rohan Desai",      appNo: "APP-2026-007", docType: "Government ID Proof",   status: "Pending",   rejectionReason: "" },
+      { id: "s08",  ts: "2026-09-02 11:30", candidate: "Kavya Reddy",      appNo: "APP-2026-008", docType: "Recommendation Letter", status: "Accepted",  rejectionReason: "" },
+      { id: "s09",  ts: "2026-09-03 09:05", candidate: "Arjun Singh",      appNo: "APP-2026-009", docType: "10th Certificate",      status: "Pending",   rejectionReason: "" },
+      { id: "s10", ts: "2026-09-03 09:40", candidate: "Divya Krishnan",   appNo: "APP-2026-010", docType: "Passport Photo",        status: "Accepted",  rejectionReason: "" },
+      { id: "s11", ts: "2026-09-03 10:15", candidate: "Karthik Menon",    appNo: "APP-2026-011", docType: "12th Certificate",      status: "Pending",   rejectionReason: "" },
+      { id: "s12", ts: "2026-09-03 11:00", candidate: "Pooja Joshi",      appNo: "APP-2026-012", docType: "Government ID Proof",   status: "Accepted",  rejectionReason: "" }
+    ];
+
+    const DEFAULT_CANDS = [
+      { id: "c01", name: "Aarav Mehta",    appNo: "APP-2026-001", has10th: true,  has12th: true,  hasId: true,  hasPhoto: true  },
+      { id: "c02", name: "Priya Sharma",   appNo: "APP-2026-002", has10th: true,  has12th: true,  hasId: false, hasPhoto: true  },
+      { id: "c03", name: "Rahul Gupta",    appNo: "APP-2026-003", has10th: true,  has12th: false, hasId: false, hasPhoto: false },
+      { id: "c04", name: "Sneha Patel",    appNo: "APP-2026-004", has10th: false, has12th: false, hasId: false, hasPhoto: false },
+      { id: "c05", name: "Vikram Nair",    appNo: "APP-2026-005", has10th: true,  has12th: true,  hasId: true,  hasPhoto: false },
+      { id: "c06", name: "Ananya Iyer",    appNo: "APP-2026-006", has10th: true,  has12th: false, hasId: true,  hasPhoto: true  },
+      { id: "c07", name: "Rohan Desai",    appNo: "APP-2026-007", has10th: true,  has12th: true,  hasId: true,  hasPhoto: true  },
+      { id: "c08", name: "Kavya Reddy",    appNo: "APP-2026-008", has10th: false, has12th: true,  hasId: true,  hasPhoto: false }
+    ];
+
+    let types = JSON.parse(localStorage.getItem(TYPES_KEY) || 'null') || DEFAULT_TYPES;
+    let subs  = JSON.parse(localStorage.getItem(SUBS_KEY)  || 'null') || DEFAULT_SUBS;
+    let cands = JSON.parse(localStorage.getItem(CANDS_KEY) || 'null') || DEFAULT_CANDS;
+    if (!localStorage.getItem(TYPES_KEY)) localStorage.setItem(TYPES_KEY, JSON.stringify(types));
+    if (!localStorage.getItem(SUBS_KEY))  localStorage.setItem(SUBS_KEY,  JSON.stringify(subs));
+    if (!localStorage.getItem(CANDS_KEY)) localStorage.setItem(CANDS_KEY, JSON.stringify(cands));
+
+    const activeTab = localStorage.getItem(TAB_KEY) || 'types';
+    const setTab = (t) => { localStorage.setItem(TAB_KEY, t); this.setState({}); };
+
+    const activeTabStyle   = 'color:var(--color-accent-700);border-bottom:2px solid var(--color-accent-700);font-weight:600;background:none;border-top:none;border-left:none;border-right:none;padding:8px 16px;cursor:pointer';
+    const inactiveTabStyle = 'color:var(--color-text);border:none;background:none;padding:8px 16px;cursor:pointer';
+
+    // ---- TAB 1: Document Types ----
+    const formVisible = this.state.docTypeFormVisible || false;
+
+    const onToggleAddDocTypeForm = () => this.setState({ docTypeFormVisible: !this.state.docTypeFormVisible });
+
+    const onAddDocType = () => {
+      const name   = (document.getElementById('doc-type-name')   || {}).value || '';
+      const maxMb  = parseInt((document.getElementById('doc-type-maxmb') || {}).value || '5', 10);
+      const req    = (document.getElementById('doc-type-required') || {}).checked || false;
+      const status = (document.getElementById('doc-type-status')  || {}).value || 'Active';
+      const fmts   = ['PDF','JPG','PNG','DOCX'].filter(f => {
+        const el = document.getElementById('fmt-' + f.toLowerCase());
+        return el && el.checked;
+      });
+      if (!name.trim()) { this.showToast('Name is required'); return; }
+      const newType = { id: Date.now(), name: name.trim(), required: req, formats: fmts.length ? fmts.join(',') : 'PDF', maxMb, status };
+      types = [...types, newType];
+      localStorage.setItem(TYPES_KEY, JSON.stringify(types));
+      this.showToast('Document type added');
+      this.setState({ docTypeFormVisible: false });
+    };
+
+    const docTypes = types.map(dt => ({
+      ...dt,
+      required: dt.required,
+      notRequired: !dt.required,
+      isActive:   dt.status === 'Active',
+      isInactive: dt.status !== 'Active',
+      toggleLabel: dt.status === 'Active' ? 'Deactivate' : 'Activate',
+      toggleIcon:  dt.status === 'Active' ? 'x-circle' : 'check-circle',
+      onToggleStatus: () => {
+        types = types.map(t => t.id === dt.id ? { ...t, status: t.status === 'Active' ? 'Inactive' : 'Active' } : t);
+        localStorage.setItem(TYPES_KEY, JSON.stringify(types));
+        this.showToast(`${dt.name} ${dt.status === 'Active' ? 'deactivated' : 'activated'}`);
+        this.setState({});
+      }
+    }));
+
+    // ---- TAB 2: Submission Log ----
+    const subTypeFilter   = this.state.docSubTypeFilter   || '';
+    const subStatusFilter = this.state.docSubStatusFilter || '';
+
+    let filteredSubs = subs;
+    if (subTypeFilter)   filteredSubs = filteredSubs.filter(s => s.docType === subTypeFilter);
+    if (subStatusFilter) filteredSubs = filteredSubs.filter(s => s.status === subStatusFilter);
+
+    const subStatusBadgeMap = { Accepted: 'success', Rejected: 'danger', Pending: 'warning' };
+
+    const docSubmissions = filteredSubs.map(sub => ({
+      ...sub,
+      isAccepted: sub.status === 'Accepted',
+      isRejected: sub.status === 'Rejected',
+      isPending:  sub.status === 'Pending',
+      canAct:     sub.status === 'Pending',
+      cannotAct:  sub.status !== 'Pending',
+      onAccept: () => {
+        subs = subs.map(s => s.id === sub.id ? { ...s, status: 'Accepted', rejectionReason: '' } : s);
+        localStorage.setItem(SUBS_KEY, JSON.stringify(subs));
+        this.showToast('Document accepted');
+        this.setState({});
+      },
+      onReject: () => {
+        const reason = window.prompt('Enter rejection reason:');
+        if (reason === null) return; // cancelled
+        subs = subs.map(s => s.id === sub.id ? { ...s, status: 'Rejected', rejectionReason: reason || 'No reason given' } : s);
+        localStorage.setItem(SUBS_KEY, JSON.stringify(subs));
+        this.showToast('Document rejected');
+        this.setState({});
+      }
+    }));
+
+    const activeTypeNames = types.filter(t => t.status === 'Active').map(t => ({ name: t.name, selected: t.name === subTypeFilter, notSelected: t.name !== subTypeFilter }));
+
+    // ---- TAB 3: Candidate Completeness ----
+    const docCandidates = cands.map(c => {
+      // required docs: 10th, 12th, ID. Photo is optional.
+      const requiredMet = c.has10th && c.has12th && c.hasId;
+      const anyRequired = c.has10th || c.has12th || c.hasId;
+      const overallCls   = requiredMet ? 'badge bg-success' : anyRequired ? 'badge bg-warning text-dark' : 'badge bg-danger';
+      const overallLabel = requiredMet ? 'Complete' : anyRequired ? 'Partial' : 'Incomplete';
+      return {
+        ...c,
+        no10th:  !c.has10th,
+        no12th:  !c.has12th,
+        noId:    !c.hasId,
+        hasPhoto: c.hasPhoto,
+        noPhoto: !c.hasPhoto,
+        overallCls,
+        overallLabel,
+        onSendReminder: () => this.showToast(`Reminder sent to ${c.name}`)
+      };
+    });
+
+    return {
+      // Tab state
+      docTabIsTypes:        activeTab === 'types',
+      docTabIsLog:          activeTab === 'log',
+      docTabIsCompleteness: activeTab === 'completeness',
+      docTabTypesStyle:        activeTab === 'types'        ? activeTabStyle : inactiveTabStyle,
+      docTabLogStyle:          activeTab === 'log'          ? activeTabStyle : inactiveTabStyle,
+      docTabCompletenessStyle: activeTab === 'completeness' ? activeTabStyle : inactiveTabStyle,
+      onDocTabTypes:        () => setTab('types'),
+      onDocTabLog:          () => setTab('log'),
+      onDocTabCompleteness: () => setTab('completeness'),
+      // Tab 1
+      docTypes,
+      docTypeFormVisible: formVisible,
+      onToggleAddDocTypeForm,
+      onAddDocType,
+      // Tab 2
+      docSubmissions,
+      docSubNoRows: docSubmissions.length === 0,
+      docSubFilteredCount: docSubmissions.length,
+      docTypeFilterOptions: activeTypeNames,
+      onDocSubTypeFilter:   (e) => this.setState({ docSubTypeFilter: e.target.value }),
+      onDocSubStatusFilter: (e) => this.setState({ docSubStatusFilter: e.target.value }),
+      // Tab 3
+      docCandidates
+    };
+  }
+<!-- ==JS_END== -->

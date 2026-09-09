@@ -110,6 +110,35 @@ export async function gotoNav(page, groupText, linkText) {
 }
 
 /**
+ * Reaches the live app instance via a React fiber walk from the #dc-root mount and calls its
+ * goTo(page) directly — used for pages with no sidebar link (e.g. Import Candidates, hidden from
+ * the nav but still functional) that gotoNav() has no link to click.
+ */
+export async function gotoPageDirect(page, pageName) {
+  await page.evaluate((pn) => {
+    const hostEl = document.getElementById('dc-root');
+    const containerKey = Object.keys(hostEl).find((k) => k.startsWith('__reactContainer'));
+    const containerFiber = hostEl[containerKey];
+    const rootFiber = containerFiber.current || containerFiber;
+    let logic = null;
+    const seen = new Set();
+    (function walk(fiber, depth) {
+      if (!fiber || depth > 40 || logic || seen.has(fiber)) return;
+      seen.add(fiber);
+      if (fiber.stateNode && typeof fiber.stateNode === 'object' && !(fiber.stateNode instanceof Node) && fiber.stateNode.logic && typeof fiber.stateNode.logic.goTo === 'function') {
+        logic = fiber.stateNode.logic;
+        return;
+      }
+      walk(fiber.child, depth + 1);
+      walk(fiber.sibling, depth + 1);
+    })(rootFiber, 0);
+    if (!logic) throw new Error('could not reach app logic via fiber walk');
+    logic.goTo(pn);
+  }, pageName);
+  await page.waitForTimeout(300);
+}
+
+/**
  * Scopes to the .field wrapper whose <label> (not just any descendant text) matches labelText.
  * Plain `.field:has-text(...)` is too loose on pages with help/hint paragraphs that happen to
  * repeat another field's label in their own text (e.g. Sessions' "Reporting Time" hint mentions

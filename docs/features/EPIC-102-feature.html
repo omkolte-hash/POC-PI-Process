@@ -1,0 +1,301 @@
+<!-- ==FEATURE_ID== EPIC-102 -->
+<!-- ==EPIC_TITLE== Workflow Instances Viewer -->
+<!-- ==NAV_GROUP== Workflow -->
+<!-- ==NAV_ITEMS_JSON== [["workflow-instances","Workflow Instances","git-branch"]] -->
+<!-- ==PAGE_TITLES_JSON== {"workflow-instances":["Workflow","Workflow Instances"]} -->
+<!-- ==RENDERVALS_JSON== {"pageIsWorkflowInstances":"page === \"workflow-instances\""} -->
+<!-- ==BUILD_CALLS_START== -->
+    if (page === "workflow-instances") Object.assign(base, this.buildWorkflowInstances(d));
+<!-- ==BUILD_CALLS_END== -->
+<!-- ==HTML_START== -->
+<sc-if value="{{ pageIsWorkflowInstances }}">
+<div style="padding:24px">
+
+  <!-- Header + cycle selector -->
+  <div class="d-flex align-items-center justify-content-between mb-4" style="flex-wrap:wrap;gap:12px">
+    <div>
+      <h4 style="margin:0;font-family:var(--font-heading);font-weight:var(--font-heading-weight)">Workflow Instances</h4>
+      <div style="font-size:13px;opacity:0.6;margin-top:2px">Per-candidate workflow state across the admission cycle</div>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <label style="font-size:13px;white-space:nowrap;margin:0">Cycle:</label>
+      <select class="form-select form-select-sm" style="min-width:180px" onChange="{{ onWfiCycleChange }}">
+        <sc-for list="{{ wfiCycleOptions }}" as="cy">
+          <sc-if value="{{ cy.selected }}"><option value="{{ cy.id }}" selected>{{ cy.label }}</option></sc-if>
+          <sc-if value="{{ cy.notSelected }}"><option value="{{ cy.id }}">{{ cy.label }}</option></sc-if>
+        </sc-for>
+      </select>
+    </div>
+  </div>
+
+  <!-- Summary bar -->
+  <div class="d-flex gap-3 mb-4" style="flex-wrap:wrap">
+    <div style="background:var(--color-surface);border:1px solid var(--color-divider);border-radius:8px;padding:12px 20px;min-width:120px">
+      <div style="font-size:22px;font-weight:700;color:var(--color-text)">{{ wfiTotal }}</div>
+      <div style="font-size:12px;opacity:0.6">Total Candidates</div>
+    </div>
+    <sc-for list="{{ wfiNodeSummary }}" as="ns">
+      <div style="background:var(--color-surface);border:1px solid var(--color-divider);border-radius:8px;padding:12px 20px;min-width:120px">
+        <div style="font-size:22px;font-weight:700;color:var(--color-accent-700)">{{ ns.count }}</div>
+        <div style="font-size:12px;opacity:0.6">{{ ns.node }}</div>
+      </div>
+    </sc-for>
+  </div>
+
+  <!-- Filters -->
+  <div class="d-flex gap-2 mb-3" style="flex-wrap:wrap">
+    <select class="form-select form-select-sm" style="max-width:180px" onChange="{{ onWfiNodeFilter }}">
+      <option value="">All Nodes</option>
+      <option value="Import">Import</option>
+      <option value="Shortlist">Shortlist</option>
+      <option value="Assessment">Assessment</option>
+      <option value="Merit">Merit</option>
+      <option value="Offer">Offer</option>
+    </select>
+    <select class="form-select form-select-sm" style="max-width:180px" onChange="{{ onWfiStatusFilter }}">
+      <option value="">All Statuses</option>
+      <option value="Completed">Completed</option>
+      <option value="In Progress">In Progress</option>
+      <option value="Pending">Pending</option>
+      <option value="Failed">Failed</option>
+    </select>
+    <div style="font-size:13px;opacity:0.6;align-self:center;margin-left:4px">{{ wfiFilteredCount }} result(s)</div>
+  </div>
+
+  <!-- Main table -->
+  <sc-if value="{{ wfiShowDetail }}">
+    <!-- Detail / timeline panel -->
+    <div style="background:var(--color-surface);border:1px solid var(--color-divider);border-radius:8px;padding:24px;margin-bottom:24px">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <div>
+          <div style="font-weight:600;font-size:16px">{{ wfiDetailName }}</div>
+          <div style="font-size:13px;opacity:0.6">App No: {{ wfiDetailAppNo }} &middot; Current Node: <strong>{{ wfiDetailCurrentNode }}</strong></div>
+        </div>
+        <button type="button" class="btn btn-ghost btn-sm" onClick="{{ onWfiCloseDetail }}">
+          <i data-lucide="x" style="width:16px;height:16px"></i> Close
+        </button>
+      </div>
+
+      <!-- Vertical timeline -->
+      <div style="position:relative;padding-left:32px">
+        <div style="position:absolute;left:10px;top:0;bottom:0;width:2px;background:var(--color-divider)"></div>
+        <sc-for list="{{ wfiDetailSteps }}" as="step">
+          <div style="position:relative;margin-bottom:24px">
+            <!-- dot -->
+            <div style="position:absolute;left:-27px;top:4px;width:14px;height:14px;border-radius:50%;border:2px solid var(--color-surface);background:{{ step.dotColor }}"></div>
+            <div class="d-flex align-items-start justify-content-between" style="flex-wrap:wrap;gap:8px">
+              <div>
+                <div style="font-weight:600;font-size:14px">{{ step.node }}</div>
+                <div style="font-size:12px;margin-top:2px">
+                  <span class="{{ step.statusCls }}">{{ step.status }}</span>
+                  <sc-if value="{{ step.hasOutcome }}"><span style="opacity:0.7;margin-left:8px">&middot; {{ step.outcome }}</span></sc-if>
+                </div>
+              </div>
+              <div style="font-size:12px;opacity:0.6;white-space:nowrap">{{ step.ts }}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <div style="background:var(--color-surface);border:1px solid var(--color-divider);border-radius:8px;overflow:hidden">
+    <table class="table" style="margin:0">
+      <thead>
+        <tr>
+          <th>Candidate Name</th>
+          <th>App No</th>
+          <th>Current Node</th>
+          <th>Node Status</th>
+          <th>Steps Completed</th>
+          <th>Last Updated</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <sc-if value="{{ wfiNoRows }}">
+          <tr><td colspan="7" style="text-align:center;opacity:0.5;padding:32px">No instances match the selected filters.</td></tr>
+        </sc-if>
+        <sc-for list="{{ wfiRows }}" as="row">
+          <tr style="{{ row.rowStyle }}">
+            <td style="font-weight:500">{{ row.name }}</td>
+            <td style="font-family:monospace;font-size:13px">{{ row.appNo }}</td>
+            <td>{{ row.currentNode }}</td>
+            <td><span class="{{ row.statusCls }}">{{ row.nodeStatus }}</span></td>
+            <td style="text-align:center">{{ row.stepsCompleted }} / {{ row.totalSteps }}</td>
+            <td style="font-size:13px;opacity:0.7">{{ row.lastUpdated }}</td>
+            <td>
+              <button type="button" class="btn btn-ghost btn-sm" onClick="{{ row.onView }}">
+                <i data-lucide="eye" style="width:14px;height:14px"></i> View
+              </button>
+            </td>
+          </tr>
+        </sc-for>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+</sc-if>
+<!-- ==HTML_END== -->
+<!-- ==JS_START== -->
+  buildWorkflowInstances(d) {
+    // ponytail: filter state lives in this.state keys prefixed wfi; no separate sub-component needed
+    const SEED = [
+      { candidateId: "c001", name: "Aarav Mehta",      appNo: "APP-2024-001", currentNode: "Import",     nodeStatus: "Completed",   lastUpdated: "2024-07-01",
+        steps: [{ node: "Import",     status: "Completed",   outcome: "1234 records loaded",      ts: "2024-07-01 09:10" }] },
+      { candidateId: "c002", name: "Priya Sharma",     appNo: "APP-2024-002", currentNode: "Shortlist",   nodeStatus: "In Progress", lastUpdated: "2024-07-03",
+        steps: [
+          { node: "Import",     status: "Completed",   outcome: "Record created",            ts: "2024-07-01 09:11" },
+          { node: "Shortlist",  status: "In Progress", outcome: "",                          ts: "2024-07-03 11:00" }
+        ] },
+      { candidateId: "c003", name: "Rahul Gupta",      appNo: "APP-2024-003", currentNode: "Assessment",  nodeStatus: "In Progress", lastUpdated: "2024-07-08",
+        steps: [
+          { node: "Import",     status: "Completed",   outcome: "Record created",            ts: "2024-07-01 09:12" },
+          { node: "Shortlist",  status: "Completed",   outcome: "Score 78 — Shortlisted",    ts: "2024-07-03 11:05" },
+          { node: "Assessment", status: "In Progress", outcome: "",                          ts: "2024-07-08 10:00" }
+        ] },
+      { candidateId: "c004", name: "Sneha Patel",      appNo: "APP-2024-004", currentNode: "Import",     nodeStatus: "Failed",      lastUpdated: "2024-07-01",
+        steps: [{ node: "Import",     status: "Failed",      outcome: "Missing mandatory fields",  ts: "2024-07-01 09:14" }] },
+      { candidateId: "c005", name: "Vikram Nair",      appNo: "APP-2024-005", currentNode: "Assessment",  nodeStatus: "Completed",   lastUpdated: "2024-07-10",
+        steps: [
+          { node: "Import",     status: "Completed",   outcome: "Record created",            ts: "2024-07-01 09:15" },
+          { node: "Shortlist",  status: "Completed",   outcome: "Score 82 — Shortlisted",    ts: "2024-07-03 11:10" },
+          { node: "Assessment", status: "Completed",   outcome: "PI Score 88",               ts: "2024-07-10 14:30" }
+        ] },
+      { candidateId: "c006", name: "Ananya Iyer",      appNo: "APP-2024-006", currentNode: "Merit",      nodeStatus: "In Progress", lastUpdated: "2024-07-14",
+        steps: [
+          { node: "Import",     status: "Completed",   outcome: "Record created",            ts: "2024-07-01 09:16" },
+          { node: "Shortlist",  status: "Completed",   outcome: "Score 91 — Shortlisted",    ts: "2024-07-03 11:15" },
+          { node: "Assessment", status: "Completed",   outcome: "PI Score 94",               ts: "2024-07-10 14:35" },
+          { node: "Merit",      status: "In Progress", outcome: "",                          ts: "2024-07-14 09:00" }
+        ] },
+      { candidateId: "c007", name: "Rohan Desai",      appNo: "APP-2024-007", currentNode: "Shortlist",   nodeStatus: "Completed",   lastUpdated: "2024-07-04",
+        steps: [
+          { node: "Import",     status: "Completed",   outcome: "Record created",            ts: "2024-07-01 09:17" },
+          { node: "Shortlist",  status: "Completed",   outcome: "Score 55 — Not shortlisted",ts: "2024-07-04 10:00" }
+        ] },
+      { candidateId: "c008", name: "Kavya Reddy",      appNo: "APP-2024-008", currentNode: "Offer",      nodeStatus: "In Progress", lastUpdated: "2024-07-18",
+        steps: [
+          { node: "Import",     status: "Completed",   outcome: "Record created",            ts: "2024-07-01 09:18" },
+          { node: "Shortlist",  status: "Completed",   outcome: "Score 89 — Shortlisted",    ts: "2024-07-03 11:20" },
+          { node: "Assessment", status: "Completed",   outcome: "PI Score 91",               ts: "2024-07-10 15:00" },
+          { node: "Merit",      status: "Completed",   outcome: "Rank 3",                    ts: "2024-07-14 09:05" },
+          { node: "Offer",      status: "In Progress", outcome: "",                          ts: "2024-07-18 10:00" }
+        ] },
+      { candidateId: "c009", name: "Arjun Singh",      appNo: "APP-2024-009", currentNode: "Assessment",  nodeStatus: "Pending",     lastUpdated: "2024-07-09",
+        steps: [
+          { node: "Import",     status: "Completed",   outcome: "Record created",            ts: "2024-07-01 09:19" },
+          { node: "Shortlist",  status: "Completed",   outcome: "Score 77 — Shortlisted",    ts: "2024-07-03 11:25" },
+          { node: "Assessment", status: "Pending",     outcome: "",                          ts: "2024-07-09 08:00" }
+        ] },
+      { candidateId: "c010", name: "Divya Krishnan",   appNo: "APP-2024-010", currentNode: "Import",     nodeStatus: "Completed",   lastUpdated: "2024-07-01",
+        steps: [{ node: "Import",     status: "Completed",   outcome: "Record created",            ts: "2024-07-01 09:20" }] },
+      { candidateId: "c011", name: "Karthik Menon",    appNo: "APP-2024-011", currentNode: "Merit",      nodeStatus: "Completed",   lastUpdated: "2024-07-15",
+        steps: [
+          { node: "Import",     status: "Completed",   outcome: "Record created",            ts: "2024-07-01 09:21" },
+          { node: "Shortlist",  status: "Completed",   outcome: "Score 86 — Shortlisted",    ts: "2024-07-03 11:30" },
+          { node: "Assessment", status: "Completed",   outcome: "PI Score 87",               ts: "2024-07-10 15:15" },
+          { node: "Merit",      status: "Completed",   outcome: "Rank 7",                    ts: "2024-07-15 10:00" }
+        ] },
+      { candidateId: "c012", name: "Pooja Joshi",      appNo: "APP-2024-012", currentNode: "Offer",      nodeStatus: "Completed",   lastUpdated: "2024-07-20",
+        steps: [
+          { node: "Import",     status: "Completed",   outcome: "Record created",            ts: "2024-07-01 09:22" },
+          { node: "Shortlist",  status: "Completed",   outcome: "Score 93 — Shortlisted",    ts: "2024-07-03 11:35" },
+          { node: "Assessment", status: "Completed",   outcome: "PI Score 96",               ts: "2024-07-10 15:30" },
+          { node: "Merit",      status: "Completed",   outcome: "Rank 1",                    ts: "2024-07-14 09:10" },
+          { node: "Offer",      status: "Completed",   outcome: "Offer letter sent",         ts: "2024-07-20 11:00" }
+        ] }
+    ];
+
+    const raw = JSON.parse(localStorage.getItem('geta_wf_instances') || 'null') || SEED;
+    localStorage.setItem('geta_wf_instances', JSON.stringify(raw));
+
+    // Cycle options — seed if absent
+    const CYCLE_SEED = [
+      { id: "cy-2024", label: "2024-25 Cycle" },
+      { id: "cy-2023", label: "2023-24 Cycle" },
+      { id: "cy-2022", label: "2022-23 Cycle" }
+    ];
+    const cycles = JSON.parse(localStorage.getItem('geta_admission_cycles') || 'null') || CYCLE_SEED;
+    if (!localStorage.getItem('geta_admission_cycles')) localStorage.setItem('geta_admission_cycles', JSON.stringify(cycles));
+
+    const selectedCycle = this.state.wfiCycle || cycles[0].id;
+    const nodeFilter   = this.state.wfiNodeFilter   || "";
+    const statusFilter = this.state.wfiStatusFilter || "";
+    const detailId     = this.state.wfiDetailId     || "";
+
+    // Status badge class helper
+    const statusCls = (s) => {
+      if (s === "Completed")   return "tag tag-accent";
+      if (s === "In Progress") return "badge bg-warning text-dark";
+      if (s === "Failed")      return "tag tag-neutral";
+      return "badge bg-secondary"; // Pending
+    };
+
+    // Step dot colour
+    const dotColor = (s) => {
+      if (s === "Completed")   return "var(--color-accent)";
+      if (s === "In Progress") return "#f59e0b";
+      if (s === "Failed")      return "#ef4444";
+      return "var(--color-divider)";
+    };
+
+    // Node counts for summary bar
+    const nodeOrder = ["Import", "Shortlist", "Assessment", "Merit", "Offer"];
+    const wfiNodeSummary = nodeOrder.map(n => ({
+      node: n,
+      count: raw.filter(x => x.currentNode === n).length
+    }));
+
+    // Apply filters
+    let filtered = raw;
+    if (nodeFilter)   filtered = filtered.filter(x => x.currentNode === nodeFilter);
+    if (statusFilter) filtered = filtered.filter(x => x.nodeStatus === statusFilter);
+
+    const detail = detailId ? raw.find(x => x.candidateId === detailId) : null;
+
+    const wfiRows = filtered.map(x => ({
+      candidateId: x.candidateId,
+      name: x.name,
+      appNo: x.appNo,
+      currentNode: x.currentNode,
+      nodeStatus: x.nodeStatus,
+      statusCls: statusCls(x.nodeStatus),
+      stepsCompleted: x.steps.filter(s => s.status === "Completed").length,
+      totalSteps: x.steps.length,
+      lastUpdated: x.lastUpdated,
+      rowStyle: x.candidateId === detailId ? "background:color-mix(in srgb, var(--color-accent) 10%, transparent)" : "",
+      onView: () => this.setState({ wfiDetailId: x.candidateId === detailId ? "" : x.candidateId })
+    }));
+
+    const wfiDetailSteps = detail ? detail.steps.map(s => ({
+      node: s.node,
+      status: s.status,
+      statusCls: statusCls(s.status),
+      outcome: s.outcome,
+      hasOutcome: !!s.outcome,
+      ts: s.ts,
+      dotColor: dotColor(s.status)
+    })) : [];
+
+    return {
+      wfiCycleOptions: cycles.map(cy => ({ ...cy, selected: cy.id === selectedCycle, notSelected: cy.id !== selectedCycle })),
+      onWfiCycleChange: (e) => this.setState({ wfiCycle: e.target.value, wfiDetailId: "" }),
+      onWfiNodeFilter:   (e) => this.setState({ wfiNodeFilter: e.target.value, wfiDetailId: "" }),
+      onWfiStatusFilter: (e) => this.setState({ wfiStatusFilter: e.target.value, wfiDetailId: "" }),
+      wfiTotal: raw.length,
+      wfiNodeSummary,
+      wfiRows,
+      wfiNoRows: wfiRows.length === 0,
+      wfiFilteredCount: wfiRows.length,
+      // Detail panel
+      wfiShowDetail: !!detail,
+      wfiDetailName: detail ? detail.name : "",
+      wfiDetailAppNo: detail ? detail.appNo : "",
+      wfiDetailCurrentNode: detail ? detail.currentNode : "",
+      wfiDetailSteps,
+      onWfiCloseDetail: () => this.setState({ wfiDetailId: "" })
+    };
+  }
+<!-- ==JS_END== -->

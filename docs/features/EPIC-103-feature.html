@@ -1,0 +1,232 @@
+<!-- ==FEATURE_ID== EPIC-103 -->
+<!-- ==EPIC_TITLE== Workflow Node Sample Tester -->
+<!-- ==NAV_GROUP== Workflow -->
+<!-- ==NAV_ITEMS_JSON== [["wf-sample-test","Node Sample Tester","test-tube-2"]] -->
+<!-- ==PAGE_TITLES_JSON== {"wf-sample-test":["Workflow","Node Sample Tester"]} -->
+<!-- ==RENDERVALS_JSON== {"pageIsWfSampleTest":"page === \"wf-sample-test\""} -->
+<!-- ==BUILD_CALLS_START== -->
+    if (page === "wf-sample-test") Object.assign(base, this.buildWfSampleTest(d));
+<!-- ==BUILD_CALLS_END== -->
+<!-- ==HTML_START== -->
+<sc-if value="{{ pageIsWfSampleTest }}">
+<div style="padding:24px;max-width:1200px">
+
+  <div class="mb-4">
+    <h4 style="margin:0;font-family:var(--font-heading);font-weight:var(--font-heading-weight)">Node Sample Tester</h4>
+    <div style="font-size:13px;opacity:0.6;margin-top:2px">Simulate workflow node logic against pasted CSV data</div>
+  </div>
+
+  <div class="d-flex gap-0" style="border:1px solid var(--color-divider);border-radius:8px;overflow:hidden;background:var(--color-surface)">
+
+    <!-- LEFT PANEL -->
+    <div style="width:280px;min-width:280px;border-right:1px solid var(--color-divider);padding:16px;display:flex;flex-direction:column;gap:16px">
+
+      <div>
+        <div style="font-weight:600;font-size:14px;margin-bottom:10px">Test a Node</div>
+        <label class="form-label" style="font-size:12px;margin-bottom:4px">Node Type</label>
+        <select class="form-select form-select-sm" onChange="{{ onSampleNodeChange }}">
+          <sc-for list="{{ sampleNodeOptions }}" as="opt">
+            <sc-if value="{{ opt.selected }}"><option value="{{ opt.value }}" selected>{{ opt.label }}</option></sc-if>
+            <sc-if value="{{ opt.notSelected }}"><option value="{{ opt.value }}">{{ opt.label }}</option></sc-if>
+          </sc-for>
+        </select>
+      </div>
+
+      <div>
+        <div style="font-weight:600;font-size:13px;margin-bottom:8px">Sample Data</div>
+        <label class="form-label" style="font-size:12px;margin-bottom:4px">Paste CSV (header row + data rows):</label>
+        <textarea class="form-control form-control-sm" rows="8" style="font-family:monospace;font-size:11px;resize:vertical"
+          placeholder="Name,Score,Category,Programme&#10;Alice,85,General,MBA&#10;Bob,72,OBC,MBA"
+          onChange="{{ onSampleCsvChange }}">{{ sampleCsvText }}</textarea>
+        <button type="button" class="btn btn-outline-secondary btn-sm w-100 mt-2" onClick="{{ onLoadSample }}">
+          <i data-lucide="upload" style="width:14px;height:14px"></i> Load Sample Data
+        </button>
+        <sc-if value="{{ sampleRowsLoaded }}">
+          <div class="mt-2" style="font-size:12px">
+            <span class="badge bg-success">{{ sampleRowCount }} rows loaded</span>
+          </div>
+        </sc-if>
+      </div>
+
+      <button type="button" class="btn btn-primary btn-sm w-100" onClick="{{ onRunSimulation }}">
+        <i data-lucide="play" style="width:14px;height:14px"></i> Run Node Simulation
+      </button>
+
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div style="flex:1;padding:16px">
+
+      <sc-if value="{{ sampleNoResults }}">
+        <div style="display:flex;align-items:center;justify-content:center;height:100%;min-height:300px">
+          <div style="text-align:center;opacity:0.5">
+            <i data-lucide="flask-conical" style="width:40px;height:40px;margin-bottom:12px;display:block;margin-left:auto;margin-right:auto"></i>
+            <div style="font-size:14px">Select a node type and load sample data, then click Run.</div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ sampleHasResults }}">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <div style="font-weight:600;font-size:15px">Results — {{ sampleNode }}</div>
+          <button type="button" class="btn btn-outline-secondary btn-sm" onClick="{{ onExportResultsCsv }}">
+            <i data-lucide="download" style="width:14px;height:14px"></i> Export Results CSV
+          </button>
+        </div>
+
+        <div style="overflow-x:auto">
+          <table class="table table-hover table-sm" style="margin:0">
+            <thead>
+              <tr>
+                <th style="width:50px">#</th>
+                <th>Name</th>
+                <th>Input Fields</th>
+                <th>Simulated Output</th>
+                <th>Outcome</th>
+              </tr>
+            </thead>
+            <tbody>
+              <sc-for list="{{ sampleResults }}" as="row">
+                <tr>
+                  <td style="font-size:12px;opacity:0.6">{{ row.rowNum }}</td>
+                  <td style="font-weight:500">{{ row.name }}</td>
+                  <td style="font-size:12px;opacity:0.75">{{ row.inputFields }}</td>
+                  <td style="font-size:12px">{{ row.simulatedOutput }}</td>
+                  <td><span class="{{ row.outcomeCls }}">{{ row.outcome }}</span></td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+      </sc-if>
+
+    </div>
+  </div>
+
+</div>
+</sc-if>
+<!-- ==HTML_END== -->
+<!-- ==JS_START== -->
+  buildWfSampleTest(d) {
+    const NODE_TYPES = [
+      "Import", "Doc Collection", "Candidate Mgmt", "Shortlist", "Scheduling",
+      "Attendance", "Score Capture", "Scoring", "Merit List", "Seat Allocation",
+      "Offer", "Communication", "Print", "Verification Gate", "Approval Gate"
+    ];
+
+    // ponytail: simulation logic is a flat switch; no strategy pattern needed for 15 mock branches
+    const simulate = (nodeType, row, rank) => {
+      const score = parseFloat(row.Score) || 0;
+      switch (nodeType) {
+        case "Import":
+          return { simulatedOutput: "Candidate record created", outcome: "Imported", outcomeCls: "badge bg-success" };
+        case "Shortlist":
+          if (score > 80) return { simulatedOutput: `Score ${score}`, outcome: "Group A", outcomeCls: "badge bg-success" };
+          if (score >= 60) return { simulatedOutput: `Score ${score}`, outcome: "Group B", outcomeCls: "badge bg-warning text-dark" };
+          return { simulatedOutput: `Score ${score}`, outcome: "Excluded", outcomeCls: "badge bg-danger" };
+        case "Merit List":
+          return { simulatedOutput: `Score ${score}`, outcome: `Rank ${rank}`, outcomeCls: "badge bg-primary" };
+        case "Approval Gate":
+          return { simulatedOutput: "Awaiting approver action", outcome: "Pending Approval", outcomeCls: "badge bg-warning text-dark" };
+        case "Verification Gate":
+          return { simulatedOutput: "Document check triggered", outcome: "Awaiting Documents", outcomeCls: "badge bg-warning text-dark" };
+        default:
+          return { simulatedOutput: "Node logic executed", outcome: "Processed", outcomeCls: "badge bg-secondary" };
+      }
+    };
+
+    const parseCsv = (text) => {
+      const lines = text.trim().split('\n').filter(l => l.trim());
+      if (lines.length < 2) return [];
+      const headers = lines[0].split(',').map(h => h.trim());
+      return lines.slice(1).map(line => {
+        const vals = line.split(',').map(v => v.trim());
+        const obj = {};
+        headers.forEach((h, i) => { obj[h] = vals[i] || ''; });
+        return obj;
+      });
+    };
+
+    const storedCsv  = localStorage.getItem('geta_sample_test_csv') || '';
+    const storedNode = localStorage.getItem('geta_sample_test_node') || NODE_TYPES[0];
+    const storedRows = JSON.parse(localStorage.getItem('geta_sample_test_rows') || 'null');
+    const storedResults = JSON.parse(localStorage.getItem('geta_sample_test_results') || 'null');
+
+    const currentNode = this.state.sampleNode || storedNode;
+    const currentCsv  = this.state.sampleCsvText !== undefined ? this.state.sampleCsvText : storedCsv;
+    const loadedRows  = this.state.sampleLoadedRows !== undefined ? this.state.sampleLoadedRows : storedRows;
+    const results     = this.state.sampleResults !== undefined ? this.state.sampleResults : storedResults;
+
+    // Build results table rows (for Merit List sort by Score desc before ranking)
+    let resultRows = null;
+    if (results && results.length) {
+      const sorted = currentNode === "Merit List"
+        ? [...results].sort((a, b) => (parseFloat(b.Score) || 0) - (parseFloat(a.Score) || 0))
+        : results;
+      let rankCounter = 0;
+      resultRows = sorted.map((row, i) => {
+        rankCounter++;
+        const inputKeys = Object.keys(row).filter(k => k !== 'Name');
+        const inputFields = inputKeys.map(k => `${k}: ${row[k]}`).join(', ');
+        const sim = simulate(currentNode, row, rankCounter);
+        return {
+          rowNum: i + 1,
+          name: row.Name || row.name || `Row ${i + 1}`,
+          inputFields,
+          simulatedOutput: sim.simulatedOutput,
+          outcome: sim.outcome,
+          outcomeCls: sim.outcomeCls
+        };
+      });
+    }
+
+    return {
+      sampleNode: currentNode,
+      sampleCsvText: currentCsv,
+      sampleRowsLoaded: !!(loadedRows && loadedRows.length),
+      sampleRowCount: loadedRows ? loadedRows.length : 0,
+      sampleHasResults: !!(resultRows && resultRows.length),
+      sampleNoResults: !(resultRows && resultRows.length),
+      sampleResults: resultRows || [],
+
+      sampleNodeOptions: NODE_TYPES.map(n => ({
+        value: n, label: n,
+        selected: n === currentNode,
+        notSelected: n !== currentNode
+      })),
+
+      onSampleNodeChange: (e) => {
+        localStorage.setItem('geta_sample_test_node', e.target.value);
+        this.setState({ sampleNode: e.target.value, sampleResults: null });
+      },
+
+      onSampleCsvChange: (e) => {
+        this.setState({ sampleCsvText: e.target.value });
+      },
+
+      onLoadSample: () => {
+        const csv = this.state.sampleCsvText !== undefined
+          ? this.state.sampleCsvText
+          : localStorage.getItem('geta_sample_test_csv') || '';
+        const rows = parseCsv(csv);
+        if (!rows.length) { this.showToast('No valid rows found — check your CSV format.'); return; }
+        localStorage.setItem('geta_sample_test_csv', csv);
+        localStorage.setItem('geta_sample_test_rows', JSON.stringify(rows));
+        this.setState({ sampleLoadedRows: rows, sampleResults: null });
+        this.showToast(`${rows.length} rows loaded`);
+      },
+
+      onRunSimulation: () => {
+        const rows = this.state.sampleLoadedRows !== undefined
+          ? this.state.sampleLoadedRows
+          : JSON.parse(localStorage.getItem('geta_sample_test_rows') || 'null');
+        if (!rows || !rows.length) { this.showToast('Load sample data first.'); return; }
+        const node = this.state.sampleNode || localStorage.getItem('geta_sample_test_node') || NODE_TYPES[0];
+        localStorage.setItem('geta_sample_test_results', JSON.stringify(rows));
+        this.setState({ sampleResults: rows, sampleNode: node });
+      },
+
+      onExportResultsCsv: () => this.showToast('Prototype note: export would download a CSV in the real system.')
+    };
+  }
+<!-- ==JS_END== -->

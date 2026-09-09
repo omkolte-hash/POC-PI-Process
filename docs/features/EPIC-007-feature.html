@@ -1,0 +1,415 @@
+<!-- ==FEATURE_ID== EPIC-007 -->
+<!-- ==EPIC_TITLE== Condition Engine Visual Builder -->
+<!-- ==NAV_GROUP== Tools -->
+<!-- ==NAV_ITEMS_JSON== [["condition-builder","Condition Builder","filter-check"]] -->
+<!-- ==PAGE_TITLES_JSON== {"condition-builder":["Tools","Condition Builder"]} -->
+<!-- ==RENDERVALS_JSON== {"pageIsConditionBuilder":"page === \"condition-builder\""} -->
+<!-- ==BUILD_CALLS_START== -->
+    if (page === "condition-builder") Object.assign(base, this.buildConditionBuilder(d));
+<!-- ==BUILD_CALLS_END== -->
+<!-- ==HTML_START== -->
+<sc-if value="{{ pageIsConditionBuilder }}">
+<div style="display:flex;height:100%;overflow:hidden">
+
+  <!-- LEFT: Available Fields + Saved Conditions -->
+  <div style="width:200px;flex:none;border-right:1px solid var(--color-divider);overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:16px">
+    <div>
+      <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--color-text-muted);margin-bottom:8px">Available Fields</div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <sc-for list="{{ cbFields }}" as="f">
+          <button type="button" class="btn btn-sm" style="text-align:left;justify-content:flex-start;font-size:12px;padding:4px 8px;border:1px solid var(--color-divider);background:var(--color-surface)" onClick="{{ f.onAdd }}">{{ f.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--color-text-muted);margin-bottom:8px">Saved Conditions</div>
+      <sc-if value="{{ cbNoSaved }}">
+        <div style="font-size:12px;opacity:0.5">None saved yet.</div>
+      </sc-if>
+      <sc-if value="{{ cbHasSaved }}">
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <sc-for list="{{ cbSavedList }}" as="s">
+            <div style="display:flex;align-items:center;gap:4px">
+              <button type="button" class="btn btn-sm" style="flex:1;text-align:left;font-size:12px;padding:3px 6px;border:1px solid var(--color-divider);background:var(--color-surface)" onClick="{{ s.onLoad }}">{{ s.name }}</button>
+              <button type="button" class="btn btn-icon btn-ghost btn-sm" onClick="{{ s.onDelete }}" title="Delete"><i data-lucide="trash-2" style="width:12px;height:12px"></i></button>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+
+  <!-- CENTER: Builder -->
+  <div style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:16px">
+    <div style="font-size:15px;font-weight:600">Build Condition</div>
+
+    <!-- Root group -->
+    <div style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:12px;background:var(--color-surface)">
+      <!-- Root AND/OR toggle -->
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span style="font-size:12px;font-weight:600;opacity:0.6">Match</span>
+        <div class="btn-group btn-group-sm">
+          <button type="button" class="btn {{ cbRootAndClass }}" onClick="{{ cbSetRootAnd }}">AND</button>
+          <button type="button" class="btn {{ cbRootOrClass }}" onClick="{{ cbSetRootOr }}">OR</button>
+        </div>
+        <span style="font-size:12px;opacity:0.5">of the following:</span>
+      </div>
+
+      <!-- Root conditions -->
+      <sc-for list="{{ cbRootCondRows }}" as="rc">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+          <select class="form-control form-control-sm" style="width:140px" onChange="{{ rc.onFieldChange }}">
+            <sc-for list="{{ rc.fieldOpts }}" as="fo">
+              <option value="{{ fo.value }}" {{ fo.selected }}>{{ fo.label }}</option>
+            </sc-for>
+          </select>
+          <select class="form-control form-control-sm" style="width:120px" onChange="{{ rc.onOpChange }}">
+            <sc-for list="{{ rc.opOpts }}" as="oo">
+              <option value="{{ oo.value }}" {{ oo.selected }}>{{ oo.label }}</option>
+            </sc-for>
+          </select>
+          <input type="text" class="form-control form-control-sm" style="width:120px" placeholder="Value" value="{{ rc.value }}" onInput="{{ rc.onValueChange }}">
+          <button type="button" class="btn btn-icon btn-ghost btn-sm" onClick="{{ rc.onRemove }}" title="Remove"><i data-lucide="x" style="width:14px;height:14px"></i></button>
+        </div>
+      </sc-for>
+
+      <button type="button" class="btn btn-sm btn-secondary" onClick="{{ cbAddRootCondition }}" style="margin-right:8px">
+        <i data-lucide="plus" style="width:13px;height:13px"></i> Add Condition
+      </button>
+      <button type="button" class="btn btn-sm btn-secondary" onClick="{{ cbAddGroup }}">
+        <i data-lucide="layers" style="width:13px;height:13px"></i> Add Nested Group
+      </button>
+    </div>
+
+    <!-- Child groups -->
+    <sc-for list="{{ cbGroupRows }}" as="grp">
+      <div style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:12px;background:var(--color-neutral-50,#fafafa);margin-left:24px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:12px;font-weight:600;opacity:0.6">Nested — Match</span>
+            <div class="btn-group btn-group-sm">
+              <button type="button" class="btn {{ grp.andClass }}" onClick="{{ grp.onSetAnd }}">AND</button>
+              <button type="button" class="btn {{ grp.orClass }}" onClick="{{ grp.onSetOr }}">OR</button>
+            </div>
+          </div>
+          <button type="button" class="btn btn-icon btn-ghost btn-sm" onClick="{{ grp.onRemoveGroup }}" title="Remove group"><i data-lucide="trash-2" style="width:13px;height:13px"></i></button>
+        </div>
+
+        <sc-for list="{{ grp.condRows }}" as="cr">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+            <select class="form-control form-control-sm" style="width:140px" onChange="{{ cr.onFieldChange }}">
+              <sc-for list="{{ cr.fieldOpts }}" as="fo">
+                <option value="{{ fo.value }}" {{ fo.selected }}>{{ fo.label }}</option>
+              </sc-for>
+            </select>
+            <select class="form-control form-control-sm" style="width:120px" onChange="{{ cr.onOpChange }}">
+              <sc-for list="{{ cr.opOpts }}" as="oo">
+                <option value="{{ oo.value }}" {{ oo.selected }}>{{ oo.label }}</option>
+              </sc-for>
+            </select>
+            <input type="text" class="form-control form-control-sm" style="width:120px" placeholder="Value" value="{{ cr.value }}" onInput="{{ cr.onValueChange }}">
+            <button type="button" class="btn btn-icon btn-ghost btn-sm" onClick="{{ cr.onRemove }}" title="Remove"><i data-lucide="x" style="width:14px;height:14px"></i></button>
+          </div>
+        </sc-for>
+
+        <button type="button" class="btn btn-sm btn-secondary" onClick="{{ grp.onAddCond }}">
+          <i data-lucide="plus" style="width:13px;height:13px"></i> Add Condition
+        </button>
+      </div>
+    </sc-for>
+
+    <!-- Save bar -->
+    <div style="display:flex;align-items:center;gap:8px;padding-top:8px;border-top:1px solid var(--color-divider)">
+      <input type="text" class="form-control form-control-sm" style="width:220px" placeholder="Condition name…" value="{{ cbCondName }}" onInput="{{ cbOnCondNameChange }}">
+      <button type="button" class="btn btn-sm btn-primary" onClick="{{ cbSave }}">
+        <i data-lucide="save" style="width:13px;height:13px"></i> Save Condition
+      </button>
+      <button type="button" class="btn btn-sm btn-secondary" onClick="{{ cbClear }}">Clear</button>
+    </div>
+  </div>
+
+  <!-- RIGHT: Preview + Test -->
+  <div style="width:280px;flex:none;border-left:1px solid var(--color-divider);overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:16px">
+    <div>
+      <div style="font-size:13px;font-weight:600;margin-bottom:8px">JsonLogic Preview</div>
+      <pre style="font-size:11px;background:var(--color-neutral-100,#f4f4f5);border-radius:var(--radius-md);padding:10px;white-space:pre-wrap;word-break:break-all;margin:0;max-height:280px;overflow-y:auto">{{ cbJsonPreview }}</pre>
+    </div>
+    <div>
+      <div style="font-size:13px;font-weight:600;margin-bottom:8px">Test Against Sample</div>
+      <textarea class="form-control form-control-sm" rows="5" placeholder='{"Score": 85, "Category": "OBC", "Rank": 12}' onInput="{{ cbOnTestInputChange }}" style="font-size:11px;font-family:monospace">{{ cbTestInput }}</textarea>
+      <button type="button" class="btn btn-sm btn-secondary" style="margin-top:8px;width:100%" onClick="{{ cbRunTest }}">
+        <i data-lucide="play" style="width:13px;height:13px"></i> Run Test
+      </button>
+      <sc-if value="{{ cbTestRan }}">
+        <div style="margin-top:10px;text-align:center">
+          <sc-if value="{{ cbTestPass }}">
+            <span class="badge bg-success" style="font-size:13px;padding:6px 16px">PASS</span>
+          </sc-if>
+          <sc-if value="{{ cbTestFail }}">
+            <span class="badge bg-danger" style="font-size:13px;padding:6px 16px">FAIL</span>
+          </sc-if>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+
+</div>
+</sc-if>
+<!-- ==HTML_END== -->
+<!-- ==JS_START== -->
+  buildConditionBuilder(d) {
+    // ponytail: builder state lives in this.state; re-render triggered via setState
+
+    const FIELDS = [
+      { label: "Application No", value: "ApplicationNo", type: "text" },
+      { label: "Name",           value: "Name",          type: "text" },
+      { label: "Programme",      value: "Programme",     type: "text" },
+      { label: "Shortlist Group",value: "ShortlistGroup",type: "text" },
+      { label: "Score",          value: "Score",         type: "number" },
+      { label: "Attendance",     value: "Attendance",    type: "text" },
+      { label: "Category",       value: "Category",      type: "text" },
+      { label: "Gender",         value: "Gender",        type: "text" },
+      { label: "State",          value: "State",         type: "text" },
+      { label: "Qualifying Score",value:"QualifyingScore",type:"number"},
+      { label: "Rank",           value: "Rank",          type: "number" }
+    ];
+
+    const TEXT_OPS   = [
+      { label: "equals",      value: "==" },
+      { label: "not equals",  value: "!=" },
+      { label: "contains",    value: "in" },
+      { label: "starts with", value: "startsWith" }
+    ];
+    const NUM_OPS = [
+      { label: "equals",        value: "==" },
+      { label: "greater than",  value: ">"  },
+      { label: "less than",     value: "<"  },
+      { label: "≥",             value: ">=" },
+      { label: "≤",             value: "<=" }
+    ];
+
+    const fieldType = (fv) => (FIELDS.find(f => f.value === fv) || {}).type || "text";
+    const opsFor    = (fv) => fieldType(fv) === "number" ? NUM_OPS : TEXT_OPS;
+
+    const uid = () => Math.random().toString(36).slice(2, 9);
+
+    // Initialise state on first render
+    if (!this.state.cbGroups) {
+      this.setState({
+        cbGroups: [],
+        cbRootOp: "and",
+        cbRootConds: [{ id: uid(), field: "Score", op: ">=", value: "70" }],
+        cbCondName: "",
+        cbTestInput: "",
+        cbTestRan: false,
+        cbTestPass: false
+      });
+    }
+
+    const s = this.state;
+    const rootOp    = s.cbRootOp    || "and";
+    const rootConds = s.cbRootConds || [];
+    const groups    = s.cbGroups    || [];
+
+    // ── helpers ────────────────────────────────────────────────────────────────
+
+    const makeCond = (field = "Score") => ({ id: uid(), field, op: opsFor(field)[0].value, value: "" });
+
+    const fieldOpts = (selected) =>
+      FIELDS.map(f => ({ label: f.label, value: f.value, selected: f.value === selected ? "selected" : "" }));
+
+    const opOpts = (fieldVal, selOp) =>
+      opsFor(fieldVal).map(o => ({ label: o.label, value: o.value, selected: o.value === selOp ? "selected" : "" }));
+
+    // ── condRow builder ────────────────────────────────────────────────────────
+
+    const condRow = (cond, updateConds, allConds) => ({
+      fieldOpts: fieldOpts(cond.field),
+      opOpts:    opOpts(cond.field, cond.op),
+      value:     cond.value,
+      onFieldChange: (e) => {
+        const nf = e.target.value;
+        const nop = opsFor(nf)[0].value;
+        updateConds(allConds.map(c => c.id === cond.id ? { ...c, field: nf, op: nop } : c));
+      },
+      onOpChange: (e) => {
+        updateConds(allConds.map(c => c.id === cond.id ? { ...c, op: e.target.value } : c));
+      },
+      onValueChange: (e) => {
+        updateConds(allConds.map(c => c.id === cond.id ? { ...c, value: e.target.value } : c));
+      },
+      onRemove: () => updateConds(allConds.filter(c => c.id !== cond.id))
+    });
+
+    // ── JsonLogic builder ──────────────────────────────────────────────────────
+
+    const condToLogic = (c) => {
+      const varRef = { "var": c.field };
+      const val    = isNaN(c.value) || c.value === "" ? c.value : Number(c.value);
+      if (c.op === "in")         return { "in": [val, { "var": c.field }] };
+      if (c.op === "startsWith") return { "startsWith": [{ "var": c.field }, val] };
+      return { [c.op]: [varRef, val] };
+    };
+
+    const buildLogic = () => {
+      const rootClause  = rootConds.length === 0 ? [] : rootConds.map(condToLogic);
+      const groupClauses = groups.map(g => {
+        const cs = g.conds.map(condToLogic);
+        if (cs.length === 0) return null;
+        return { [g.op]: cs };
+      }).filter(Boolean);
+      const all = [...rootClause, ...groupClauses];
+      if (all.length === 0) return {};
+      if (all.length === 1) return { [rootOp]: [all[0]] };
+      return { [rootOp]: all };
+    };
+
+    const jsonPreview = JSON.stringify(buildLogic(), null, 2);
+
+    // ── saved conditions ───────────────────────────────────────────────────────
+
+    const saved = JSON.parse(localStorage.getItem('geta_saved_conditions') || '[]');
+
+    const persistSaved = (arr) => localStorage.setItem('geta_saved_conditions', JSON.stringify(arr));
+
+    const savedList = saved.map(sc => ({
+      name: sc.name,
+      onLoad: () => {
+        // Flatten the top-level into root conds; nested groups ignored on load for POC
+        // ponytail: full deserialise from JsonLogic skipped, load stores the raw state snapshot instead
+        const snap = sc.snapshot;
+        if (snap) {
+          this.setState({ cbRootOp: snap.rootOp, cbRootConds: snap.rootConds, cbGroups: snap.groups, cbCondName: sc.name, cbTestRan: false });
+        } else {
+          this.showToast("Condition loaded (legacy format — no snapshot).");
+        }
+      },
+      onDelete: () => {
+        persistSaved(saved.filter(x => x.id !== sc.id));
+        this.showToast("Deleted.");
+        this.setState({});
+      }
+    }));
+
+    // ── root condition rows ────────────────────────────────────────────────────
+
+    const updateRootConds = (next) => this.setState({ cbRootConds: next });
+
+    const cbRootCondRows = rootConds.map(rc =>
+      condRow(rc, updateRootConds, rootConds)
+    );
+
+    // ── child group rows ───────────────────────────────────────────────────────
+
+    const cbGroupRows = groups.map((g) => {
+      const updateGroupConds = (next) => {
+        this.setState({ cbGroups: groups.map(x => x.id === g.id ? { ...x, conds: next } : x) });
+      };
+      return {
+        andClass: g.op === "and" ? "btn-primary" : "btn-outline-secondary",
+        orClass:  g.op === "or"  ? "btn-primary" : "btn-outline-secondary",
+        onSetAnd: () => this.setState({ cbGroups: groups.map(x => x.id === g.id ? { ...x, op: "and" } : x) }),
+        onSetOr:  () => this.setState({ cbGroups: groups.map(x => x.id === g.id ? { ...x, op: "or"  } : x) }),
+        onRemoveGroup: () => this.setState({ cbGroups: groups.filter(x => x.id !== g.id) }),
+        onAddCond: () => this.setState({ cbGroups: groups.map(x => x.id === g.id ? { ...x, conds: [...x.conds, makeCond()] } : x) }),
+        condRows: g.conds.map(c => condRow(c, updateGroupConds, g.conds))
+      };
+    });
+
+    // ── test runner ───────────────────────────────────────────────────────────
+
+    // ponytail: JsonLogic evaluation done inline; no lib needed for the ops we support
+    const evalLogic = (logic, data) => {
+      if (!logic || typeof logic !== "object") return true;
+      const keys = Object.keys(logic);
+      if (keys.length === 0) return true;
+      const op = keys[0];
+      const args = logic[op];
+      if (op === "and") return args.every(a => evalLogic(a, data));
+      if (op === "or")  return args.some(a => evalLogic(a, data));
+      if (op === "in") {
+        const [needle, haystack] = args;
+        const hv = haystack && haystack.var ? String(data[haystack.var] ?? "") : String(haystack ?? "");
+        return hv.includes(String(needle));
+      }
+      if (op === "startsWith") {
+        const [ref, prefix] = args;
+        const sv = ref && ref.var ? String(data[ref.var] ?? "") : String(ref ?? "");
+        return sv.startsWith(String(prefix));
+      }
+      // numeric / equality ops: args = [{"var":"Field"}, value]
+      const [lhs, rhs] = args;
+      const lv = lhs && lhs.var !== undefined ? data[lhs.var] : lhs;
+      const lNum = Number(lv), rNum = Number(rhs);
+      if (op === "==") return lNum === rNum || String(lv) === String(rhs);
+      if (op === "!=") return lNum !== rNum && String(lv) !== String(rhs);
+      if (op === ">")  return lNum > rNum;
+      if (op === "<")  return lNum < rNum;
+      if (op === ">=") return lNum >= rNum;
+      if (op === "<=") return lNum <= rNum;
+      return false;
+    };
+
+    return {
+      // field chip list
+      cbFields: FIELDS.map(f => ({
+        label: f.label,
+        onAdd: () => this.setState({ cbRootConds: [...(this.state.cbRootConds || []), makeCond(f.value)] })
+      })),
+
+      // saved list
+      cbNoSaved:  savedList.length === 0,
+      cbHasSaved: savedList.length > 0,
+      cbSavedList: savedList,
+
+      // root toggle classes
+      cbRootAndClass: rootOp === "and" ? "btn-primary" : "btn-outline-secondary",
+      cbRootOrClass:  rootOp === "or"  ? "btn-primary" : "btn-outline-secondary",
+      cbSetRootAnd: () => this.setState({ cbRootOp: "and" }),
+      cbSetRootOr:  () => this.setState({ cbRootOp: "or"  }),
+
+      cbRootCondRows,
+      cbAddRootCondition: () => this.setState({ cbRootConds: [...rootConds, makeCond()] }),
+      cbAddGroup: () => this.setState({ cbGroups: [...groups, { id: uid(), op: "and", conds: [makeCond()] }] }),
+
+      cbGroupRows,
+
+      // save bar
+      cbCondName: s.cbCondName || "",
+      cbOnCondNameChange: (e) => this.setState({ cbCondName: e.target.value }),
+      cbSave: () => {
+        const name = (this.state.cbCondName || "").trim();
+        if (!name) { this.showToast("Enter a condition name first."); return; }
+        const existing = JSON.parse(localStorage.getItem('geta_saved_conditions') || '[]');
+        const entry = {
+          id: uid(),
+          name,
+          logic: buildLogic(),
+          snapshot: { rootOp: this.state.cbRootOp, rootConds: this.state.cbRootConds, groups: this.state.cbGroups }
+        };
+        persistSaved([...existing, entry]);
+        this.showToast(`Saved "${name}".`);
+        this.setState({ cbCondName: "" });
+      },
+      cbClear: () => this.setState({
+        cbRootOp: "and", cbRootConds: [], cbGroups: [],
+        cbCondName: "", cbTestInput: "", cbTestRan: false, cbTestPass: false
+      }),
+
+      // right panel
+      cbJsonPreview: jsonPreview,
+      cbTestInput: s.cbTestInput || "",
+      cbOnTestInputChange: (e) => this.setState({ cbTestInput: e.target.value, cbTestRan: false }),
+      cbRunTest: () => {
+        let data;
+        try { data = JSON.parse(this.state.cbTestInput || "{}"); }
+        catch { this.showToast("Invalid JSON — check the test input."); return; }
+        const pass = evalLogic(buildLogic(), data);
+        this.setState({ cbTestRan: true, cbTestPass: pass });
+      },
+      cbTestRan:  !!(s.cbTestRan),
+      cbTestPass: !!(s.cbTestPass),
+      cbTestFail: !!(s.cbTestRan && !s.cbTestPass)
+    };
+  }
+<!-- ==JS_END== -->

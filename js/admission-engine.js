@@ -1,5 +1,6 @@
 // Admission Processing System — mock data model + workflow logic (client-side only, no backend).
 // Terminology: "Room" in the source docs = Zoom Room (virtual). Exam terminology shown as "SLAT" (docs call it SET).
+import { evaluateFilter } from "./import-engine.js";
 
 function mulberry32(seed) {
   return function () {
@@ -19,6 +20,121 @@ export const CATEGORIES = [
   { id: "DA", label: "Differently Abled (DA)" },
   { id: "KM", label: "Kashmiri Migrants / Kashmiri Pandits" }
 ];
+
+// Default per-programme document requirements — reproduces the app's original hardcoded behavior
+// (a category document for every non-OPEN candidate, plus a DA certificate for DA candidates) as
+// the starting config for every new programme. Institute admins edit this per programme from there.
+export const DEFAULT_REQUIRED_DOCUMENTS = [
+  { id: "RD-default-category", key: "category", seq: 1, label: "Category / Medical Certificate", appliesToCategories: ["SC", "ST", "DA", "KM"] },
+  { id: "RD-default-da", key: "da", seq: 2, label: "DA Eligibility Certificate", appliesToCategories: ["DA"] }
+];
+
+// Default per-programme approval chain — reproduces the app's original hardcoded Director-then-SIU
+// two-level chain as the starting config for every new programme. No stable "key" field like
+// requiredDocuments rows: nothing references a level by persistent key, every reference is positional
+// (levelIndex into the chain sorted by seq).
+export const DEFAULT_APPROVAL_CHAIN = [
+  { id: "AC-default-director", seq: 1, name: "Director", approverEmail: "" },
+  { id: "AC-default-siu", seq: 2, name: "SIU", approverEmail: "" }
+];
+export function effectiveApprovalChain(programme) {
+  return ((programme && programme.approvalChain) || DEFAULT_APPROVAL_CHAIN).slice().sort((a, b) => a.seq - b.seq);
+}
+
+// Panelist approval is dataset-global, not per-programme: a panelist can be linked to several
+// programmes at once (see savePanelist), but has a single approval array on their own record — a
+// per-programme chain would leave that ambiguous whenever a panelist's linked programmes disagree on
+// chain length. No approverEmail: panelist approval is a direct toggle, no mail/OTP step exists for it.
+export const DEFAULT_PANELIST_APPROVAL_CHAIN = [
+  { id: "PAC-default-director", seq: 1, name: "Director" },
+  { id: "PAC-default-registrar", seq: 2, name: "Registrar" }
+];
+export function effectivePanelistApprovalChain(ds) {
+  return ((ds && ds.panelistApprovalChain) || DEFAULT_PANELIST_APPROVAL_CHAIN).slice().sort((a, b) => a.seq - b.seq);
+}
+
+// Institute-staff RBAC: each role names which nav pages (see index.html's instituteNavGroups(),
+// the single source of truth both the sidebar and the Roles & Permissions checkbox list read from)
+// its members may see. "roles-mgmt"/"user-memberships" are never included here — those two pages
+// are reserved for the institute's own admin login (auth.role === "institute"), not any
+// configurable staff role, per explicit product requirement. These are starting defaults seeded
+// per-institute (see seedDefaultRoles) and freely editable afterward by that institute's admin.
+// "workflow-builder" and the whole Settings section (Academic Years, Assessment Config, Admission
+// Cycles, Fee Structure, Required Documents, Roles & Permissions, User Memberships, Email/Print
+// Templates) are Institute-Admin-only — never granted to any staff role, per explicit product
+// decision, not just an omission (see the "Settings" nav group filtered out in navSpec()).
+export const DEFAULT_INSTITUTE_ROLES = [
+  { name: "Director", pages: ["programmes", "candidate-list", "shortlist", "shortlist-approvals", "sessions", "candidate-allocation", "zoom-rooms", "panelists", "panelist-allocation", "barcode-labels", "pi-attendance", "pi-scoring", "verification", "final-scores", "merit-processing", "merit-approval", "merit-releases", "waiting-list", "provisional-letters", "seat-allocation", "formula-builder", "offer-management", "workflow-instances", "document-collection", "reports-dashboard", "reports-candidates", "reports-sessions", "sent-mail", "pending-approvals", "reopen-corrections", "condition-builder"] },
+  { name: "Registrar", pages: ["programmes", "candidate-list", "shortlist", "shortlist-approvals", "verification", "final-scores", "merit-processing", "merit-approval", "merit-releases", "waiting-list", "provisional-letters", "seat-allocation", "offer-management", "workflow-instances", "document-collection", "reports-dashboard", "reports-candidates", "reports-sessions", "sent-mail", "pending-approvals", "reopen-corrections"] },
+  { name: "Admission Officer", pages: ["candidate-list", "shortlist", "shortlist-approvals", "sessions", "candidate-allocation", "zoom-rooms", "panelists", "panelist-allocation", "barcode-labels", "pi-attendance", "pi-scoring", "verification", "document-collection"] },
+  // Coordinator's whole job is the join-meeting-and-mark-attendance screen — nothing else.
+  { name: "Coordinator", pages: ["pi-attendance"] },
+  { name: "Panelist", pages: ["candidate-list", "pi-attendance", "pi-scoring"] },
+  // Observer needs to see and drop into any scheduled Zoom Room for quality monitoring.
+  { name: "Observer", pages: ["reports-dashboard", "reports-candidates", "reports-sessions", "candidate-list", "zoom-rooms", "final-scores", "merit-releases", "waiting-list"] },
+  { name: "Document Verification Team", pages: ["candidate-list", "verification", "document-collection"] },
+  { name: "SIU", pages: ["reports-dashboard", "reports-candidates", "reports-sessions", "candidate-list", "verification", "final-scores", "merit-releases", "waiting-list"] }
+];
+export function seedDefaultRoles(ds, instituteId) {
+  DEFAULT_INSTITUTE_ROLES.forEach((r, i) => {
+    ds.roles.push({ id: `ROLE-${instituteId}-${i + 1}`, instituteId, name: r.name, pages: [...r.pages], isDefault: true });
+  });
+}
+export function saveRole(ds, instituteId, id, form) {
+  if (!form.name || !form.name.trim()) return { error: "Role name is required." };
+  const pages = (form.pages || []).filter((p) => p !== "roles-mgmt" && p !== "user-memberships");
+  if (id) {
+    const idx = ds.roles.findIndex((r) => r.id === id && r.instituteId === instituteId);
+    if (idx === -1) return { error: "Role not found." };
+    ds.roles[idx] = { ...ds.roles[idx], name: form.name.trim(), pages };
+    return { ok: true, record: ds.roles[idx] };
+  }
+  const record = { id: `ROLE-${instituteId}-${Date.now()}`, instituteId, name: form.name.trim(), pages, isDefault: false };
+  ds.roles.push(record);
+  return { ok: true, record };
+}
+export function deleteRole(ds, instituteId, id) {
+  if (ds.staff.some((s) => s.instituteId === instituteId && s.roleId === id)) {
+    return { error: "This role is still assigned to a staff member — reassign them first." };
+  }
+  ds.roles = ds.roles.filter((r) => !(r.id === id && r.instituteId === instituteId));
+  return { ok: true };
+}
+
+// Institute staff directory (User Memberships) — a real, loggable identity per staff member,
+// distinct from the institute's own single admin login. Credentials are issued immediately on
+// creation (mirrors how a panelist gets credentials the moment their approval chain completes) so
+// the new member can log in right away; see index.html's onLogin for how these are checked.
+export function saveStaffMember(ds, instituteId, id, form) {
+  if (!form.name || !form.name.trim()) return { error: "Name is required." };
+  if (!form.email || !form.email.trim()) return { error: "Email is required." };
+  if (!form.roleId) return { error: "Select a role." };
+  const email = form.email.trim().toLowerCase();
+  if (ds.staff.some((s) => s.instituteId === instituteId && s.email === email && s.id !== id)) {
+    return { error: "A staff member with this email already exists." };
+  }
+  const fields = { name: form.name.trim(), email, mobile: form.mobile || "", roleId: form.roleId, status: form.status || "Active" };
+  if (id) {
+    const idx = ds.staff.findIndex((s) => s.id === id && s.instituteId === instituteId);
+    if (idx === -1) return { error: "Staff member not found." };
+    ds.staff[idx] = { ...ds.staff[idx], ...fields };
+    if (ds.staff[idx].credentials) ds.staff[idx].credentials.loginId = email;
+    return { ok: true, id, credentials: null };
+  }
+  const newId = `STAFF-${instituteId}-${Date.now()}`;
+  const credentials = { loginId: email, password: genPassword(), issuedOn: nowISO().slice(0, 10) };
+  ds.staff.push({ id: newId, instituteId, ...fields, credentials });
+  ds.sentMails.push({
+    id: `MAIL-${ds.sentMails.length + 1}`, approvalRequestId: null, levelIndex: null, levelLabel: "Info",
+    to: email, subject: `Institute Portal Access — ${fields.name}`,
+    body: `Hi ${fields.name},\n\nYou have been added as a staff member. Here are your login details:\n\nLogin ID: ${credentials.loginId}\nPassword: ${credentials.password}\n\nLog in from the "Institute" tab on the login screen.`,
+    sentOn: nowISO().slice(0, 10), token: null, otp: null, status: "delivered", summary: `Staff credentials — ${fields.name}`
+  });
+  return { ok: true, id: newId, credentials };
+}
+export function deleteStaffMember(ds, instituteId, id) {
+  ds.staff = ds.staff.filter((s) => !(s.id === id && s.instituteId === instituteId));
+}
 
 // No seeded institutes/programmes \u2014 a fresh dataset starts empty except for the Super Admin login.
 // Institutes get real login credentials generated when Super Admin creates them (see createInstitute),
@@ -79,7 +195,9 @@ export function fmtDate(d) {
 export function nowISO() { return new Date().toISOString(); }
 
 // ---------- Candidate CSV import ----------
-function parseCsvText(text) {
+// Generic RFC4180-ish CSV parser, reused by js/import-engine.js's CSV data-source connector — this
+// module has no other opinion about import (see js/import-engine.js for the configurable pipeline).
+export function parseCsvText(text) {
   const rows = [];
   let row = [], field = "", inQuotes = false;
   const s = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
@@ -97,60 +215,6 @@ function parseCsvText(text) {
   return rows.filter((r) => !(r.length === 1 && r[0].trim() === ""));
 }
 
-export const IMPORT_COLUMNS = [
-  { key: "id", header: "Applicant ID", rowRequired: true },
-  { key: "name", header: "Name", rowRequired: true },
-  { key: "gender", header: "Gender" },
-  { key: "category", header: "Category", rowRequired: true },
-  { key: "educationBackground", header: "Education Background" },
-  { key: "tenthPct", header: "10th %", numeric: true },
-  { key: "twelfthPct", header: "12th %", numeric: true },
-  { key: "slatScore", header: "SLAT Score", rowRequired: true, numeric: true },
-  { key: "slatPercentile", header: "SLAT Percentile", numeric: true }
-];
-
-export function parseImportCsv(text) {
-  const rows = parseCsvText(text);
-  if (!rows.length) return { headerErrors: ["The file is empty."], rows: [], validCount: 0, invalidCount: 0 };
-  const normalized = rows[0].map((h) => h.trim().toLowerCase());
-  const colIndex = {};
-  const missing = [];
-  IMPORT_COLUMNS.forEach((col) => {
-    const idx = normalized.indexOf(col.header.toLowerCase());
-    if (idx === -1) missing.push(col.header);
-    else colIndex[col.key] = idx;
-  });
-  if (missing.length) {
-    return { headerErrors: [`Missing required column(s): ${missing.join(", ")}.`], rows: [], validCount: 0, invalidCount: 0 };
-  }
-  const categoryIds = CATEGORIES.map((c) => c.id);
-  const parsedRows = rows.slice(1).map((cells, i) => {
-    const rowNum = i + 2;
-    const get = (key) => (cells[colIndex[key]] || "").trim();
-    const numOrNull = (key) => { const v = get(key); if (!v) return null; const n = Number(v); return Number.isFinite(n) ? n : null; };
-    const errors = [];
-    const id = get("id");
-    if (!id) errors.push("Applicant ID is required.");
-    const name = get("name");
-    if (!name) errors.push("Name is required.");
-    const category = get("category").toUpperCase();
-    if (!categoryIds.includes(category)) errors.push(`Category must be one of ${categoryIds.join(", ")}.`);
-    const slatScoreRaw = get("slatScore");
-    const slatScore = Number(slatScoreRaw);
-    if (!slatScoreRaw || !Number.isFinite(slatScore)) errors.push("SLAT Score must be a number.");
-    const data = {
-      id, name, gender: get("gender") || null, category,
-      educationBackground: get("educationBackground") || null,
-      tenthPct: numOrNull("tenthPct"), twelfthPct: numOrNull("twelfthPct"),
-      slatScore: Number.isFinite(slatScore) ? slatScore : null,
-      slatPercentile: numOrNull("slatPercentile")
-    };
-    return { rowNum, valid: errors.length === 0, errors, data };
-  });
-  const validCount = parsedRows.filter((r) => r.valid).length;
-  return { headerErrors: [], rows: parsedRows, validCount, invalidCount: parsedRows.length - validCount };
-}
-
 // This prototype has no candidate-facing application portal and CSV import carries no file attachments, so
 // there's nowhere a real certificate could actually come from before an admin reviews it. To keep the real
 // workflow — documents already exist, the admin only approves/rejects them — a placeholder document is
@@ -160,52 +224,68 @@ function placeholderDocument(candidateId, label) {
   return { fileName: `${candidateId}_${label.replace(/\s+/g, "_")}.pdf`, dataUrl: `data:text/plain;charset=utf-8,${encodeURIComponent(text)}` };
 }
 
-export function commitImportedCandidates(ds, programmeId, academicYearId, rowsData) {
-  // A candidate's real identity is (programmeId, academicYearId, Applicant ID) — the same Applicant ID
-  // can exist once per programme+academic year, as fully independent candidates. Every candidate lookup
-  // across the app matches on all three, so reusing an ID under a different programme/year is safe.
-  let added = 0, existing = 0;
-  rowsData.forEach((r) => {
-    const dup = ds.candidates.find((c) => c.id === r.id && c.programmeId === programmeId && c.academicYearId === academicYearId);
-    if (dup) { existing++; return; }
-    ds.candidates.push({
-      id: r.id, name: r.name, gender: r.gender, programmeId, academicYearId,
-      category: r.category, educationBackground: r.educationBackground,
-      tenthPct: r.tenthPct, twelfthPct: r.twelfthPct, slatScore: r.slatScore, slatPercentile: r.slatPercentile,
-      shortlistStatus: "yet-to-shortlist", shortlistId: null,
-      allocation: null, piId: null,
-      registrationAttendance: "pending", piAttendance: "pending",
-      piScores: {}, piNotes: {}, piScoreLocked: {}, piTotal: null, apvScore: null,
-      verification: {
-        categoryVerification: { eligibilityTeam: null, institute: null },
-        categoryDocument: r.category !== "OPEN" ? placeholderDocument(r.id, "Category Certificate") : { fileName: null, dataUrl: null },
-        daDocument: r.category === "DA" ? placeholderDocument(r.id, "DA Certificate") : { fileName: null, dataUrl: null },
-        daVerification: null
-      },
-      outcome: null, finalScore: null, meritCategory: null, meritBatchId: null, rank: null, waitingListNumber: null,
-      meritApproval: { director: null, siu: null }, meritListReleaseId: null,
-      timeline: [{ label: "Imported", date: nowISO().slice(0, 10) }]
-    });
-    added++;
+// Builds the verification.documents map for one candidate: one entry per programme.requiredDocuments
+// row applicable to the candidate's category, each seeded with a placeholder file (see placeholderDocument).
+// A candidate with no applicable documents (e.g. OPEN category under the default config) gets {}.
+export function buildCandidateDocuments(candidateId, category, requiredDocuments) {
+  const documents = {};
+  (requiredDocuments || []).forEach((doc) => {
+    if (doc.appliesToCategories.includes(category)) {
+      documents[doc.key] = { ...placeholderDocument(candidateId, doc.label), status: null };
+    }
   });
-  return { added, existing, total: rowsData.length };
+  return documents;
 }
 
 // Fills in any top-level fields missing from a JSON file saved by an older version of this app
 // (e.g. a file saved before "shortlists" existed), so opening it never crashes on a missing collection.
 export function normalizeDataset(d) {
   d = d || {};
-  // Migrate the old "Registrar" second-approval-level naming (pre-SIU) to "siu" so older saved files still work.
-  const shortlists = (d.shortlists || []).map((l) => {
-    const approvals = { director: null, siu: null, ...(l.approvals || {}) };
+  // Migrate the old fixed-two-level {director,siu} approvals shape (itself already migrated from an
+  // even older "Registrar" naming, pre-SIU) to the new chain-length-agnostic array shape: approvals[i]
+  // is level i's {status,date,comments} or null. currentLevelIndex is derived from the old status string
+  // (pending-siu meant level 0 was done, level 1 pending); status collapses to pending/approved/rejected.
+  const migrateApprovals = (rec) => {
+    if (Array.isArray(rec.approvals)) return rec; // already migrated
+    const approvals = { director: null, siu: null, ...(rec.approvals || {}) };
     if (approvals.registrar && !approvals.siu) approvals.siu = approvals.registrar;
-    delete approvals.registrar;
-    return { ...l, approvals, status: l.status === "pending-registrar" ? "pending-siu" : l.status };
-  });
+    const oldStatus = rec.status === "pending-registrar" ? "pending-siu" : rec.status;
+    const currentLevelIndex = oldStatus === "pending-siu" ? 1 : 0;
+    const status = oldStatus === "approved" ? "approved" : oldStatus === "rejected" ? "rejected" : "pending";
+    return { ...rec, approvals: [approvals.director, approvals.siu], currentLevelIndex, status };
+  };
+  // Migrate the old fixed {category, criteria, value} shortlist shape (one hardcoded category dimension,
+  // ranked against the programme's single global shortlistRankField) to the generic {filter, rankField,
+  // mode, value} shape confirmShortlist now uses — category becomes an ordinary "category = X" filter
+  // condition instead of a required top-level field, using the same DNF shape import's filter engine
+  // reads. rankField is backfilled from the programme's old shortlistRankField default since that's what
+  // every legacy shortlist was actually ranked against, even though it wasn't stored on the record itself.
+  const migrateShortlistCriteria = (rec) => {
+    if (rec.filter !== undefined) return rec; // already migrated
+    const programme = (d.programmes || []).find((p) => p.id === rec.programmeId);
+    const rankField = (programme && programme.shortlistRankField) || "slatScore";
+    const filter = { groups: [{ id: "FG-legacy", conditions: [{ id: "FC-legacy", field: "category", op: "=", value: rec.category }] }] };
+    const { category, criteria, ...rest } = rec;
+    return { ...rest, filter, rankField, mode: criteria === "count" ? "count" : "cutoff" };
+  };
+  const shortlists = (d.shortlists || []).map(migrateApprovals).map(migrateShortlistCriteria);
+  const meritBatches = (d.meritBatches || []).map(migrateApprovals);
   const candidates = (d.candidates || []).map((c) => {
     let cand = c;
-    if (cand.meritApproval && cand.meritApproval.registrar && !cand.meritApproval.siu) {
-      cand = { ...cand, meritApproval: { director: cand.meritApproval.director || null, siu: cand.meritApproval.registrar } };
+    // meritApproval: old {director,siu|registrar} object -> chain-length-agnostic array (write-only
+    // field, nothing reads it, so this is just a shape match with meritBatches.approvals above).
+    if (cand.meritApproval && !Array.isArray(cand.meritApproval)) {
+      const ma = cand.meritApproval;
+      cand = { ...cand, meritApproval: [ma.director || null, ma.siu || ma.registrar || null] };
+    }
+    // shortlistStatus: the two approval-level-specific labels collapse into one "pending-approval"
+    // bucket (see recomputeOutcome-adjacent reasoning: nothing actually branches on "first" vs "second"
+    // level specifically — only not-started / mid-chain / fully-done). The dead "rejected-list" value
+    // (never actually written by any function) needs no migration since nothing ever held it.
+    if (cand.shortlistStatus === "shortlisted" || cand.shortlistStatus === "first-level-approved") {
+      cand = { ...cand, shortlistStatus: "pending-approval" };
+    } else if (cand.shortlistStatus === "second-level-approved") {
+      cand = { ...cand, shortlistStatus: "approved" };
     }
     // Migrate the old fixed "p1"/"p2" score-slot shape to the per-panelist-id map: the total score
     // stands, but the old slots can't be mapped to a real panelist id so the breakdown is dropped.
@@ -215,29 +295,49 @@ export function normalizeDataset(d) {
     if (!cand.piNotes) cand = { ...cand, piNotes: {} };
     if (!cand.piScoreLocked) cand = { ...cand, piScoreLocked: {} };
     if (cand.apvScore === undefined) cand = { ...cand, apvScore: null };
-    // Each document-related field is checked and defaulted independently — a real legacy file could plausibly
-    // have only some of these fields (e.g. categoryDocument but not daDocument) rather than all-or-nothing.
-    if (cand.verification && !cand.verification.categoryDocument) {
-      cand = { ...cand, verification: { ...cand.verification, categoryDocument: { fileName: null, dataUrl: null } } };
-    }
-    if (cand.verification && !cand.verification.daDocument) {
-      cand = { ...cand, verification: { ...cand.verification, daDocument: { fileName: null, dataUrl: null } } };
-    }
-    if (cand.verification && cand.verification.daVerification === undefined) {
-      cand = { ...cand, verification: { ...cand.verification, daVerification: null } };
-    }
-    // Candidates imported before documents were auto-attached at import time still need one backfilled —
-    // otherwise they'd sit on Category Verification with nothing for the admin to actually approve.
-    if (cand.verification && cand.category !== "OPEN" && !cand.verification.categoryDocument.fileName) {
-      cand = { ...cand, verification: { ...cand.verification, categoryDocument: placeholderDocument(cand.id, "Category Certificate") } };
-    }
-    if (cand.verification && cand.category === "DA" && !cand.verification.daDocument.fileName) {
-      cand = { ...cand, verification: { ...cand.verification, daDocument: placeholderDocument(cand.id, "DA Certificate") } };
+    if (cand.importLineage === undefined) cand = { ...cand, importLineage: null };
+    // Old files store verification as { categoryVerification: {eligibilityTeam, institute}, categoryDocument,
+    // daDocument, daVerification } — collapse onto the new { documents: { <key>: {fileName,dataUrl,status} } }
+    // shape, mapping the same two document types onto DEFAULT_REQUIRED_DOCUMENTS' keys ("category"/"da"), which
+    // is what every migrated programme defaults to below. `eligibilityTeam` is dropped: it was never actually
+    // settable from any UI (only "institute"/"da" statuses ever got written), so there's nothing to migrate.
+    // Already-migrated files (verification.documents present) pass through untouched.
+    if (cand.verification && !cand.verification.documents) {
+      const documents = {};
+      if (cand.category !== "OPEN") {
+        const doc = cand.verification.categoryDocument || {};
+        documents.category = { fileName: doc.fileName || null, dataUrl: doc.dataUrl || null, status: (cand.verification.categoryVerification || {}).institute || null };
+        if (!documents.category.fileName) documents.category = { ...placeholderDocument(cand.id, "Category Certificate"), status: documents.category.status };
+      }
+      if (cand.category === "DA") {
+        const doc = cand.verification.daDocument || {};
+        documents.da = { fileName: doc.fileName || null, dataUrl: doc.dataUrl || null, status: cand.verification.daVerification || null };
+        if (!documents.da.fileName) documents.da = { ...placeholderDocument(cand.id, "DA Certificate"), status: documents.da.status };
+      }
+      cand = { ...cand, verification: { documents } };
+    } else if (!cand.verification) {
+      cand = { ...cand, verification: { documents: {} } };
     }
     return cand;
   });
-  const panelists = (d.panelists || []).map((p) => (p.credentials !== undefined ? p : { ...p, credentials: null }));
+  const panelists = (d.panelists || []).map((p) => {
+    let panelist = p.credentials !== undefined ? p : { ...p, credentials: null };
+    // approval: old {director,registrar} object -> array indexed by levelIndex, matching
+    // effectivePanelistApprovalChain. Bare strings (no {status,date}) since nothing displays a date here.
+    if (panelist.approval && !Array.isArray(panelist.approval)) {
+      panelist = { ...panelist, approval: [panelist.approval.director || "pending", panelist.approval.registrar || "pending"] };
+    }
+    return panelist;
+  });
   const institutes = (d.institutes || []).map((i) => (i.credentials !== undefined ? i : { ...i, credentials: null }));
+  // Backfill the default role catalogue for any institute saved before this feature existed
+  // (createInstitute seeds it for every new one going forward — see seedDefaultRoles).
+  const roles = (d.roles || []).slice();
+  institutes.forEach((inst) => {
+    if (!roles.some((r) => r.instituteId === inst.id)) {
+      DEFAULT_INSTITUTE_ROLES.forEach((r, i) => roles.push({ id: `ROLE-${inst.id}-${i + 1}`, instituteId: inst.id, name: r.name, pages: [...r.pages], isDefault: true }));
+    }
+  });
   // Migrate sessions saved before Zoom Room links required panelists first: strip any link that has no panelists behind it.
   // Also migrate the old loose "assessmentType" short-code field to a real link to a specific assessment record.
   const sessions = (d.sessions || []).map((s) => {
@@ -257,27 +357,81 @@ export function normalizeDataset(d) {
       })
     };
   });
+  // Programme-level config defaults — reproduce today's behavior exactly for any programme saved before
+  // these fields existed (two-document category/DA verification, no import-column overrides, SLAT-ranked
+  // shortlisting).
+  // Each programme gets its OWN copy of the defaults, not a shared reference to the DEFAULT_* constant:
+  // saveRequiredDocument/saveApprovalLevel mutate p.requiredDocuments/p.approvalChain in place (index
+  // assignment, push), so two programmes sharing one array by reference would silently corrupt each
+  // other the moment either one is edited (safe in the running app, which always clones the whole
+  // dataset before any mutation — but not safe for anything that touches the engine directly).
+  const programmes = (d.programmes || []).map((p) => ({
+    ...p,
+    requiredDocuments: p.requiredDocuments || DEFAULT_REQUIRED_DOCUMENTS.map((doc) => ({ ...doc })),
+    shortlistRankField: p.shortlistRankField || "slatScore",
+    approvalChain: p.approvalChain || DEFAULT_APPROVAL_CHAIN.map((lvl) => ({ ...lvl }))
+  }));
+  // approvalRequests: old {level:"director"|"siu", status, directorMailId, siuMailId} -> chain-length-
+  // agnostic {levelIndex, status, mailIds}. sentMails: old {level:"director"|"siu"|"info"} -> adds
+  // levelIndex + a snapshotted levelLabel (the popup approval tab has no dataset access to resolve a
+  // chain lookup itself, and a historical mail shouldn't retroactively relabel if a level is renamed).
+  const approvalRequests = (d.approvalRequests || []).map((r) => {
+    if (r.levelIndex !== undefined && r.chainLength !== undefined) return r;
+    // Backfill chainLength for requests saved before it existed — best-effort against the
+    // programme's chain as it stands right now, same live lookup verifyMailOtp used to do inline.
+    const chainLength = effectiveApprovalChain(programmes.find((p) => p.id === r.programmeId)).length;
+    if (r.levelIndex !== undefined) return { ...r, chainLength };
+    const levelIndex = r.level === "siu" ? 1 : 0;
+    const status = r.status === "approved" ? "approved" : r.status === "rejected" ? "rejected" : "pending";
+    return { ...r, levelIndex, status, mailIds: [r.directorMailId || null, r.siuMailId || null], chainLength };
+  });
+  const sentMails = (d.sentMails || []).map((m) => {
+    if (m.levelLabel !== undefined) return m;
+    if (m.level === "info" || !m.approvalRequestId) return { ...m, levelIndex: null, levelLabel: "Info" };
+    const levelIndex = m.level === "siu" ? 1 : 0;
+    return { ...m, levelIndex, levelLabel: levelIndex === 1 ? "SIU" : "Director" };
+  });
+  // assessmentParams/assessmentParamsDraft used to be global ({PI,GE,WAT,WE}); now they're per-programme
+  // ({[programmeId]: {PI,GE,WAT,WE}}). Both shapes are plain objects, so detect the old one by checking for
+  // an array directly under a known assessment-type key, and if found, copy it onto every programme (that's
+  // what "global" meant in practice — every programme shared the same rubric).
+  const oldFlatParams = d.assessmentParams && ["PI", "GE", "WAT", "WE"].some((t) => Array.isArray(d.assessmentParams[t]));
+  const assessmentParams = {}, assessmentParamsDraft = {};
+  programmes.forEach((p) => {
+    assessmentParams[p.id] = oldFlatParams ? d.assessmentParams : ((d.assessmentParams && d.assessmentParams[p.id]) || { PI: RUBRIC, GE: [], WAT: [], WE: [] });
+    assessmentParamsDraft[p.id] = oldFlatParams ? { PI: null, GE: null, WAT: null, WE: null } : ((d.assessmentParamsDraft && d.assessmentParamsDraft[p.id]) || { PI: null, GE: null, WAT: null, WE: null });
+  });
   return {
     institutes,
-    programmes: d.programmes || [],
+    programmes,
     academicYears: d.academicYears || [],
     activeAcademicYearByProgramme: d.activeAcademicYearByProgramme || {},
-    activeProgrammeId: d.activeProgrammeId || (d.programmes && d.programmes[0] ? d.programmes[0].id : null),
+    activeProgrammeId: d.activeProgrammeId || (programmes[0] ? programmes[0].id : null),
     categories: d.categories || CATEGORIES,
     assessmentTypes: d.assessmentTypes || ASSESSMENT_TYPES,
-    assessmentParams: d.assessmentParams || { PI: RUBRIC, GE: [], WAT: [], WE: [] },
-    assessmentParamsDraft: d.assessmentParamsDraft || { PI: null, GE: null, WAT: null, WE: null },
+    assessmentParams,
+    assessmentParamsDraft,
     scoreEntryModels: d.scoreEntryModels || SCORE_ENTRY_MODELS,
     assessments: d.assessments || [],
     sessions,
     panelists,
     candidates,
     shortlists,
-    meritBatches: d.meritBatches || [],
+    meritBatches,
     meritListReleases: d.meritListReleases || [],
-    approvalRequests: d.approvalRequests || [],
-    sentMails: d.sentMails || [],
-    auditLog: d.auditLog || []
+    approvalRequests,
+    sentMails,
+    panelistApprovalChain: d.panelistApprovalChain || DEFAULT_PANELIST_APPROVAL_CHAIN,
+    auditLog: d.auditLog || [],
+    importConfigs: d.importConfigs || [],
+    importJobs: d.importJobs || [],
+    roles,
+    staff: d.staff || [],
+    // Cycles are a hard prerequisite going forward (see cycleScopeKey/createAdmissionCycle) — a file
+    // saved before this feature existed has none, and none are invented for it retroactively; every
+    // programme+year in it will show the "create a cycle first" gate until one is made fresh.
+    admissionCycles: d.admissionCycles || [],
+    activeCycleByProgYear: d.activeCycleByProgYear || {}
   };
 }
 
@@ -290,8 +444,10 @@ export function generateDataset() {
     activeProgrammeId: null,
     categories: CATEGORIES,
     assessmentTypes: ASSESSMENT_TYPES,
-    assessmentParams: { PI: RUBRIC, GE: [], WAT: [], WE: [] },
-    assessmentParamsDraft: { PI: null, GE: null, WAT: null, WE: null },
+    // Empty: no programmes exist yet in a brand-new dataset. createProgramme() seeds each new programme's
+    // entry here, the same way it already seeds activeAcademicYearByProgramme.
+    assessmentParams: {},
+    assessmentParamsDraft: {},
     scoreEntryModels: SCORE_ENTRY_MODELS,
     assessments: [],
     sessions: [],
@@ -302,17 +458,21 @@ export function generateDataset() {
     meritListReleases: [],
     approvalRequests: [],
     sentMails: [],
-    auditLog: []
+    panelistApprovalChain: DEFAULT_PANELIST_APPROVAL_CHAIN,
+    auditLog: [],
+    importConfigs: [],
+    importJobs: [],
+    roles: [],
+    staff: [],
+    admissionCycles: [],
+    activeCycleByProgYear: {}
   };
 }
 
 // ---------- Status metadata (label + tag class + icon) ----------
 export const STATUS_META = {
   "yet-to-shortlist": { label: "Yet to be Shortlisted", cls: "tag-neutral" },
-  shortlisted: { label: "Shortlisted", cls: "tag-outline" },
-  "first-level-approved": { label: "First Level Approved", cls: "tag-outline" },
-  "second-level-approved": { label: "Second Level Approved", cls: "tag-accent" },
-  "rejected-list": { label: "Rejected", cls: "tag-neutral" },
+  "pending-approval": { label: "Pending Approval", cls: "tag-outline" },
   pending: { label: "Pending", cls: "tag-neutral" },
   present: { label: "Present", cls: "tag-accent" },
   absent: { label: "Absent", cls: "tag-neutral" },
@@ -335,57 +495,77 @@ export const STATUS_META = {
 // ---------- Workflow actions (mutate a cloned dataset, return it) ----------
 export function clone(ds) { return JSON.parse(JSON.stringify(ds)); }
 
-export function confirmShortlist(ds, { programmeId, academicYearId, category, criteria, value }) {
-  // A negative value would invert `.slice(0, value)` into "everyone but the last N", and NaN/0 has no
-  // sane meaning here either — treat anything that isn't a real positive number as "select nothing".
-  if (!Number.isFinite(value) || value <= 0) return { count: 0, list: null };
-  const pool = ds.candidates.filter((c) => c.programmeId === programmeId && c.academicYearId === academicYearId && c.category === category && c.shortlistStatus === "yet-to-shortlist");
-  pool.sort((a, b) => b.slatScore - a.slatScore);
-  const selected = criteria === "count" ? pool.slice(0, value) : pool.filter((c) => c.slatScore >= value);
+// Infers a candidate field's type the same way js/import-engine.js's evaluateCondition needs it
+// (which operators are legal for the field) — purely from the JS value's own typeof, since by the
+// time a field lands on a committed candidate it's already gone through the import mapping's
+// transform step (parseNumber etc.), unlike raw CSV text which is why the import engine itself
+// needs a declared schema instead of inference.
+function candidateFieldType(ds, programmeId, academicYearId, field) {
+  const sample = ds.candidates.find((c) => c.programmeId === programmeId && c.academicYearId === academicYearId && c[field] != null);
+  return sample && typeof sample[field] === "number" ? "number" : "string";
+}
+
+// Shortlisting is a generic filter + optional rank/limit over whatever fields an institute's import
+// mapped onto the candidate — category is just one filterable field among others now, not a required
+// dimension (see js/import-engine.js's DNF filter engine, reused here via evaluateFilter so the same
+// AND/OR condition model works identically in Import and Shortlisting).
+// mode: "all" (everyone matching filter) | "count" (top N by rankField) | "cutoff" (rankField >= value).
+export function confirmShortlist(ds, { programmeId, academicYearId, cycleId, filter, rankField, mode, value }) {
+  // count/cutoff need a rank field and a real positive value to mean anything; a negative value would
+  // invert `.slice(0, value)` into "everyone but the last N", and NaN/0 has no sane meaning either —
+  // treat anything malformed as "select nothing" rather than guessing.
+  if (mode !== "all" && (!rankField || !Number.isFinite(value) || value <= 0)) return { count: 0, list: null };
+  const programme = ds.programmes.find((p) => p.id === programmeId);
+  const typeOf = (field) => candidateFieldType(ds, programmeId, academicYearId, field);
+  let pool = ds.candidates.filter((c) => c.programmeId === programmeId && c.academicYearId === academicYearId && c.cycleId === cycleId && c.shortlistStatus === "yet-to-shortlist" && evaluateFilter(c, filter, typeOf));
+  if (rankField) {
+    const rank = (c) => (c[rankField] == null ? -Infinity : c[rankField]);
+    pool.sort((a, b) => rank(b) - rank(a));
+    if (mode === "cutoff") pool = pool.filter((c) => rank(c) >= value);
+  }
+  const selected = mode === "count" ? pool.slice(0, value) : pool;
   if (!selected.length) return { count: 0, list: null };
   const date = nowISO().slice(0, 10);
-  const seq = ds.shortlists.filter((l) => l.programmeId === programmeId && l.category === category).length + 1;
+  const seq = ds.shortlists.filter((l) => l.programmeId === programmeId).length + 1;
+  // Approval level count is frozen at creation time from the programme's chain as it stands right now —
+  // an admin editing the chain later never puts an in-flight shortlist out of bounds; new shortlists
+  // pick up the new chain, in-flight ones finish under the one they started with.
+  const chain = effectiveApprovalChain(programme);
   const list = {
-    id: `SL-${programmeId}-${category}-${seq}`, programmeId, academicYearId, category, criteria, value,
+    id: `SL-${programmeId}-${seq}`, programmeId, academicYearId, cycleId, filter, rankField: rankField || null, mode, value: mode === "all" ? null : value,
     candidateIds: selected.map((c) => c.id), createdOn: date,
-    approvals: { director: null, siu: null }, status: "pending-director"
+    approvals: new Array(chain.length).fill(null), currentLevelIndex: 0, status: "pending"
   };
   ds.shortlists.push(list);
   selected.forEach((c) => {
-    c.shortlistStatus = "shortlisted";
+    c.shortlistStatus = "pending-approval";
     c.shortlistId = list.id;
     c.timeline.push({ label: `Shortlisted (${list.id})`, date });
   });
   return { count: selected.length, list };
 }
 
-export function approveShortlistList(ds, listId, level, decision, comments) {
+export function approveShortlistList(ds, listId, levelIndex, decision, comments) {
   const list = ds.shortlists.find((l) => l.id === listId);
   if (!list) return;
+  if (list.status !== "pending" || list.currentLevelIndex !== levelIndex) return;
   const date = nowISO().slice(0, 10);
   const candidates = list.candidateIds
-    .map((id) => ds.candidates.find((c) => c.id === id && c.programmeId === list.programmeId && c.academicYearId === list.academicYearId))
+    .map((id) => ds.candidates.find((c) => c.id === id && c.programmeId === list.programmeId && c.academicYearId === list.academicYearId && c.cycleId === list.cycleId))
     .filter(Boolean);
-  if (level === "director") {
-    if (list.status !== "pending-director") return;
-    list.approvals.director = { status: decision, date, comments };
-    if (decision === "approved") {
-      list.status = "pending-siu";
-      candidates.forEach((c) => { c.shortlistStatus = "first-level-approved"; c.timeline.push({ label: `Director Approved (${listId})`, date }); });
+  list.approvals[levelIndex] = { status: decision, date, comments };
+  if (decision === "approved") {
+    const isLast = levelIndex === list.approvals.length - 1;
+    if (isLast) {
+      list.status = "approved";
+      candidates.forEach((c) => { c.shortlistStatus = "approved"; c.timeline.push({ label: `Shortlist Approved (${listId})`, date }); });
     } else {
-      list.status = "rejected";
-      candidates.forEach((c) => { c.shortlistStatus = "yet-to-shortlist"; c.shortlistId = null; c.timeline.push({ label: `Director Rejected (${listId}) — returned to pool`, date }); });
+      list.currentLevelIndex = levelIndex + 1;
+      candidates.forEach((c) => c.timeline.push({ label: `Level ${levelIndex + 1} Approved (${listId})`, date }));
     }
   } else {
-    if (list.status !== "pending-siu") return;
-    list.approvals.siu = { status: decision, date, comments };
-    if (decision === "approved") {
-      list.status = "approved";
-      candidates.forEach((c) => { c.shortlistStatus = "second-level-approved"; c.timeline.push({ label: `SIU Approved (${listId})`, date }); });
-    } else {
-      list.status = "rejected";
-      candidates.forEach((c) => { c.shortlistStatus = "yet-to-shortlist"; c.shortlistId = null; c.timeline.push({ label: `SIU Rejected (${listId}) — returned to pool`, date }); });
-    }
+    list.status = "rejected";
+    candidates.forEach((c) => { c.shortlistStatus = "yet-to-shortlist"; c.shortlistId = null; c.timeline.push({ label: `Level ${levelIndex + 1} Rejected (${listId}) — returned to pool`, date }); });
   }
 }
 
@@ -419,7 +599,7 @@ export function createSession(ds, form, groupInputs) {
   });
   const programme = ds.programmes.find((p) => p.id === form.programmeId);
   const session = {
-    id: `SESS-${form.programmeId}-${seq}`, programmeId: form.programmeId, academicYearId: form.academicYearId,
+    id: `SESS-${form.programmeId}-${seq}`, programmeId: form.programmeId, academicYearId: form.academicYearId, cycleId: form.cycleId,
     assessmentId: assessment.id, date: form.date,
     startTime: form.startTime, endTime: form.endTime, durationMinutes: dur.minutes, reportingTime: form.reportingTime,
     capacity: form.capacity, city: programme.city, centre: programme.centre, groups
@@ -435,6 +615,7 @@ export function createInstitute(ds, form) {
     credentials: { password: genPassword(), issuedOn: nowISO().slice(0, 10) }
   };
   ds.institutes.push(institute);
+  seedDefaultRoles(ds, id);
   ds.auditLog.unshift({ date: nowISO().slice(0, 10), actor: "Super Admin", action: `Created institute ${form.name} (${id}).` });
   return institute;
 }
@@ -445,11 +626,17 @@ export function setInstituteStatus(ds, instituteId, status) {
 
 export function createProgramme(ds, form) {
   const id = form.code ? form.code.toUpperCase().replace(/[^A-Z0-9]/g, "") : `PROG${ds.programmes.length + 1}`;
-  const programme = { id, instituteId: form.instituteId, name: form.name, code: form.code, description: form.description || "", status: "Active", city: "\u2014", centre: "\u2014" };
+  const programme = {
+    id, instituteId: form.instituteId, name: form.name, code: form.code, description: form.description || "", status: "Active", city: "\u2014", centre: "\u2014",
+    requiredDocuments: DEFAULT_REQUIRED_DOCUMENTS.map((doc) => ({ ...doc })), shortlistRankField: "slatScore",
+    approvalChain: DEFAULT_APPROVAL_CHAIN.map((lvl) => ({ ...lvl }))
+  };
   ds.programmes.push(programme);
   const years = [{ id: `AY2026-${id}`, programmeId: id, label: "2026\u201327", status: "Active" }];
   ds.academicYears.push(...years);
   ds.activeAcademicYearByProgramme[id] = years[0].id;
+  ds.assessmentParams[id] = { PI: RUBRIC, GE: [], WAT: [], WE: [] };
+  ds.assessmentParamsDraft[id] = { PI: null, GE: null, WAT: null, WE: null };
   ds.auditLog.unshift({ date: nowISO().slice(0, 10), actor: form.actor || "Institute Admin", action: `Created programme ${form.name}.` });
   return programme;
 }
@@ -474,6 +661,35 @@ export function setProgrammeFeeConfig(ds, programmeId, form) {
   return { ok: true };
 }
 
+// Per-programme required-document config — drives Category Verification (see verificationComplete /
+// recomputeOutcome / commitImportedCandidates). Same add/edit/delete-one-row shape as saveAssessmentParam /
+// deleteAssessmentParam below, minus the draft/approval staging — these apply immediately.
+export function saveRequiredDocument(ds, programmeId, id, form) {
+  const p = ds.programmes.find((x) => x.id === programmeId);
+  if (!p) return { error: "Programme not found." };
+  if (!form.label || !form.label.trim()) return { error: "Label is required." };
+  if (!form.appliesToCategories || !form.appliesToCategories.length) return { error: "Select at least one applicable category." };
+  if (!p.requiredDocuments) p.requiredDocuments = [];
+  const record = {
+    id: id || `RD-${Date.now()}`,
+    key: id ? (p.requiredDocuments.find((d) => d.id === id) || {}).key || `doc-${Date.now()}` : `doc-${Date.now()}`,
+    seq: Number(form.seq) || p.requiredDocuments.length + 1,
+    label: form.label.trim(), appliesToCategories: form.appliesToCategories
+  };
+  if (id) {
+    const idx = p.requiredDocuments.findIndex((d) => d.id === id);
+    if (idx !== -1) p.requiredDocuments[idx] = record;
+  } else {
+    p.requiredDocuments.push(record);
+  }
+  return { ok: true, record };
+}
+export function deleteRequiredDocument(ds, programmeId, id) {
+  const p = ds.programmes.find((x) => x.id === programmeId);
+  if (!p) return;
+  p.requiredDocuments = (p.requiredDocuments || []).filter((d) => d.id !== id);
+}
+
 export function createAcademicYear(ds, form) {
   const id = `AY-${Date.now()}`;
   const year = { id, programmeId: form.programmeId, label: form.label, status: form.status || "Upcoming" };
@@ -484,6 +700,58 @@ export function createAcademicYear(ds, form) {
 export function setActiveAcademicYear(ds, programmeId, academicYearId) {
   ds.academicYears.filter((y) => y.programmeId === programmeId).forEach((y) => { y.status = y.id === academicYearId ? "Active" : (y.status === "Active" ? "Closed" : y.status); });
   ds.activeAcademicYearByProgramme[programmeId] = academicYearId;
+}
+
+// ---------- Admission Cycles ----------
+// A programme can run multiple admission cycles within the same academic year (Round 1, Round 2,
+// ...). cycleId joins programmeId+academicYearId as part of the identity of every candidate-pipeline
+// record (candidates, sessions/groups/panelist allocation, shortlists, merit batches/releases,
+// approval requests) — the same candidate could legitimately have separate records in different
+// cycles (e.g. re-applying in a later round). Creating a cycle is a hard prerequisite: every
+// cycle-scoped page in index.html gates on cycleGateOk() before rendering its real content.
+export function cycleScopeKey(programmeId, academicYearId) { return `${programmeId}::${academicYearId}`; }
+
+export function cyclesForScope(ds, programmeId, academicYearId) {
+  return ds.admissionCycles.filter((c) => c.programmeId === programmeId && c.academicYearId === academicYearId);
+}
+
+export function activeCycleId(ds, programmeId, academicYearId) {
+  return ds.activeCycleByProgYear[cycleScopeKey(programmeId, academicYearId)] || null;
+}
+
+export function createAdmissionCycle(ds, { programmeId, academicYearId, name }) {
+  if (!name || !name.trim()) return { error: "Cycle name is required." };
+  // Sequential, not Date.now()-based — two cycles created in fast succession (or programmatically,
+  // as in tests) would otherwise land in the same millisecond and collide on id.
+  const id = `CYC-${programmeId}-${academicYearId}-${ds.admissionCycles.length + 1}`;
+  const cycle = { id, programmeId, academicYearId, name: name.trim(), status: "Draft", createdOn: nowISO().slice(0, 10) };
+  ds.admissionCycles.push(cycle);
+  // The first cycle created for a programme+year becomes the active one automatically — otherwise
+  // every cycle-scoped page would still show the gate even though a cycle now exists.
+  const key = cycleScopeKey(programmeId, academicYearId);
+  if (!ds.activeCycleByProgYear[key]) ds.activeCycleByProgYear[key] = id;
+  ds.auditLog.unshift({ date: cycle.createdOn, actor: "Institute Admin", action: `Created admission cycle ${cycle.name}.` });
+  return { ok: true, cycle };
+}
+export function setActiveCycle(ds, programmeId, academicYearId, cycleId) {
+  ds.activeCycleByProgYear[cycleScopeKey(programmeId, academicYearId)] = cycleId;
+}
+export function setCycleStatus(ds, cycleId, status) {
+  const cycle = ds.admissionCycles.find((c) => c.id === cycleId);
+  if (cycle) cycle.status = status;
+}
+export function deleteAdmissionCycle(ds, cycleId) {
+  const cycle = ds.admissionCycles.find((c) => c.id === cycleId);
+  if (!cycle) return;
+  const inUse = ds.candidates.some((c) => c.cycleId === cycleId) || ds.sessions.some((s) => s.cycleId === cycleId);
+  if (inUse) return { error: "This cycle already has candidates or sessions — it can't be deleted." };
+  ds.admissionCycles = ds.admissionCycles.filter((c) => c.id !== cycleId);
+  const key = cycleScopeKey(cycle.programmeId, cycle.academicYearId);
+  if (ds.activeCycleByProgYear[key] === cycleId) {
+    const remaining = cyclesForScope(ds, cycle.programmeId, cycle.academicYearId).filter((c) => c.id !== cycleId);
+    ds.activeCycleByProgYear[key] = remaining[0] ? remaining[0].id : null;
+  }
+  return { ok: true };
 }
 
 export function saveAssessment(ds, id, form) {
@@ -513,10 +781,10 @@ export function deleteAssessment(ds, id) {
   ds.assessments = ds.assessments.filter((a) => a.id !== id);
 }
 
-export function saveAssessmentParam(ds, type, id, form) {
+export function saveAssessmentParam(ds, programmeId, type, id, form) {
   if (!form.name.trim() || !form.sequenceNo || !form.max) return { error: "All mandatory fields must be filled." };
-  if (!ds.assessmentParamsDraft[type]) ds.assessmentParamsDraft[type] = ds.assessmentParams[type].map((p) => ({ ...p }));
-  const list = ds.assessmentParamsDraft[type];
+  if (!ds.assessmentParamsDraft[programmeId][type]) ds.assessmentParamsDraft[programmeId][type] = ds.assessmentParams[programmeId][type].map((p) => ({ ...p }));
+  const list = ds.assessmentParamsDraft[programmeId][type];
   const record = {
     id: id || `${type}-${Date.now()}`, key: id ? (list.find((p) => p.id === id) || {}).key || `p${Date.now()}` : `p${Date.now()}`,
     name: form.name.trim(), seq: Number(form.sequenceNo), max: Number(form.max),
@@ -530,20 +798,25 @@ export function saveAssessmentParam(ds, type, id, form) {
   }
   return { ok: true, record };
 }
-export function deleteAssessmentParam(ds, type, id) {
-  if (!ds.assessmentParamsDraft[type]) ds.assessmentParamsDraft[type] = ds.assessmentParams[type].map((p) => ({ ...p }));
-  ds.assessmentParamsDraft[type] = ds.assessmentParamsDraft[type].filter((p) => p.id !== id);
+export function deleteAssessmentParam(ds, programmeId, type, id) {
+  if (!ds.assessmentParamsDraft[programmeId][type]) ds.assessmentParamsDraft[programmeId][type] = ds.assessmentParams[programmeId][type].map((p) => ({ ...p }));
+  ds.assessmentParamsDraft[programmeId][type] = ds.assessmentParamsDraft[programmeId][type].filter((p) => p.id !== id);
 }
 
 // ---------- Universal approval flow (Send for Approval -> mail -> OTP, Director then SIU) ----------
 function randomToken() { return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`; }
 function randomOtp() { return String(Math.floor(100000 + Math.random() * 900000)); }
 
-export function createApprovalRequest(ds, { subjectType, subjectId, programmeId, academicYearId, summary }) {
+export function createApprovalRequest(ds, { subjectType, subjectId, programmeId, academicYearId, cycleId, summary }) {
   const id = `AR-${ds.approvalRequests.length + 1}`;
+  // chainLength is frozen here, the same way a shortlist/merit batch freezes its own approvals
+  // array length at creation (see confirmShortlist/runMeritProcessing) — so an admin editing the
+  // programme's approval chain while this request is mid-flight can't desync "is this the last
+  // level?" from what the underlying shortlist/merit batch actually finishes on.
+  const chainLength = effectiveApprovalChain(ds.programmes.find((p) => p.id === programmeId)).length;
   const req = {
-    id, subjectType, subjectId, programmeId, academicYearId, summary,
-    level: "director", status: "pending-director", directorMailId: null, siuMailId: null, createdOn: nowISO().slice(0, 10)
+    id, subjectType, subjectId, programmeId, academicYearId, cycleId, summary, chainLength,
+    levelIndex: 0, status: "pending", mailIds: [], createdOn: nowISO().slice(0, 10)
   };
   ds.approvalRequests.push(req);
   return req;
@@ -553,12 +826,17 @@ export function sendApprovalMail(ds, requestId, { to, subject, body }) {
   const req = ds.approvalRequests.find((r) => r.id === requestId);
   if (!req) return { error: "Approval request not found." };
   if (!to || !to.trim()) return { error: "Recipient email is required." };
+  // levelLabel is snapshotted at send time, not resolved live: the popup approval tab that drives OTP
+  // entry has no dataset access of its own (see handlePopupMessage), and a historical mail shouldn't
+  // retroactively relabel itself if the chain is renamed later anyway.
+  const chain = effectiveApprovalChain(ds.programmes.find((p) => p.id === req.programmeId));
+  const levelLabel = (chain[req.levelIndex] || {}).name || `Level ${req.levelIndex + 1}`;
   const mail = {
-    id: `MAIL-${ds.sentMails.length + 1}`, approvalRequestId: requestId, level: req.level,
+    id: `MAIL-${ds.sentMails.length + 1}`, approvalRequestId: requestId, levelIndex: req.levelIndex, levelLabel,
     to: to.trim(), subject, body, sentOn: nowISO().slice(0, 10), token: randomToken(), otp: null, status: "pending"
   };
   ds.sentMails.push(mail);
-  if (req.level === "director") req.directorMailId = mail.id; else req.siuMailId = mail.id;
+  req.mailIds[req.levelIndex] = mail.id;
   return { ok: true, mail };
 }
 
@@ -570,18 +848,26 @@ export function generateMailOtp(ds, mailId) {
   return { ok: true, otp: mail.otp, to: mail.to };
 }
 
-function finalizeApprovalSubject(ds, req, level) {
-  if (req.subjectType === "shortlist") approveShortlistList(ds, req.subjectId, level, "approved", "");
-  else if (req.subjectType === "merit") approveMeritBatch(ds, req.subjectId, level, "approved", "");
-  else if (req.subjectType === "assessment-params" && level === "siu") {
-    const type = req.subjectId;
-    if (ds.assessmentParamsDraft[type]) { ds.assessmentParams[type] = ds.assessmentParamsDraft[type]; ds.assessmentParamsDraft[type] = null; }
+function finalizeApprovalSubject(ds, req, levelIndex, isLast) {
+  if (req.subjectType === "shortlist") approveShortlistList(ds, req.subjectId, levelIndex, "approved", "");
+  else if (req.subjectType === "merit") approveMeritBatch(ds, req.subjectId, levelIndex, "approved", "");
+  else if (req.subjectType === "assessment-params" && isLast) {
+    // subjectId is "<programmeId>:<type>" — the rubric is per-programme, so the bare type alone (e.g.
+    // "PI") isn't unique across programmes; see saveAssessmentParam for where this key is built.
+    const [programmeId, type] = req.subjectId.split(":");
+    if (ds.assessmentParamsDraft[programmeId] && ds.assessmentParamsDraft[programmeId][type]) {
+      ds.assessmentParams[programmeId][type] = ds.assessmentParamsDraft[programmeId][type];
+      ds.assessmentParamsDraft[programmeId][type] = null;
+    }
   }
 }
 function rejectApprovalSubject(ds, req) {
-  if (req.subjectType === "shortlist") approveShortlistList(ds, req.subjectId, req.level, "rejected", "");
-  else if (req.subjectType === "merit") approveMeritBatch(ds, req.subjectId, req.level, "rejected", "");
-  else if (req.subjectType === "assessment-params") ds.assessmentParamsDraft[req.subjectId] = null;
+  if (req.subjectType === "shortlist") approveShortlistList(ds, req.subjectId, req.levelIndex, "rejected", "");
+  else if (req.subjectType === "merit") approveMeritBatch(ds, req.subjectId, req.levelIndex, "rejected", "");
+  else if (req.subjectType === "assessment-params") {
+    const [programmeId, type] = req.subjectId.split(":");
+    if (ds.assessmentParamsDraft[programmeId]) ds.assessmentParamsDraft[programmeId][type] = null;
+  }
 }
 
 export function verifyMailOtp(ds, mailId, entered) {
@@ -592,13 +878,13 @@ export function verifyMailOtp(ds, mailId, entered) {
   mail.status = "approved";
   const req = ds.approvalRequests.find((r) => r.id === mail.approvalRequestId);
   if (!req) return { error: "Approval request not found." };
-  if (req.level === "director") {
-    req.level = "siu";
-    req.status = "pending-siu";
-    finalizeApprovalSubject(ds, req, "director");
-  } else {
+  // Frozen at request creation (req.chainLength) rather than read live — see createApprovalRequest.
+  const isLast = req.levelIndex >= req.chainLength - 1;
+  finalizeApprovalSubject(ds, req, req.levelIndex, isLast);
+  if (isLast) {
     req.status = "approved";
-    finalizeApprovalSubject(ds, req, "siu");
+  } else {
+    req.levelIndex += 1;
   }
   return { ok: true, request: req };
 }
@@ -618,9 +904,9 @@ export function rejectMail(ds, mailId) {
 export function allocateCandidate(ds, candidateId, sessionId, groupId) {
   const session = ds.sessions.find((s) => s.id === sessionId);
   const group = session && session.groups.find((g) => g.id === groupId);
-  const c = session && ds.candidates.find((x) => x.id === candidateId && x.programmeId === session.programmeId && x.academicYearId === session.academicYearId);
+  const c = session && ds.candidates.find((x) => x.id === candidateId && x.programmeId === session.programmeId && x.academicYearId === session.academicYearId && x.cycleId === session.cycleId);
   if (!c || !group) return { error: "Not found." };
-  if (c.shortlistStatus !== "second-level-approved") return { error: "Candidate must be Second Level Approved before allocation." };
+  if (c.shortlistStatus !== "approved") return { error: "Candidate must be fully approved before allocation." };
   if (c.allocation) return { error: "Candidate already has an active Session allocation." };
   if (group.candidateIds.length >= group.capacity) return { error: `Group ${group.name} is at capacity (${group.capacity}).` };
   group.candidateIds.push(c.id);
@@ -652,7 +938,7 @@ export function moveCandidatesAllocation(ds, candidateIds, toSessionId, toGroupI
   const toSession = ds.sessions.find((s) => s.id === toSessionId);
   const toGroup = toSession && toSession.groups.find((g) => g.id === toGroupId);
   if (!toGroup) return { error: "Target group not found." };
-  const findCandidate = (id) => ds.candidates.find((x) => x.id === id && x.programmeId === toSession.programmeId && x.academicYearId === toSession.academicYearId);
+  const findCandidate = (id) => ds.candidates.find((x) => x.id === id && x.programmeId === toSession.programmeId && x.academicYearId === toSession.academicYearId && x.cycleId === toSession.cycleId);
   const moving = candidateIds.filter((id) => {
     const c = findCandidate(id);
     return c && c.allocation && !(c.allocation.sessionId === toSessionId && c.allocation.groupId === toGroupId);
@@ -676,7 +962,10 @@ export function moveCandidatesAllocation(ds, candidateIds, toSessionId, toGroupI
     c.piScoreLocked = {};
     c.piNotes = {};
     c.piTotal = null;
-    if (c.outcome === "ready-for-merit") { c.outcome = null; c.finalScore = null; }
+    // Only claw back readiness for a candidate merit processing hasn't already assigned a band to —
+    // once meritCategory is set, resetting outcome/finalScore here would orphan the merit batch/rank/
+    // waiting-list entry that already points at this candidate (see recomputeOutcome's matching guard).
+    if (c.outcome === "ready-for-merit" && !c.meritCategory) { c.outcome = null; c.finalScore = null; }
     c.timeline.push({ label: `Moved to ${toGroup.name}`, date });
   });
   return { ok: true, moved: moving.length };
@@ -718,7 +1007,7 @@ function findPanelistConflict(ds, panelistId, sessionId, excludeGroupId) {
 
 export function assignPanelist(ds, sessionId, groupId, panelistId) {
   const p = ds.panelists.find((x) => x.id === panelistId);
-  if (!p || p.approval.director !== "approved" || p.approval.registrar !== "approved") return { error: "Panelist is not fully approved yet." };
+  if (!p || !p.approval.length || p.approval.some((a) => a !== "approved")) return { error: "Panelist is not fully approved yet." };
   const session = ds.sessions.find((s) => s.id === sessionId);
   const group = session && session.groups.find((g) => g.id === groupId);
   if (!group) return { error: "Group not found." };
@@ -746,6 +1035,16 @@ export function assignZoomRoomLink(ds, sessionId, groupId) {
   group.zoomRoom.link = `https://zoom.us/j/${randInt(100000000, 999999999)}`;
   return { ok: true, link: group.zoomRoom.link };
 }
+// A real institute has an actual Zoom account and pastes its own meeting link in rather than using
+// a fake auto-generated one — unlike assignZoomRoomLink, this can overwrite an existing link.
+export function setZoomRoomLink(ds, sessionId, groupId, link) {
+  const session = ds.sessions.find((s) => s.id === sessionId);
+  const group = session && session.groups.find((g) => g.id === groupId);
+  if (!group) return { error: "Group not found." };
+  if (!link || !link.trim()) return { error: "Enter a meeting link." };
+  group.zoomRoom.link = link.trim();
+  return { ok: true, link: group.zoomRoom.link };
+}
 
 function genPassword() {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
@@ -770,19 +1069,24 @@ export function savePanelist(ds, form, existingId) {
     return { ok: true, id: p.id };
   }
   const id = `P${ds.panelists.length + 1}`;
-  ds.panelists.push({ id, ...fields, programmeIds: form.programmeIds, approval: { director: "pending", registrar: "pending" } });
+  ds.panelists.push({ id, ...fields, programmeIds: form.programmeIds, approval: effectivePanelistApprovalChain(ds).map(() => "pending") });
   return { ok: true, id };
 }
 
-export function approvePanelist(ds, panelistId, level, decision) {
+export function approvePanelist(ds, panelistId, levelIndex, decision) {
   const p = ds.panelists.find((x) => x.id === panelistId);
   if (!p) return;
-  if (level === "director") p.approval.director = decision;
-  else { if (p.approval.director !== "approved") return; p.approval.registrar = decision; }
-  if (p.approval.director === "approved" && p.approval.registrar === "approved" && !p.credentials) {
+  const chain = effectivePanelistApprovalChain(ds);
+  // Self-healing pad: unlike a shortlist/merit batch (a fresh snapshot every time), a panelist record
+  // persists indefinitely — if the global chain grows after this panelist was created, extend their
+  // approval array to match on next use rather than going out of bounds.
+  if (p.approval.length < chain.length) p.approval = [...p.approval, ...new Array(chain.length - p.approval.length).fill("pending")];
+  if (levelIndex > 0 && p.approval[levelIndex - 1] !== "approved") return;
+  p.approval[levelIndex] = decision;
+  if (p.approval.length === chain.length && p.approval.every((a) => a === "approved") && !p.credentials) {
     p.credentials = { loginId: p.email, password: genPassword(), issuedOn: nowISO().slice(0, 10) };
     ds.sentMails.push({
-      id: `MAIL-${ds.sentMails.length + 1}`, approvalRequestId: null, level: "info",
+      id: `MAIL-${ds.sentMails.length + 1}`, approvalRequestId: null, levelIndex: null, levelLabel: "Info",
       to: p.email, subject: `Panelist Portal Access — ${p.name}`,
       body: `Hi ${p.name},\n\nYou have been approved as a panelist. Here are your Panelist Portal login details:\n\nLogin ID: ${p.credentials.loginId}\nPassword: ${p.credentials.password}\n\nLog in from the "Panelist" tab on the login screen.`,
       sentOn: nowISO().slice(0, 10), token: null, otp: null, status: "delivered", summary: `Panelist credentials — ${p.name}`
@@ -790,8 +1094,41 @@ export function approvePanelist(ds, panelistId, level, decision) {
   }
 }
 
-export function markAttendance(ds, candidateId, kind, status, programmeId, academicYearId) {
-  const c = ds.candidates.find((x) => x.id === candidateId && x.programmeId === programmeId && x.academicYearId === academicYearId);
+export function saveApprovalLevel(ds, programmeId, id, form) {
+  const p = ds.programmes.find((x) => x.id === programmeId);
+  if (!p) return { error: "Programme not found." };
+  if (!form.name || !form.name.trim()) return { error: "Level name is required." };
+  if (!p.approvalChain) p.approvalChain = [];
+  const record = {
+    id: id || `AC-${Date.now()}`, seq: Number(form.seq) || p.approvalChain.length + 1,
+    name: form.name.trim(), approverEmail: (form.approverEmail || "").trim()
+  };
+  if (id) { const idx = p.approvalChain.findIndex((l) => l.id === id); if (idx !== -1) p.approvalChain[idx] = record; }
+  else p.approvalChain.push(record);
+  return { ok: true, record };
+}
+export function deleteApprovalLevel(ds, programmeId, id) {
+  const p = ds.programmes.find((x) => x.id === programmeId);
+  if (!p) return;
+  if ((p.approvalChain || []).length <= 1) return { error: "A programme must keep at least one approval level." };
+  p.approvalChain = (p.approvalChain || []).filter((l) => l.id !== id);
+}
+
+export function savePanelistApprovalLevel(ds, id, form) {
+  if (!form.name || !form.name.trim()) return { error: "Level name is required." };
+  if (!ds.panelistApprovalChain) ds.panelistApprovalChain = [];
+  const record = { id: id || `PAC-${Date.now()}`, seq: Number(form.seq) || ds.panelistApprovalChain.length + 1, name: form.name.trim() };
+  if (id) { const idx = ds.panelistApprovalChain.findIndex((l) => l.id === id); if (idx !== -1) ds.panelistApprovalChain[idx] = record; }
+  else ds.panelistApprovalChain.push(record);
+  return { ok: true, record };
+}
+export function deletePanelistApprovalLevel(ds, id) {
+  if ((ds.panelistApprovalChain || []).length <= 1) return { error: "At least one panelist approval level is required." };
+  ds.panelistApprovalChain = (ds.panelistApprovalChain || []).filter((l) => l.id !== id);
+}
+
+export function markAttendance(ds, candidateId, kind, status, programmeId, academicYearId, cycleId) {
+  const c = ds.candidates.find((x) => x.id === candidateId && x.programmeId === programmeId && x.academicYearId === academicYearId && x.cycleId === cycleId);
   if (!c) return;
   if (kind === "registration") { c.registrationAttendance = status; return; }
   c.piAttendance = status;
@@ -803,23 +1140,24 @@ export function markAttendance(ds, candidateId, kind, status, programmeId, acade
     c.piScoreLocked = {};
     c.piNotes = {};
     c.piTotal = null;
-    if (c.outcome === "ready-for-merit") { c.outcome = null; c.finalScore = null; }
+    // Same guard as moveCandidatesAllocation: don't orphan an already-decided merit record.
+    if (c.outcome === "ready-for-merit" && !c.meritCategory) { c.outcome = null; c.finalScore = null; }
   } else {
-    recomputeOutcome(c);
+    recomputeOutcome(ds, c);
   }
 }
 
 // Each assigned panelist submits their own score independently; piTotal is the
 // average across however many panelists have a complete score in for this candidate.
-export function submitPanelistScore(ds, candidateId, panelistId, scores, programmeId, academicYearId) {
-  const c = ds.candidates.find((x) => x.id === candidateId && x.programmeId === programmeId && x.academicYearId === academicYearId);
+export function submitPanelistScore(ds, candidateId, panelistId, scores, programmeId, academicYearId, cycleId) {
+  const c = ds.candidates.find((x) => x.id === candidateId && x.programmeId === programmeId && x.academicYearId === academicYearId && x.cycleId === cycleId);
   if (!c || !c.allocation) return;
   const session = ds.sessions.find((s) => s.id === c.allocation.sessionId);
   const group = session && session.groups.find((g) => g.id === c.allocation.groupId);
   if (!group) return;
   const assessment = session && ds.assessments.find((a) => a.id === session.assessmentId);
   const type = assessment ? assessment.shortName : "PI";
-  const params = ds.assessmentParams[type] || [];
+  const params = (ds.assessmentParams[programmeId] && ds.assessmentParams[programmeId][type]) || [];
   if (!c.piScores) c.piScores = {};
   c.piScores[panelistId] = scores;
   const submittedTotals = group.zoomRoom.panelistIds
@@ -837,67 +1175,92 @@ export function submitPanelistScore(ds, candidateId, panelistId, scores, program
   } else {
     c.piTotal = null;
   }
-  recomputeOutcome(c);
+  recomputeOutcome(ds, c);
 }
 
-export function setPanelistNote(ds, candidateId, panelistId, text, programmeId, academicYearId) {
-  const c = ds.candidates.find((x) => x.id === candidateId && x.programmeId === programmeId && x.academicYearId === academicYearId);
+export function setPanelistNote(ds, candidateId, panelistId, text, programmeId, academicYearId, cycleId) {
+  const c = ds.candidates.find((x) => x.id === candidateId && x.programmeId === programmeId && x.academicYearId === academicYearId && x.cycleId === cycleId);
   if (!c) return;
   if (!c.piNotes) c.piNotes = {};
   c.piNotes[panelistId] = text;
 }
 
 // Called when a panelist moves past a candidate they scored, so the score can no longer be edited from the portal.
-export function lockPanelistScore(ds, candidateId, panelistId, programmeId, academicYearId) {
-  const c = ds.candidates.find((x) => x.id === candidateId && x.programmeId === programmeId && x.academicYearId === academicYearId);
+export function lockPanelistScore(ds, candidateId, panelistId, programmeId, academicYearId, cycleId) {
+  const c = ds.candidates.find((x) => x.id === candidateId && x.programmeId === programmeId && x.academicYearId === academicYearId && x.cycleId === cycleId);
   if (!c) return;
   if (!c.piScoreLocked) c.piScoreLocked = {};
   c.piScoreLocked[panelistId] = true;
 }
 
-export function setVerification(ds, candidateId, field, value, programmeId, academicYearId) {
-  const c = ds.candidates.find((x) => x.id === candidateId && x.programmeId === programmeId && x.academicYearId === academicYearId);
-  if (!c) return;
-  if (field === "eligibilityTeam") c.verification.categoryVerification.eligibilityTeam = value;
-  else if (field === "institute") c.verification.categoryVerification.institute = value;
-  else if (field === "da") c.verification.daVerification = value;
-  recomputeOutcome(c);
+export function setVerification(ds, candidateId, docKey, value, programmeId, academicYearId, cycleId) {
+  const c = ds.candidates.find((x) => x.id === candidateId && x.programmeId === programmeId && x.academicYearId === academicYearId && x.cycleId === cycleId);
+  if (!c || !c.verification.documents[docKey]) return;
+  c.verification.documents[docKey].status = value;
+  recomputeOutcome(ds, c);
 }
 
 // APV (Academic Profile Verification) is a distinct 0-10 score the admin enters directly on the
 // candidate's profile — separate from the panelist-scored PI total, combined with it for merit ranking.
-export function setApvScore(ds, candidateId, value, programmeId, academicYearId) {
-  const c = ds.candidates.find((x) => x.id === candidateId && x.programmeId === programmeId && x.academicYearId === academicYearId);
+export function setApvScore(ds, candidateId, value, programmeId, academicYearId, cycleId) {
+  const c = ds.candidates.find((x) => x.id === candidateId && x.programmeId === programmeId && x.academicYearId === academicYearId && x.cycleId === cycleId);
   if (!c) return;
   const n = value === "" || value == null ? NaN : Number(value);
   c.apvScore = Number.isFinite(n) ? Math.max(0, Math.min(10, n)) : null;
-  recomputeOutcome(c);
+  recomputeOutcome(ds, c);
 }
 
-// OPEN candidates have no category document to verify at all (see buildVerification), so they count as
-// verified by default. Everyone else needs their institute-reviewed category document marked Valid; DA
-// candidates additionally need their DA eligibility certificate marked Valid.
-function verificationComplete(c) {
-  if (c.category === "OPEN") return true;
-  if (c.verification.categoryVerification.institute !== "valid") return false;
-  if (c.category === "DA" && c.verification.daVerification !== "valid") return false;
-  return true;
+// Institute-configurable merit scoring (Formula Builder). Committing a formula only re-derives
+// finalScore.final for candidates recomputeOutcome would still touch on its own (ready-for-merit,
+// not yet merit-processed) — a candidate merit processing has already banded keeps the score that
+// decision was actually made on, same restraint recomputeOutcome already applies everywhere else.
+export function setScoringFormula(ds, programmeId, weights) {
+  const p = ds.programmes.find((x) => x.id === programmeId);
+  if (!p) return { error: "Programme not found." };
+  p.scoringFormula = { weights: { pi: Number(weights.pi) || 0, apv: Number(weights.apv) || 0, slat: Number(weights.slat) || 0 } };
+  ds.candidates
+    .filter((c) => c.programmeId === programmeId && c.outcome === "ready-for-merit" && !c.meritCategory)
+    .forEach((c) => recomputeOutcome(ds, c));
+  return { ok: true };
 }
 
-// Re-derives merit-readiness from whichever of its inputs (category/DA document status, panelist-recorded
+// A candidate with no applicable documents at all (e.g. OPEN category under the default config) counts
+// as verified by default. Every document that applies to this candidate's category (see
+// programme.requiredDocuments) must be marked Valid.
+function verificationComplete(c, requiredDocuments) {
+  return (requiredDocuments || []).every((doc) => {
+    if (!doc.appliesToCategories.includes(c.category)) return true;
+    const entry = c.verification.documents[doc.key];
+    return !!entry && entry.status === "valid";
+  });
+}
+
+// Re-derives merit-readiness from whichever of its inputs (document statuses, panelist-recorded
 // attendance, completed PI score, APV score) currently holds. Called from every function that can change any
 // one of those inputs — not just setVerification — so readiness never depends on something else happening to
-// also run setVerification afterwards (e.g. an OPEN-category candidate has no category document step at all, so
+// also run setVerification afterwards (e.g. an OPEN-category candidate has no document step at all, so
 // this must fire on its own once they're present, fully scored, and APV-scored).
-function recomputeOutcome(c) {
-  const cv = c.verification.categoryVerification;
-  if (cv.eligibilityTeam === "invalid" || cv.institute === "invalid" || c.verification.daVerification === "invalid") {
+function recomputeOutcome(ds, c) {
+  const programme = ds.programmes.find((p) => p.id === c.programmeId);
+  const requiredDocuments = (programme && programme.requiredDocuments) || [];
+  const anyDocumentInvalid = requiredDocuments.some((doc) => {
+    if (!doc.appliesToCategories.includes(c.category)) return false;
+    const entry = c.verification.documents[doc.key];
+    return !!entry && entry.status === "invalid";
+  });
+  if (anyDocumentInvalid) {
     c.outcome = "ineligible";
-  } else if (c.piAttendance === "present" && c.piTotal != null && c.apvScore != null && verificationComplete(c)) {
+  } else if (c.piAttendance === "present" && c.piTotal != null && c.apvScore != null && verificationComplete(c, requiredDocuments)) {
     c.outcome = "ready-for-merit";
     const pi = c.piTotal;
     const apv = c.apvScore;
-    c.finalScore = { pi, apv, piApv: pi + apv, slat: c.slatScore, scaledSlat: null, final: pi + apv };
+    // Default final score is PI + APV, same as always — a programme only deviates from that once
+    // its institute admin explicitly commits a custom weighting via Formula Builder (setScoringFormula).
+    const formula = programme && programme.scoringFormula;
+    const final = formula
+      ? Math.round((pi * (formula.weights.pi || 0) + apv * (formula.weights.apv || 0) + (c.slatScore || 0) * (formula.weights.slat || 0)) * 10) / 10
+      : pi + apv;
+    c.finalScore = { pi, apv, piApv: pi + apv, slat: c.slatScore, scaledSlat: null, final };
   } else if (!c.meritCategory) {
     // Not ineligible, not (yet) fully ready — e.g. verification still pending. Only reset readiness for
     // candidates merit processing hasn't already assigned a band to; a decided candidate keeps its finalScore.
@@ -907,19 +1270,19 @@ function recomputeOutcome(c) {
 }
 
 
-export function runMeritProcessing(ds, { programmeId, academicYearId, category, criteria, value, waitingSize }) {
+export function runMeritProcessing(ds, { programmeId, academicYearId, cycleId, category, criteria, value, waitingSize }) {
   // A negative/NaN value makes meritCount negative, which sends the ENTIRE pool to "rejected" (nothing is
   // ever < a negative meritCount) — permanently, since rejected candidates never re-enter a future pool
   // (the `!c.meritCategory` filter above excludes them). Refuse rather than silently reject everyone.
   if (!Number.isFinite(value) || value < 0) return { error: "Enter a valid, non-negative number." };
   if (!Number.isFinite(waitingSize) || waitingSize < 0) return { error: "Enter a valid, non-negative waiting list size." };
-  const pool = ds.candidates.filter((c) => c.programmeId === programmeId && c.academicYearId === academicYearId && c.category === category && c.outcome === "ready-for-merit" && !c.meritCategory);
+  const pool = ds.candidates.filter((c) => c.programmeId === programmeId && c.academicYearId === academicYearId && c.cycleId === cycleId && c.category === category && c.outcome === "ready-for-merit" && !c.meritCategory);
   pool.sort((a, b) => b.finalScore.final - a.finalScore.final);
   const meritCount = criteria === "count" ? Math.min(value, pool.length) : pool.filter((c) => c.finalScore.final >= value).length;
   // Waiting-list numbers must keep incrementing across separate processing runs for the same
   // programme+category, not restart at 001 each time — otherwise a later run collides with numbers
   // already handed out (and already possibly consumed by a Merit List Release) by an earlier run.
-  const existingWaitingCount = ds.candidates.filter((c) => c.programmeId === programmeId && c.academicYearId === academicYearId && c.category === category && c.meritCategory === "waiting").length;
+  const existingWaitingCount = ds.candidates.filter((c) => c.programmeId === programmeId && c.academicYearId === academicYearId && c.cycleId === cycleId && c.category === category && c.meritCategory === "waiting").length;
   const date = nowISO().slice(0, 10);
   const meritCandidates = [];
   pool.forEach((c, i) => {
@@ -931,10 +1294,11 @@ export function runMeritProcessing(ds, { programmeId, academicYearId, category, 
   let batch = null;
   if (meritCandidates.length) {
     const seq = ds.meritBatches.filter((b) => b.programmeId === programmeId && b.category === category).length + 1;
+    const chain = effectiveApprovalChain(ds.programmes.find((p) => p.id === programmeId));
     batch = {
-      id: `MB-${programmeId}-${category}-${seq}`, programmeId, academicYearId, category, criteria, value,
+      id: `MB-${programmeId}-${category}-${seq}`, programmeId, academicYearId, cycleId, category, criteria, value,
       candidateIds: meritCandidates.map((c) => c.id), createdOn: date,
-      approvals: { director: null, siu: null }, status: "pending-director"
+      approvals: new Array(chain.length).fill(null), currentLevelIndex: 0, status: "pending"
     };
     ds.meritBatches.push(batch);
     meritCandidates.forEach((c) => { c.meritBatchId = batch.id; });
@@ -942,33 +1306,28 @@ export function runMeritProcessing(ds, { programmeId, academicYearId, category, 
   return { merit: meritCount, waiting: Math.min(waitingSize, pool.length - meritCount), rejected: Math.max(0, pool.length - meritCount - waitingSize), batch };
 }
 
-export function approveMeritBatch(ds, batchId, level, decision, comments) {
+export function approveMeritBatch(ds, batchId, levelIndex, decision, comments) {
   const batch = ds.meritBatches.find((b) => b.id === batchId);
   if (!batch) return;
+  if (batch.status !== "pending" || batch.currentLevelIndex !== levelIndex) return;
   const date = nowISO().slice(0, 10);
   const candidates = batch.candidateIds
-    .map((id) => ds.candidates.find((c) => c.id === id && c.programmeId === batch.programmeId && c.academicYearId === batch.academicYearId))
+    .map((id) => ds.candidates.find((c) => c.id === id && c.programmeId === batch.programmeId && c.academicYearId === batch.academicYearId && c.cycleId === batch.cycleId))
     .filter(Boolean);
-  if (level === "director") {
-    if (batch.status !== "pending-director") return;
-    batch.approvals.director = { status: decision, date, comments };
-    if (decision === "approved") {
-      batch.status = "pending-siu";
-      candidates.forEach((c) => { c.meritApproval.director = { status: "approved", date }; c.timeline.push({ label: `Merit List — Director Approved (${batchId})`, date }); });
+  batch.approvals[levelIndex] = { status: decision, date, comments };
+  if (decision === "approved") {
+    candidates.forEach((c) => { if (!c.meritApproval) c.meritApproval = []; c.meritApproval[levelIndex] = { status: "approved", date }; });
+    const isLast = levelIndex === batch.approvals.length - 1;
+    if (isLast) {
+      batch.status = "approved";
+      candidates.forEach((c) => c.timeline.push({ label: `Merit List Approved (${batchId})`, date }));
     } else {
-      batch.status = "rejected";
-      candidates.forEach((c) => { c.meritCategory = null; c.rank = null; c.meritBatchId = null; c.meritApproval = { director: null, siu: null }; c.timeline.push({ label: `Merit List — Director Rejected (${batchId}) — returned to pool`, date }); });
+      batch.currentLevelIndex = levelIndex + 1;
+      candidates.forEach((c) => c.timeline.push({ label: `Merit List — Level ${levelIndex + 1} Approved (${batchId})`, date }));
     }
   } else {
-    if (batch.status !== "pending-siu") return;
-    batch.approvals.siu = { status: decision, date, comments };
-    if (decision === "approved") {
-      batch.status = "approved";
-      candidates.forEach((c) => { c.meritApproval.siu = { status: "approved", date }; c.timeline.push({ label: `Merit List — SIU Approved (${batchId})`, date }); });
-    } else {
-      batch.status = "rejected";
-      candidates.forEach((c) => { c.meritCategory = null; c.rank = null; c.meritBatchId = null; c.meritApproval = { director: null, siu: null }; c.timeline.push({ label: `Merit List — SIU Rejected (${batchId}) — returned to pool`, date }); });
-    }
+    batch.status = "rejected";
+    candidates.forEach((c) => { c.meritCategory = null; c.rank = null; c.meritBatchId = null; c.meritApproval = []; c.timeline.push({ label: `Merit List — Level ${levelIndex + 1} Rejected (${batchId}) — returned to pool`, date }); });
   }
 }
 
@@ -978,17 +1337,17 @@ export function approveMeritBatch(ds, batchId, level, decision, comments) {
 export function releaseMeritBatch(ds, batchId, lastFeeDate, nextReleaseDate) {
   const batch = ds.meritBatches.find((b) => b.id === batchId);
   if (!batch) return { error: "Merit batch not found." };
-  if (batch.status !== "approved") return { error: "This merit batch hasn't completed Director + SIU approval yet." };
+  if (batch.status !== "approved") return { error: "This merit batch hasn't completed its full approval chain yet." };
   if (!lastFeeDate || !nextReleaseDate) return { error: "Enter both the Last Date to Pay Fees and the Next Merit List Release Date." };
   const candidates = batch.candidateIds
-    .map((id) => ds.candidates.find((c) => c.id === id && c.programmeId === batch.programmeId && c.academicYearId === batch.academicYearId))
+    .map((id) => ds.candidates.find((c) => c.id === id && c.programmeId === batch.programmeId && c.academicYearId === batch.academicYearId && c.cycleId === batch.cycleId))
     .filter((c) => c && !c.meritListReleaseId);
   if (!candidates.length) return { error: "Every candidate in this batch has already been released." };
   const priorCount = ds.meritListReleases.filter((r) => r.programmeId === batch.programmeId && r.category === batch.category).length;
   const date = nowISO().slice(0, 10);
   const release = {
     id: `MLR-${batch.programmeId}-${batch.category}-${priorCount + 1}`, releaseNumber: priorCount + 1,
-    programmeId: batch.programmeId, category: batch.category, method: "Approved Merit List", source: "Direct",
+    programmeId: batch.programmeId, academicYearId: batch.academicYearId, cycleId: batch.cycleId, category: batch.category, method: "Approved Merit List", source: "Direct",
     count: candidates.length, lastFeeDate, nextReleaseDate, createdOn: date, meritBatchId: batch.id
   };
   candidates.forEach((c) => { c.meritListReleaseId = release.id; c.timeline.push({ label: `Merit List Released (${release.id})`, date }); });
@@ -1002,19 +1361,22 @@ export function releaseMeritBatch(ds, batchId, lastFeeDate, nextReleaseDate) {
 export function releaseFromWaitingList(ds, form) {
   if (!Number.isFinite(form.count) || form.count <= 0) return { error: "Enter a valid number of candidates to release." };
   if (!form.lastFeeDate || !form.nextReleaseDate) return { error: "Enter both the Last Date to Pay Fees and the Next Merit List Release Date." };
-  const picked = ds.candidates.filter((c) => c.programmeId === form.programmeId && c.academicYearId === form.academicYearId && c.category === form.category && c.meritCategory === "waiting" && !c.meritListReleaseId)
+  const picked = ds.candidates.filter((c) => c.programmeId === form.programmeId && c.academicYearId === form.academicYearId && c.cycleId === form.cycleId && c.category === form.category && c.meritCategory === "waiting" && !c.meritListReleaseId)
     .sort((a, b) => (a.waitingListNumber > b.waitingListNumber ? 1 : -1)).slice(0, form.count);
   if (!picked.length) return { error: "No Waiting List candidates available for this category." };
   const priorCount = ds.meritListReleases.filter((r) => r.programmeId === form.programmeId && r.category === form.category).length;
   const date = nowISO().slice(0, 10);
   const release = {
     id: `MLR-${form.programmeId}-${form.category}-${priorCount + 1}`, releaseNumber: priorCount + 1,
-    programmeId: form.programmeId, category: form.category, method: "Number of Candidates", source: "Waiting List",
+    programmeId: form.programmeId, academicYearId: form.academicYearId, cycleId: form.cycleId, category: form.category, method: "Number of Candidates", source: "Waiting List",
     count: picked.length, lastFeeDate: form.lastFeeDate, nextReleaseDate: form.nextReleaseDate, createdOn: date
   };
+  // Waiting-list promotion bypasses the approval chain entirely (never went through Director/SIU as a
+  // batch), so stamp every configured level "approved" directly rather than leaving meritApproval empty.
+  const chainLength = effectiveApprovalChain(ds.programmes.find((p) => p.id === form.programmeId)).length;
   picked.forEach((c) => {
     c.meritCategory = "merit";
-    c.meritApproval = { director: { status: "approved", date }, siu: { status: "approved", date } };
+    c.meritApproval = Array.from({ length: chainLength }, () => ({ status: "approved", date }));
     c.meritListReleaseId = release.id;
     c.timeline.push({ label: `Merit List Released (${release.id})`, date });
   });

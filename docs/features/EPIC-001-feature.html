@@ -1,0 +1,329 @@
+<!-- ==FEATURE_ID== EPIC-001 -->
+<!-- ==EPIC_TITLE== Roles Management and User Memberships -->
+<!-- ==NAV_GROUP== Configuration -->
+<!-- ==NAV_ITEMS_JSON== [["roles-mgmt","Roles & Permissions","shield-check"],["user-memberships","User Memberships","users"]] -->
+<!-- ==PAGE_TITLES_JSON== {"roles-mgmt":["Configuration","Roles & Permissions"],"user-memberships":["Configuration","User Memberships"]} -->
+<!-- ==RENDERVALS_JSON== {"pageIsRolesMgmt":"page === \"roles-mgmt\"","pageIsUserMemberships":"page === \"user-memberships\""} -->
+<!-- ==BUILD_CALLS_START== -->
+    if (page === "roles-mgmt") Object.assign(base, this.buildRolesMgmt(d));
+    if (page === "user-memberships") Object.assign(base, this.buildUserMemberships(d));
+<!-- ==BUILD_CALLS_END== -->
+<!-- ==HTML_START== -->
+<sc-if value="{{ pageIsRolesMgmt }}">
+<div style="padding:24px">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h4 class="mb-0">Roles &amp; Permissions</h4>
+    <button class="btn btn-primary btn-sm" onClick="{{ onRmToggleForm }}">
+      <i data-lucide="plus" style="width:16px;height:16px"></i> Add Role
+    </button>
+  </div>
+
+  <table class="table table-bordered table-hover align-middle mb-3">
+    <thead class="table-light">
+      <tr>
+        <th>Role Name</th>
+        <th style="text-align:center">Permissions</th>
+        <th style="text-align:center">Users</th>
+        <th style="text-align:center">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <sc-for list="{{ rmRows }}" as="r" hint-placeholder-count="5">
+        <tr>
+          <td><strong>{{ r.name }}</strong></td>
+          <td style="text-align:center"><span class="badge bg-secondary">{{ r.permCount }}</span></td>
+          <td style="text-align:center"><span class="badge bg-info text-dark">{{ r.userCount }}</span></td>
+          <td style="text-align:center;white-space:nowrap">
+            <button type="button" class="btn btn-sm btn-ghost me-1" onClick="{{ r.onEdit }}">
+              <i data-lucide="pencil" style="width:14px;height:14px"></i>
+            </button>
+            <button type="button" class="btn btn-sm btn-ghost" onClick="{{ r.onDelete }}">
+              <i data-lucide="trash-2" style="width:14px;height:14px"></i>
+            </button>
+          </td>
+        </tr>
+      </sc-for>
+    </tbody>
+  </table>
+
+  <sc-if value="{{ rmShowForm }}">
+  <div class="card elev-sm" style="padding:var(--space-4);margin-top:var(--space-4)">
+    <div class="card-title mb-3">{{ rmFormTitle }}</div>
+    <div class="field mb-3" style="max-width:360px">
+      <label>Role Name *</label>
+      <input class="input form-control" value="{{ rmFormName }}" onChange="{{ onRmNameChange }}" placeholder="e.g. Programme Coordinator" />
+    </div>
+    <div class="field mb-3">
+      <label style="display:block;margin-bottom:8px">Permissions</label>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px">
+        <sc-for list="{{ rmPermGroups }}" as="grp" hint-placeholder-count="6">
+          <div class="card" style="padding:var(--space-3)">
+            <div style="font-size:12px;font-weight:600;color:var(--color-accent-700);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">{{ grp.label }}</div>
+            <sc-for list="{{ grp.items }}" as="perm" hint-placeholder-count="2">
+              <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;margin-bottom:4px">
+                <input type="checkbox" checked="{{ perm.checked }}" onChange="{{ perm.onToggle }}" />{{ perm.label }}
+              </label>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div class="d-flex gap-2">
+      <button type="button" class="btn btn-primary" onClick="{{ onRmSave }}">{{ rmSaveLabel }}</button>
+      <button type="button" class="btn btn-secondary" onClick="{{ onRmCancel }}">Cancel</button>
+    </div>
+  </div>
+  </sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ pageIsUserMemberships }}">
+<div style="padding:24px">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h4 class="mb-0">User Memberships</h4>
+    <button class="btn btn-primary btn-sm" onClick="{{ onMbToggleForm }}">
+      <i data-lucide="user-plus" style="width:16px;height:16px"></i> Add User
+    </button>
+  </div>
+
+  <table class="table table-bordered table-hover align-middle mb-3">
+    <thead class="table-light">
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Role</th>
+        <th style="text-align:center">Status</th>
+        <th style="text-align:center">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <sc-for list="{{ mbRows }}" as="m" hint-placeholder-count="6">
+        <tr>
+          <td>{{ m.name }}</td>
+          <td style="font-size:13px;color:var(--color-text)">{{ m.email }}</td>
+          <td><span class="badge bg-secondary">{{ m.role }}</span></td>
+          <td style="text-align:center">
+            <span class="badge {{ m.statusCls }}">{{ m.status }}</span>
+          </td>
+          <td style="text-align:center;white-space:nowrap">
+            <button type="button" class="btn btn-sm btn-ghost me-1" onClick="{{ m.onEdit }}">
+              <i data-lucide="pencil" style="width:14px;height:14px"></i>
+            </button>
+            <button type="button" class="btn btn-sm btn-ghost" onClick="{{ m.onDelete }}">
+              <i data-lucide="trash-2" style="width:14px;height:14px"></i>
+            </button>
+          </td>
+        </tr>
+      </sc-for>
+    </tbody>
+  </table>
+
+  <sc-if value="{{ mbShowForm }}">
+  <div class="card elev-sm" style="padding:var(--space-4);margin-top:var(--space-4)">
+    <div class="card-title mb-3">{{ mbFormTitle }}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--space-4);margin-bottom:var(--space-4)">
+      <div class="field" style="margin:0">
+        <label>Name *</label>
+        <input class="input form-control" value="{{ mbFormName }}" onChange="{{ onMbNameChange }}" placeholder="Full name" />
+      </div>
+      <div class="field" style="margin:0">
+        <label>Email *</label>
+        <input class="input form-control" type="email" value="{{ mbFormEmail }}" onChange="{{ onMbEmailChange }}" placeholder="user@institute.edu" />
+      </div>
+      <div class="field" style="margin:0">
+        <label>Role *</label>
+        <select class="input form-select" onChange="{{ onMbRoleChange }}">
+          <option value="">-- Select Role --</option>
+          <sc-for list="{{ mbRoleOptions }}" as="opt" hint-placeholder-count="5">
+            <option value="{{ opt.name }}" selected="{{ opt.selected }}">{{ opt.name }}</option>
+          </sc-for>
+        </select>
+      </div>
+    </div>
+    <div class="field mb-3" style="max-width:200px">
+      <label>Status</label>
+      <select class="input form-select" onChange="{{ onMbStatusChange }}">
+        <option value="Active" selected="{{ mbStatusIsActive }}">Active</option>
+        <option value="Inactive" selected="{{ mbStatusIsInactive }}">Inactive</option>
+      </select>
+    </div>
+    <div class="d-flex gap-2">
+      <button type="button" class="btn btn-primary" onClick="{{ onMbSave }}">{{ mbSaveLabel }}</button>
+      <button type="button" class="btn btn-secondary" onClick="{{ onMbCancel }}">Cancel</button>
+    </div>
+  </div>
+  </sc-if>
+</div>
+</sc-if>
+<!-- ==HTML_END== -->
+<!-- ==JS_START== -->
+  buildRolesMgmt(d) {
+    const s = this.state;
+    const ALL_PERMS = [
+      { id: "manage_institute",  label: "Manage Institute",  group: "Admin" },
+      { id: "manage_cycles",     label: "Manage Cycles",     group: "Admin" },
+      { id: "manage_programmes", label: "Manage Programmes", group: "Admin" },
+      { id: "view_candidates",   label: "View Candidates",   group: "Candidates" },
+      { id: "edit_candidates",   label: "Edit Candidates",   group: "Candidates" },
+      { id: "export_candidates", label: "Export Candidates", group: "Candidates" },
+      { id: "enter_scores",      label: "Enter Scores",      group: "Scoring" },
+      { id: "view_scores",       label: "View Scores",       group: "Scoring" },
+      { id: "verify_docs",       label: "Verify Documents",  group: "Documents" },
+      { id: "view_docs",         label: "View Documents",    group: "Documents" },
+      { id: "design_workflow",   label: "Design Workflow",   group: "Workflow" },
+      { id: "run_workflow",      label: "Run Workflow",      group: "Workflow" },
+      { id: "view_reports",      label: "View Reports",      group: "Reports" },
+      { id: "export_reports",    label: "Export Reports",    group: "Reports" }
+    ];
+    const GROUPS = ["Admin", "Candidates", "Scoring", "Documents", "Workflow", "Reports"];
+
+    const roles = JSON.parse(localStorage.getItem('geta_roles') || 'null') || [
+      { id: 1, name: "Programme Coordinator", permissions: ["view_candidates","edit_candidates","enter_scores","view_scores","design_workflow","run_workflow","view_reports"] },
+      { id: 2, name: "Admission Officer",      permissions: ["view_candidates","edit_candidates","export_candidates","verify_docs","view_docs","view_reports","export_reports"] },
+      { id: 3, name: "Panelist",               permissions: ["view_candidates","enter_scores","view_scores"] },
+      { id: 4, name: "Document Verifier",      permissions: ["verify_docs","view_docs","view_candidates"] },
+      { id: 5, name: "Institute Admin",        permissions: ["manage_institute","manage_cycles","manage_programmes","view_candidates","edit_candidates","export_candidates","enter_scores","view_scores","verify_docs","view_docs","design_workflow","run_workflow","view_reports","export_reports"] }
+    ];
+    localStorage.setItem('geta_roles', JSON.stringify(roles));
+
+    const members = JSON.parse(localStorage.getItem('geta_memberships') || 'null') || [];
+
+    const editId = s.rmEditId || null;
+    const formName = s.rmFormName != null ? s.rmFormName : "";
+    const formPerms = s.rmFormPerms || {};
+    const showForm = !!s.rmShowForm;
+
+    const save = (roles) => {
+      localStorage.setItem('geta_roles', JSON.stringify(roles));
+      this.setState({ rmShowForm: false, rmEditId: null, rmFormName: "", rmFormPerms: {} });
+      this.showToast(editId ? "Role updated." : "Role added.");
+    };
+
+    return {
+      rmShowForm: showForm,
+      rmFormTitle: editId ? "Edit Role" : "New Role",
+      rmSaveLabel: editId ? "Update" : "Save Role",
+      rmFormName: formName,
+      onRmNameChange: (e) => this.setState({ rmFormName: e.target.value }),
+      onRmToggleForm: () => this.setState({ rmShowForm: !s.rmShowForm, rmEditId: null, rmFormName: "", rmFormPerms: {} }),
+      onRmCancel: () => this.setState({ rmShowForm: false, rmEditId: null, rmFormName: "", rmFormPerms: {} }),
+      onRmSave: () => {
+        const data = JSON.parse(localStorage.getItem('geta_roles') || '[]');
+        const name = (this.state.rmFormName || "").trim();
+        if (!name) { this.showToast("Role name is required."); return; }
+        const permsObj = this.state.rmFormPerms || {};
+        const permissions = ALL_PERMS.filter(p => permsObj[p.id]).map(p => p.id);
+        if (editId) {
+          const idx = data.findIndex(r => r.id === editId);
+          if (idx >= 0) data[idx] = { ...data[idx], name, permissions };
+        } else {
+          const maxId = data.reduce((m, r) => Math.max(m, r.id || 0), 0);
+          data.push({ id: maxId + 1, name, permissions });
+        }
+        save(data);
+      },
+      rmPermGroups: GROUPS.map(grp => ({
+        label: grp,
+        items: ALL_PERMS.filter(p => p.group === grp).map(p => ({
+          label: p.label,
+          checked: !!(formPerms[p.id]),
+          onToggle: () => {
+            const cur = this.state.rmFormPerms || {};
+            this.setState({ rmFormPerms: { ...cur, [p.id]: !cur[p.id] } });
+          }
+        }))
+      })),
+      rmRows: roles.map(r => ({
+        name: r.name,
+        permCount: (r.permissions || []).length,
+        userCount: members.filter(m => m.role === r.name).length,
+        onEdit: () => {
+          const permsObj = {};
+          (r.permissions || []).forEach(p => { permsObj[p] = true; });
+          this.setState({ rmShowForm: true, rmEditId: r.id, rmFormName: r.name, rmFormPerms: permsObj });
+        },
+        onDelete: () => {
+          const data = JSON.parse(localStorage.getItem('geta_roles') || '[]');
+          localStorage.setItem('geta_roles', JSON.stringify(data.filter(x => x.id !== r.id)));
+          this.showToast("Role deleted.");
+          this.setState({});
+        }
+      }))
+    };
+  }
+
+  buildUserMemberships(d) {
+    const s = this.state;
+    const members = JSON.parse(localStorage.getItem('geta_memberships') || 'null') || [
+      { id: 1, name: "Priya Sharma",    email: "priya.sharma@symbiosis.edu",    role: "Programme Coordinator", status: "Active" },
+      { id: 2, name: "Arjun Mehta",     email: "arjun.mehta@symbiosis.edu",     role: "Admission Officer",     status: "Active" },
+      { id: 3, name: "Sneha Kulkarni",  email: "sneha.k@symbiosis.edu",         role: "Document Verifier",     status: "Active" },
+      { id: 4, name: "Rohit Desai",     email: "rohit.desai@symbiosis.edu",     role: "Panelist",              status: "Inactive" },
+      { id: 5, name: "Kavita Joshi",    email: "kavita.joshi@symbiosis.edu",    role: "Institute Admin",       status: "Active" },
+      { id: 6, name: "Aditya Nair",     email: "aditya.nair@symbiosis.edu",     role: "Panelist",              status: "Active" }
+    ];
+    localStorage.setItem('geta_memberships', JSON.stringify(members));
+
+    const roles = JSON.parse(localStorage.getItem('geta_roles') || '[]');
+    const editId = s.mbEditId || null;
+    const showForm = !!s.mbShowForm;
+    const formName = s.mbFormName != null ? s.mbFormName : "";
+    const formEmail = s.mbFormEmail != null ? s.mbFormEmail : "";
+    const formRole = s.mbFormRole != null ? s.mbFormRole : "";
+    const formStatus = s.mbFormStatus != null ? s.mbFormStatus : "Active";
+
+    const save = (data) => {
+      localStorage.setItem('geta_memberships', JSON.stringify(data));
+      this.setState({ mbShowForm: false, mbEditId: null, mbFormName: "", mbFormEmail: "", mbFormRole: "", mbFormStatus: "Active" });
+      this.showToast(editId ? "User updated." : "User added.");
+    };
+
+    return {
+      mbShowForm: showForm,
+      mbFormTitle: editId ? "Edit User" : "Add User",
+      mbSaveLabel: editId ? "Update" : "Add User",
+      mbFormName: formName,
+      mbFormEmail: formEmail,
+      mbFormRole: formRole,
+      mbStatusIsActive: formStatus === "Active",
+      mbStatusIsInactive: formStatus === "Inactive",
+      onMbNameChange: (e) => this.setState({ mbFormName: e.target.value }),
+      onMbEmailChange: (e) => this.setState({ mbFormEmail: e.target.value }),
+      onMbRoleChange: (e) => this.setState({ mbFormRole: e.target.value }),
+      onMbStatusChange: (e) => this.setState({ mbFormStatus: e.target.value }),
+      onMbToggleForm: () => this.setState({ mbShowForm: !s.mbShowForm, mbEditId: null, mbFormName: "", mbFormEmail: "", mbFormRole: "", mbFormStatus: "Active" }),
+      onMbCancel: () => this.setState({ mbShowForm: false, mbEditId: null, mbFormName: "", mbFormEmail: "", mbFormRole: "", mbFormStatus: "Active" }),
+      onMbSave: () => {
+        const data = JSON.parse(localStorage.getItem('geta_memberships') || '[]');
+        const name = (this.state.mbFormName || "").trim();
+        const email = (this.state.mbFormEmail || "").trim();
+        const role = (this.state.mbFormRole || "").trim();
+        if (!name || !email || !role) { this.showToast("Name, email and role are required."); return; }
+        const status = this.state.mbFormStatus || "Active";
+        if (editId) {
+          const idx = data.findIndex(m => m.id === editId);
+          if (idx >= 0) data[idx] = { ...data[idx], name, email, role, status };
+        } else {
+          const maxId = data.reduce((m, r) => Math.max(m, r.id || 0), 0);
+          data.push({ id: maxId + 1, name, email, role, status });
+        }
+        save(data);
+      },
+      mbRoleOptions: roles.map(r => ({ name: r.name, selected: r.name === formRole })),
+      mbRows: members.map(m => ({
+        name: m.name,
+        email: m.email,
+        role: m.role,
+        status: m.status,
+        statusCls: m.status === "Active" ? "bg-success" : "bg-secondary",
+        onEdit: () => this.setState({ mbShowForm: true, mbEditId: m.id, mbFormName: m.name, mbFormEmail: m.email, mbFormRole: m.role, mbFormStatus: m.status }),
+        onDelete: () => {
+          const data = JSON.parse(localStorage.getItem('geta_memberships') || '[]');
+          localStorage.setItem('geta_memberships', JSON.stringify(data.filter(x => x.id !== m.id)));
+          this.showToast("User removed.");
+          this.setState({});
+        }
+      }))
+    };
+  }
+<!-- ==JS_END== -->

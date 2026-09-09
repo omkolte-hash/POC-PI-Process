@@ -1,0 +1,510 @@
+<!-- ==FEATURE_ID== EPIC-304 -->
+<!-- ==EPIC_TITLE== Email Templates & Communication -->
+<!-- ==NAV_GROUP== Communications -->
+<!-- ==NAV_ITEMS_JSON== [["email-templates","Email Templates","mail-open"]] -->
+<!-- ==PAGE_TITLES_JSON== {"email-templates":["Communications","Email Templates"]} -->
+<!-- ==RENDERVALS_JSON== {"pageIsEmailTemplates":"page === \"email-templates\""} -->
+<!-- ==BUILD_CALLS_START== -->
+    if (page === "email-templates") Object.assign(base, this.buildEmailTemplates(d));
+<!-- ==BUILD_CALLS_END== -->
+<!-- ==HTML_START== -->
+<sc-if value="{{ pageIsEmailTemplates }}">
+<div style="padding:24px;max-width:1200px">
+  <div class="d-flex align-items-center gap-2 mb-4">
+    <i data-lucide="mail-open" style="width:20px;height:20px;color:var(--color-accent-700)"></i>
+    <h5 class="mb-0">Email Templates &amp; Communication</h5>
+  </div>
+
+  <!-- Tabs -->
+  <ul class="nav nav-tabs mb-4">
+    <li class="nav-item">
+      <button class="nav-link" onclick="{{ onEtTabTemplates }}" style="{{ etTabTemplatesStyle }}">
+        <i data-lucide="layout-template" style="width:14px;height:14px"></i> Templates
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" onclick="{{ onEtTabSend }}" style="{{ etTabSendStyle }}">
+        <i data-lucide="send" style="width:14px;height:14px"></i> Send Communication
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" onclick="{{ onEtTabHistory }}" style="{{ etTabHistoryStyle }}">
+        <i data-lucide="history" style="width:14px;height:14px"></i> History
+      </button>
+    </li>
+  </ul>
+
+  <!-- TAB 1: Templates -->
+  <sc-if value="{{ etTabIsTemplates }}">
+    <div>
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="mb-0">Email Templates</h6>
+        <button class="btn btn-primary btn-sm" onclick="{{ onEtToggleForm }}">
+          <i data-lucide="plus" style="width:14px;height:14px"></i> New Template
+        </button>
+      </div>
+
+      <div class="table-responsive mb-4">
+        <table class="table table-hover table-sm align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Template Name</th>
+              <th>Subject</th>
+              <th>Recipient Group</th>
+              <th>Last Used</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{ etTemplateRows }}" as="t" hint-placeholder-count="4">
+              <tr>
+                <td><strong>{{ t.name }}</strong></td>
+                <td style="font-size:13px;color:#555">{{ t.subject }}</td>
+                <td><span class="badge bg-secondary">{{ t.group }}</span></td>
+                <td style="font-size:12px">{{ t.used }}</td>
+                <td>
+                  <button class="btn btn-sm btn-outline-secondary me-1" onclick="{{ t.onEdit }}" title="Edit">
+                    <i data-lucide="pencil" style="width:13px;height:13px"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger me-1" onclick="{{ t.onDelete }}" title="Delete">
+                    <i data-lucide="trash-2" style="width:13px;height:13px"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-primary" onclick="{{ t.onSendNow }}" title="Send Now">
+                    <i data-lucide="send" style="width:13px;height:13px"></i> Send Now
+                  </button>
+                </td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- New / Edit Template Form -->
+      <sc-if value="{{ etShowForm }}">
+        <div class="card mb-4">
+          <div class="card-header fw-semibold">{{ etFormTitle }}</div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-12 col-md-6">
+                <label class="form-label">Template Name</label>
+                <input type="text" class="form-control" value="{{ etFormName }}" oninput="{{ onEtFormNameChange }}" placeholder="e.g. Shortlist Notification" />
+              </div>
+              <div class="col-12 col-md-6">
+                <label class="form-label">Recipient Group</label>
+                <select class="form-select" onchange="{{ onEtFormGroupChange }}">
+                  <sc-for list="{{ etGroupOptions }}" as="g" hint-placeholder-count="5">
+                    <option value="{{ g.value }}" selected="{{ g.selected }}">{{ g.label }}</option>
+                  </sc-for>
+                </select>
+              </div>
+              <div class="col-12">
+                <label class="form-label">
+                  Subject
+                  <span class="text-muted ms-1" style="font-size:12px">Use <code>{name}</code>, <code>{programme}</code>, <code>{date}</code> as merge fields</span>
+                </label>
+                <input type="text" class="form-control" value="{{ etFormSubject }}" oninput="{{ onEtFormSubjectChange }}" placeholder="e.g. You have been shortlisted for {programme}" />
+              </div>
+              <div class="col-12">
+                <label class="form-label">Body</label>
+                <textarea class="form-control" rows="6" oninput="{{ onEtFormBodyChange }}"
+                  placeholder="Dear {name},&#10;&#10;We are pleased to inform you that you have been shortlisted for {programme}. Your interview is scheduled for {date}.&#10;&#10;Regards,&#10;Admissions Team">{{ etFormBody }}</textarea>
+                <div class="form-text">Merge fields: <code>{name}</code>, <code>{programme}</code>, <code>{date}</code></div>
+              </div>
+            </div>
+            <div class="d-flex gap-2 mt-3">
+              <button class="btn btn-outline-secondary" onclick="{{ onEtFormPreview }}">
+                <i data-lucide="eye" style="width:14px;height:14px"></i> Preview
+              </button>
+              <button class="btn btn-primary" onclick="{{ onEtFormSave }}">
+                <i data-lucide="save" style="width:14px;height:14px"></i> Save Template
+              </button>
+              <button class="btn btn-outline-secondary" onclick="{{ onEtFormCancel }}">Cancel</button>
+            </div>
+
+            <!-- Preview panel -->
+            <sc-if value="{{ etPreviewVisible }}">
+              <div class="card mt-3 border-info">
+                <div class="card-header text-bg-info py-2" style="font-size:13px">
+                  <strong>Preview</strong> — rendered with sample candidate data
+                </div>
+                <div class="card-body" style="font-size:13px">
+                  <p class="mb-1"><strong>Subject:</strong> {{ etPreviewSubject }}</p>
+                  <hr class="my-2" />
+                  <p class="mb-0" style="white-space:pre-line">{{ etPreviewBody }}</p>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <!-- TAB 2: Send Communication -->
+  <sc-if value="{{ etTabIsSend }}">
+    <div class="row g-4">
+      <div class="col-12 col-lg-6">
+        <div class="card">
+          <div class="card-header fw-semibold">Select &amp; Send</div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label class="form-label">Template</label>
+              <select class="form-select" onchange="{{ onEtSendTemplateChange }}">
+                <option value="">-- Select a template --</option>
+                <sc-for list="{{ etSendTemplateOptions }}" as="opt" hint-placeholder-count="4">
+                  <option value="{{ opt.value }}" selected="{{ opt.selected }}">{{ opt.label }}</option>
+                </sc-for>
+              </select>
+            </div>
+
+            <sc-if value="{{ etSendTemplateSelected }}">
+              <div class="alert alert-light border mb-3" style="font-size:13px">
+                <div class="mb-1"><strong>Subject:</strong> {{ etSendPreviewSubject }}</div>
+                <div class="mb-1"><strong>To group:</strong> <span class="badge bg-secondary">{{ etSendPreviewGroup }}</span></div>
+                <hr class="my-2" />
+                <div style="color:#555">{{ etSendPreviewBodySnippet }}</div>
+              </div>
+
+              <div class="alert alert-info py-2 mb-3" style="font-size:13px">
+                <i data-lucide="users" style="width:14px;height:14px"></i>
+                This will send to approximately <strong>{{ etSendRecipientCount }}</strong> candidates.
+              </div>
+
+              <button class="btn btn-primary w-100" onclick="{{ onEtSendConfirmOpen }}">
+                <i data-lucide="send" style="width:14px;height:14px"></i> Send to {{ etSendRecipientCount }} Recipients
+              </button>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+
+      <!-- Confirmation modal (inline toggle) -->
+      <sc-if value="{{ etSendModalOpen }}">
+        <div class="modal d-block" style="background:rgba(0,0,0,0.4)">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h6 class="modal-title">Confirm Send</h6>
+                <button class="btn-close" onclick="{{ onEtSendModalClose }}"></button>
+              </div>
+              <div class="modal-body" style="font-size:14px">
+                <p>You are about to send <strong>{{ etSendPreviewSubject }}</strong> to <strong>{{ etSendRecipientCount }}</strong> candidates in the <em>{{ etSendPreviewGroup }}</em> group.</p>
+                <p class="mb-0 text-danger" style="font-size:12px">This action cannot be undone. Emails will be dispatched immediately.</p>
+              </div>
+              <div class="modal-footer">
+                <button class="btn btn-outline-secondary btn-sm" onclick="{{ onEtSendModalClose }}">Cancel</button>
+                <button class="btn btn-primary btn-sm" onclick="{{ onEtSendConfirm }}">
+                  <i data-lucide="send" style="width:13px;height:13px"></i> Confirm &amp; Send
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ etSendSuccess }}">
+        <div class="col-12">
+          <div class="alert alert-success">
+            <i data-lucide="check-circle" style="width:16px;height:16px"></i>
+            <strong>Sent!</strong> Email dispatched to {{ etSendLastCount }} recipients. Entry logged in History.
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <!-- TAB 3: History -->
+  <sc-if value="{{ etTabIsHistory }}">
+    <div>
+      <h6 class="mb-3">Communication History</h6>
+      <div class="table-responsive">
+        <table class="table table-hover table-sm align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Date</th>
+              <th>Template</th>
+              <th>Recipients</th>
+              <th>Triggered By</th>
+              <th>Delivery Rate</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{ etHistoryRows }}" as="h" hint-placeholder-count="5">
+              <tr>
+                <td style="font-size:12px">{{ h.date }}</td>
+                <td style="font-size:13px"><strong>{{ h.template }}</strong></td>
+                <td><span class="badge bg-light text-dark border">{{ h.group }}</span></td>
+                <td style="font-size:12px">{{ h.by }}</td>
+                <td>
+                  <span class="badge" style="{{ h.deliveryBadgeStyle }}">{{ h.deliveryLabel }}</span>
+                </td>
+                <td>
+                  <button class="btn btn-sm btn-outline-secondary" onclick="{{ h.onViewDetails }}">
+                    <i data-lucide="list" style="width:13px;height:13px"></i> View Details
+                  </button>
+                </td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Detail modal -->
+      <sc-if value="{{ etDetailModalOpen }}">
+        <div class="modal d-block" style="background:rgba(0,0,0,0.4)">
+          <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h6 class="modal-title">{{ etDetailModalTitle }}</h6>
+                <button class="btn-close" onclick="{{ onEtDetailModalClose }}"></button>
+              </div>
+              <div class="modal-body">
+                <p class="text-muted mb-3" style="font-size:13px">{{ etDetailModalMeta }}</p>
+                <div class="table-responsive">
+                  <table class="table table-sm table-bordered">
+                    <thead class="table-light">
+                      <tr>
+                        <th>#</th>
+                        <th>Candidate</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <sc-for list="{{ etDetailRecipients }}" as="r" hint-placeholder-count="6">
+                        <tr>
+                          <td style="font-size:12px">{{ r.num }}</td>
+                          <td style="font-size:13px">{{ r.name }}</td>
+                          <td style="font-size:12px">{{ r.email }}</td>
+                          <td><span class="badge" style="{{ r.statusStyle }}">{{ r.status }}</span></td>
+                        </tr>
+                      </sc-for>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button class="btn btn-outline-secondary btn-sm" onclick="{{ onEtDetailModalClose }}">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+</div>
+</sc-if>
+<!-- ==HTML_END== -->
+<!-- ==JS_START== -->
+  buildEmailTemplates(d) {
+    const TMPL_KEY = 'geta_email_templates';
+    const HIST_KEY = 'geta_comm_history';
+    const UI_KEY   = 'geta_email_templates_ui';
+
+    const defaultTemplates = [
+      { id: 1, name: 'Shortlist Notification',  subject: 'You have been shortlisted for {programme}',          body: 'Dear {name},\n\nWe are pleased to inform you that you have been shortlisted for {programme}.\n\nRegards,\nAdmissions Team', group: 'Shortlisted',    used: '2026-09-01' },
+      { id: 2, name: 'Interview Schedule',       subject: 'Interview Schedule — {programme} {date}',            body: 'Dear {name},\n\nYour interview for {programme} is scheduled on {date}. Please be available 15 minutes early.\n\nRegards,\nAdmissions Team', group: 'Shortlisted',    used: '2026-09-02' },
+      { id: 3, name: 'Merit List Release',       subject: 'Merit List Released — Check Your Status',           body: 'Dear {name},\n\nThe merit list for {programme} has been released. Please log in to the portal to check your status.\n\nRegards,\nAdmissions Team', group: 'All Candidates', used: '2026-09-03' },
+      { id: 4, name: 'Offer Ready',              subject: 'Your Admission Offer is Ready — {programme}',       body: 'Dear {name},\n\nCongratulations! Your admission offer for {programme} is ready. Please log in to accept your offer before {date}.\n\nRegards,\nAdmissions Team', group: 'Merit Listed',   used: '2026-09-04' }
+    ];
+
+    const defaultHistory = [
+      { id: 'h1', date: '2026-09-01', template: 'Shortlist Notification',  group: 'Shortlisted',    by: 'Admin',          sent: 87,  delivered: 85 },
+      { id: 'h2', date: '2026-09-02', template: 'Interview Schedule',       group: 'Shortlisted',    by: 'Admin',          sent: 87,  delivered: 87 },
+      { id: 'h3', date: '2026-09-03', template: 'Merit List Release',       group: 'All Candidates', by: 'System',         sent: 312, delivered: 298 },
+      { id: 'h4', date: '2026-09-04', template: 'Offer Ready',              group: 'Merit Listed',   by: 'Admin',          sent: 50,  delivered: 48 },
+      { id: 'h5', date: '2026-09-04', template: 'Waitlist Update',          group: 'Waitlisted',     by: 'Nishant Sharma', sent: 22,  delivered: 20 }
+    ];
+
+    const defaultUI = {
+      tab: 'templates',
+      showForm: false, editId: null,
+      formName: '', formSubject: '', formBody: '', formGroup: 'All Candidates',
+      previewVisible: false,
+      sendTemplateId: null, sendModalOpen: false, sendSuccess: false, sendLastCount: 0,
+      detailHistId: null
+    };
+
+    // ponytail: sample candidate for merge-field preview
+    const sampleCandidate = { name: 'Priya Mehta', programme: 'MBA', date: '2026-09-10' };
+
+    let templates = JSON.parse(localStorage.getItem(TMPL_KEY) || 'null') || defaultTemplates;
+    let history   = JSON.parse(localStorage.getItem(HIST_KEY) || 'null') || defaultHistory;
+    let ui        = JSON.parse(localStorage.getItem(UI_KEY)   || 'null') || defaultUI;
+
+    if (!localStorage.getItem(TMPL_KEY)) localStorage.setItem(TMPL_KEY, JSON.stringify(templates));
+    if (!localStorage.getItem(HIST_KEY)) localStorage.setItem(HIST_KEY, JSON.stringify(history));
+
+    const save = () => {
+      localStorage.setItem(TMPL_KEY, JSON.stringify(templates));
+      localStorage.setItem(HIST_KEY, JSON.stringify(history));
+      localStorage.setItem(UI_KEY,   JSON.stringify(ui));
+      if (this.renderVals) this.renderVals();
+    };
+
+    const merge = (str) => str
+      .replace(/\{name\}/g, sampleCandidate.name)
+      .replace(/\{programme\}/g, sampleCandidate.programme)
+      .replace(/\{date\}/g, sampleCandidate.date);
+
+    const activeTab   = 'color:var(--color-accent-700);border-bottom:2px solid var(--color-accent-700);font-weight:600;background:none;border-top:none;border-left:none;border-right:none;padding:8px 16px;cursor:pointer';
+    const inactiveTab = 'color:var(--color-text);border:none;background:none;padding:8px 16px;cursor:pointer';
+
+    const groupOptions = ['All Candidates', 'Shortlisted', 'Merit Listed', 'Waitlisted', 'Custom'];
+    // ponytail: mock recipient counts per group
+    const recipientCounts = { 'All Candidates': 312, 'Shortlisted': 87, 'Merit Listed': 50, 'Waitlisted': 22, 'Custom': 15 };
+
+    // --- Template rows ---
+    const etTemplateRows = templates.map(t => ({
+      ...t,
+      onEdit: () => {
+        ui = { ...ui, showForm: true, editId: t.id, formName: t.name, formSubject: t.subject, formBody: t.body, formGroup: t.group, previewVisible: false };
+        save();
+      },
+      onDelete: () => {
+        if (!confirm(`Delete template "${t.name}"?`)) return;
+        templates = templates.filter(x => x.id !== t.id);
+        if (ui.editId === t.id) ui = { ...ui, showForm: false, editId: null };
+        this.showToast('Template deleted.');
+        save();
+      },
+      onSendNow: () => {
+        ui = { ...ui, tab: 'send', sendTemplateId: t.id, sendSuccess: false };
+        save();
+      }
+    }));
+
+    // --- Form handlers ---
+    const onEtFormSave = () => {
+      if (!ui.formName.trim() || !ui.formSubject.trim()) { this.showToast('Name and Subject are required.'); return; }
+      if (ui.editId !== null) {
+        templates = templates.map(t => t.id === ui.editId ? { ...t, name: ui.formName, subject: ui.formSubject, body: ui.formBody, group: ui.formGroup, used: new Date().toISOString().slice(0, 10) } : t);
+        this.showToast('Template updated.');
+      } else {
+        templates = [...templates, { id: Date.now(), name: ui.formName, subject: ui.formSubject, body: ui.formBody, group: ui.formGroup, used: new Date().toISOString().slice(0, 10) }];
+        this.showToast('Template saved.');
+      }
+      ui = { ...ui, showForm: false, editId: null, formName: '', formSubject: '', formBody: '', formGroup: 'All Candidates', previewVisible: false };
+      save();
+    };
+
+    // --- Send tab ---
+    const selectedTmpl = templates.find(t => t.id === ui.sendTemplateId) || null;
+    const sendCount = selectedTmpl ? (recipientCounts[selectedTmpl.group] || 0) : 0;
+
+    const onEtSendConfirm = () => {
+      if (!selectedTmpl) return;
+      const entry = {
+        id: 'h' + Date.now(),
+        date: new Date().toISOString().slice(0, 10),
+        template: selectedTmpl.name,
+        group: selectedTmpl.group,
+        by: 'Admin',
+        sent: sendCount,
+        delivered: Math.round(sendCount * (0.94 + Math.random() * 0.05))
+      };
+      history = [entry, ...history];
+      ui = { ...ui, sendModalOpen: false, sendSuccess: true, sendLastCount: sendCount };
+      this.showToast(`Sent to ${sendCount} recipients.`);
+      save();
+    };
+
+    // --- History rows ---
+    const etHistoryRows = history.map(h => {
+      const rate = h.sent > 0 ? Math.round((h.delivered / h.sent) * 100) : 0;
+      const isGood = rate >= 95;
+      return {
+        ...h,
+        deliveryLabel: `${h.delivered}/${h.sent} (${rate}%)`,
+        deliveryBadgeStyle: isGood ? 'background:#dcfce7;color:#14532d' : rate >= 85 ? 'background:#fef9c3;color:#713f12' : 'background:#fee2e2;color:#991b1b',
+        onViewDetails: () => {
+          ui = { ...ui, detailHistId: h.id };
+          save();
+        }
+      };
+    });
+
+    // --- Detail modal ---
+    const detailEntry = history.find(h => h.id === ui.detailHistId) || null;
+    // ponytail: generate plausible mock recipient list from seed names
+    const seedNames = [
+      ['Priya Mehta',     'priya.mehta@example.com'],
+      ['Arjun Singh',     'arjun.singh@example.com'],
+      ['Sneha Patil',     'sneha.patil@example.com'],
+      ['Rahul Verma',     'rahul.verma@example.com'],
+      ['Kavya Nair',      'kavya.nair@example.com'],
+      ['Amit Gupta',      'amit.gupta@example.com'],
+      ['Pooja Sharma',    'pooja.sharma@example.com'],
+      ['Vikram Das',      'vikram.das@example.com'],
+    ];
+    let etDetailRecipients = [];
+    if (detailEntry) {
+      const count = Math.min(detailEntry.sent, seedNames.length);
+      etDetailRecipients = seedNames.slice(0, count).map((pair, i) => ({
+        num: i + 1, name: pair[0], email: pair[1],
+        status: i < detailEntry.delivered ? 'Delivered' : 'Failed',
+        statusStyle: i < detailEntry.delivered ? 'background:#dcfce7;color:#14532d' : 'background:#fee2e2;color:#991b1b'
+      }));
+    }
+
+    return {
+      etTabIsTemplates: ui.tab === 'templates',
+      etTabIsSend:      ui.tab === 'send',
+      etTabIsHistory:   ui.tab === 'history',
+      etTabTemplatesStyle: ui.tab === 'templates' ? activeTab : inactiveTab,
+      etTabSendStyle:      ui.tab === 'send'      ? activeTab : inactiveTab,
+      etTabHistoryStyle:   ui.tab === 'history'   ? activeTab : inactiveTab,
+      onEtTabTemplates: () => { ui = { ...ui, tab: 'templates' }; save(); },
+      onEtTabSend:      () => { ui = { ...ui, tab: 'send', sendSuccess: false }; save(); },
+      onEtTabHistory:   () => { ui = { ...ui, tab: 'history' }; save(); },
+
+      // Templates tab
+      etTemplateRows,
+      etShowForm:    ui.showForm,
+      etFormTitle:   ui.editId !== null ? 'Edit Template' : 'New Template',
+      etFormName:    ui.formName,
+      etFormSubject: ui.formSubject,
+      etFormBody:    ui.formBody,
+      etGroupOptions: groupOptions.map(g => ({ value: g, label: g, selected: g === ui.formGroup })),
+      etPreviewVisible:   ui.previewVisible,
+      etPreviewSubject:   ui.previewVisible ? merge(ui.formSubject || '') : '',
+      etPreviewBody:      ui.previewVisible ? merge(ui.formBody    || '') : '',
+      onEtToggleForm:        () => { ui = { ...ui, showForm: !ui.showForm, editId: null, formName: '', formSubject: '', formBody: '', formGroup: 'All Candidates', previewVisible: false }; save(); },
+      onEtFormNameChange:    (e) => { ui = { ...ui, formName:    e.target.value, previewVisible: false }; save(); },
+      onEtFormSubjectChange: (e) => { ui = { ...ui, formSubject: e.target.value, previewVisible: false }; save(); },
+      onEtFormBodyChange:    (e) => { ui = { ...ui, formBody:    e.target.value, previewVisible: false }; save(); },
+      onEtFormGroupChange:   (e) => { ui = { ...ui, formGroup:   e.target.value }; save(); },
+      onEtFormPreview:       () => { ui = { ...ui, previewVisible: true };  save(); },
+      onEtFormSave,
+      onEtFormCancel:        () => { ui = { ...ui, showForm: false, editId: null, previewVisible: false }; save(); },
+
+      // Send tab
+      etSendTemplateOptions: templates.map(t => ({ value: t.id, label: t.name, selected: t.id === ui.sendTemplateId })),
+      etSendTemplateSelected: !!selectedTmpl,
+      etSendPreviewSubject:   selectedTmpl ? merge(selectedTmpl.subject) : '',
+      etSendPreviewGroup:     selectedTmpl ? selectedTmpl.group : '',
+      etSendPreviewBodySnippet: selectedTmpl ? (merge(selectedTmpl.body).slice(0, 200) + (selectedTmpl.body.length > 200 ? '…' : '')) : '',
+      etSendRecipientCount:   sendCount,
+      etSendModalOpen:        ui.sendModalOpen,
+      etSendSuccess:          ui.sendSuccess,
+      etSendLastCount:        ui.sendLastCount,
+      onEtSendTemplateChange: (e) => {
+        const id = parseInt(e.target.value, 10) || null;
+        ui = { ...ui, sendTemplateId: id, sendSuccess: false, sendModalOpen: false };
+        save();
+      },
+      onEtSendConfirmOpen:  () => { ui = { ...ui, sendModalOpen: true };  save(); },
+      onEtSendModalClose:   () => { ui = { ...ui, sendModalOpen: false }; save(); },
+      onEtSendConfirm,
+
+      // History tab
+      etHistoryRows,
+      etDetailModalOpen:  !!detailEntry,
+      etDetailModalTitle: detailEntry ? `Recipients — ${detailEntry.template}` : '',
+      etDetailModalMeta:  detailEntry ? `Sent on ${detailEntry.date} by ${detailEntry.by} · ${detailEntry.delivered}/${detailEntry.sent} delivered` : '',
+      etDetailRecipients,
+      onEtDetailModalClose: () => { ui = { ...ui, detailHistId: null }; save(); }
+    };
+  }
+<!-- ==JS_END== -->

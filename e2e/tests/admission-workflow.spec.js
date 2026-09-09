@@ -8,7 +8,7 @@ import { test, expect } from '@playwright/test';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  mockFilePicker, trackConsoleErrors, openSampleFile, loginInstitute, loginPanelist, gotoNav, fieldByLabel,
+  mockFilePicker, trackConsoleErrors, openSampleFile, loginInstitute, loginPanelist, gotoNav, gotoPageDirect, fieldByLabel,
 } from './helpers.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -75,8 +75,20 @@ test('full admission lifecycle: programme creation through provisional letters',
     await selectProgramme(page);
   });
 
+  await test.step('Create an Admission Cycle (hard prerequisite before any candidate work)', async () => {
+    await gotoNav(page, 'Settings', 'Admission Cycles');
+    await expect(page.locator('text=No admission cycles yet')).toBeVisible();
+    await page.locator('button:has-text("Create Cycle")').click();
+    await page.waitForTimeout(300);
+    await page.locator('input[placeholder="e.g. Round 1"]').fill('Round 1');
+    await page.locator('button:has-text("Save")').click();
+    await expect(page.locator('table')).toContainText('Round 1');
+    // The first cycle created for a programme+year becomes the active one automatically.
+    await expect(page.locator('header select').nth(2)).toHaveValue(/CYC-/);
+  });
+
   await test.step('Configure a PI assessment (required before Sessions can be created)', async () => {
-    await gotoNav(page, 'Programmes', 'Assessment / PI Configuration');
+    await gotoNav(page, 'Settings', 'Assessment / PI Configuration');
     await fieldByLabel(page, 'Assessment Name').locator('input').fill('PI Round');
     await fieldByLabel(page, 'Assessment Short Name').locator('select').selectOption('PI');
     await fieldByLabel(page, 'Sequence No').locator('input').fill('1');
@@ -90,11 +102,36 @@ test('full admission lifecycle: programme creation through provisional letters',
     await expect(page.locator('table')).toContainText('PI Round');
   });
 
-  await test.step('Import the fixed candidate roster (6 OPEN + 2 SC)', async () => {
-    await gotoNav(page, 'Candidates', 'Import Candidates');
+  await test.step('Import the fixed candidate roster (6 OPEN + 2 SC) via the Import Wizard', async () => {
+    // Import Candidates has no sidebar link (hidden from the mockup nav) but the page/engine are
+    // still intact — reach it directly instead of clicking a nav item that no longer exists.
+    await gotoPageDirect(page, 'import-candidates');
+    await page.locator('button:has-text("New Import")').click();
+    await page.waitForTimeout(400);
+
+    // Step 1: Sources — a single CSV dataset, so the Joins step (dataset[i] ⋈ dataset[i+1]) auto-skips.
+    await fieldByLabel(page, 'Dataset Name').locator('input').fill('Roster');
     await page.setInputFiles('input[type="file"]', CANDIDATES_CSV);
-    await expect(page.locator('button:has-text("Import 8 Candidate")')).toBeVisible();
-    await page.locator('button:has-text("Import 8 Candidate")').click();
+    await page.waitForTimeout(300);
+    await expect(page.locator('table', { hasText: 'Roster' })).toBeVisible();
+    await page.locator('button:has-text("Next: Inspect Schema")').click();
+
+    // Step 2: Schema (read-only) — single dataset skips straight to Field Mapping.
+    await page.locator('button:has-text("Next: Field Mapping")').click();
+
+    // Step 4: Mapping — auto-map camelCases each CSV header ("Applicant ID" -> applicantId,
+    // "SLAT Score" -> slatScore, ...), so only the two required identity pointers need selecting.
+    await page.locator('button:has-text("Auto-map from columns")').click();
+    await fieldByLabel(page, 'Candidate ID Field').locator('select').selectOption('applicantId');
+    await fieldByLabel(page, 'Category Field').locator('select').selectOption('category');
+    await page.locator('button:has-text("Next: Filters")').click();
+
+    // Step 5: Filters — none needed for this single-dataset import.
+    await page.locator('button:has-text("Next: Preview")').click();
+
+    // Step 6: Preview — confirm the pipeline resolves to all 8 candidates, then commit.
+    await expect(page.locator('.card-kicker', { hasText: 'Final Record Count' }).locator('xpath=following-sibling::div[1]')).toHaveText('8');
+    await page.locator('button:has-text("Confirm & Commit")').click();
     await expect(page.locator('.toast-pop')).toContainText('8 new candidate');
   });
 
@@ -115,10 +152,16 @@ test('full admission lifecycle: programme creation through provisional letters',
   });
 
   await test.step('Shortlist all 6 OPEN candidates', async () => {
+    // Shortlisting is a generic filter now (any field, any operator), not a fixed category dropdown —
+    // build "category = OPEN" as one condition and select "All Matching" instead of a top-N count.
     await gotoNav(page, 'Candidates', 'Shortlisting');
-    await fieldByLabel(page, 'Reservation Category').locator('select').selectOption({ label: 'OPEN' });
-    await page.locator('label.radio:has-text("No. of Candidates")').click();
-    await fieldByLabel(page, 'Number of Candidates').locator('input').fill('6');
+    await page.locator('button:has-text("+ Add OR Group")').click();
+    await page.locator('button:has-text("+ Add Condition (AND)")').click();
+    // hasText is substring-matching by default, and "Rank / Sort Field" would also match a plain
+    // "Field" substring search — anchor to the exact condition label.
+    await fieldByLabel(page, /^Field$/).locator('select').selectOption({ label: 'category (string)' });
+    await fieldByLabel(page, /^Value$/).locator('input').fill('OPEN');
+    await page.locator('label.radio:has-text("All Matching")').click();
     await page.locator('button:has-text("Preview Shortlist")').click();
     await expect(page.locator('.card', { hasText: 'Candidates Selected' }).first()).toContainText('6');
     await page.locator('button:has-text("Confirm Shortlist")').click();
@@ -215,8 +258,9 @@ test('full admission lifecycle: programme creation through provisional letters',
 
   await test.step('Assign a Zoom Room to the group', async () => {
     await gotoNav(page, 'PI Management', 'Zoom Rooms');
-    await page.locator('button:has-text("Assign Zoom Room")').first().click();
-    await expect(page.locator('body')).toContainText('zoom.us');
+    await page.locator('button:has-text("Auto-Assign")').first().click();
+    await page.waitForTimeout(300);
+    await expect(page.locator('table input').first()).toHaveValue(/zoom\.us/);
   });
 
   await test.step('Allocate all 6 OPEN candidates to the session/group', async () => {
@@ -240,15 +284,22 @@ test('full admission lifecycle: programme creation through provisional letters',
       await page.locator('button:has-text("Join")').first().click();
       await page.waitForTimeout(400);
 
-      for (let c = 0; c < OPEN_IDS.length; c++) {
-        const isDone = await page.locator('text=All candidates completed').isVisible().catch(() => false);
-        if (isDone) break;
+      // Free selection: pick each candidate directly from the dropdown by Applicant ID (the
+      // option's value) rather than stepping through a forced queue.
+      const candidateSelect = fieldByLabel(page, 'Candidate').locator('select');
+      for (const candidateId of OPEN_IDS) {
+        await candidateSelect.selectOption(candidateId);
+        await page.waitForTimeout(250);
+        await expect(page.locator('.card strong').first()).toHaveText(candidateId);
         if (i === 0) {
-          await page.locator('button:has-text("Present")').click();
+          // Selecting a not-yet-marked candidate must surface the warning banner (not silently
+          // hide the scoring panel) — its CTA does the same mark-present action as the regular
+          // "Present" button below it, so clicking whichever matches first works either way.
+          await expect(page.locator('text=is not marked present yet')).toBeVisible();
+          await page.locator('button:has-text("Present")').first().click();
+          await page.waitForTimeout(200);
+          await expect(page.locator('text=is not marked present yet')).not.toBeVisible();
         }
-        // Read the candidate's own Applicant ID off the page rather than assuming queue order
-        // matches OPEN_IDS — the score entered must match the candidate actually on screen.
-        const candidateId = (await page.locator('.card strong').first().innerText()).trim();
         const score = RUBRIC_SCORE_BY_ID[candidateId];
         expect(score, `no expected rubric score for candidate "${candidateId}"`).toBeTruthy();
         const fields = page.locator('.field input[type="number"]');
@@ -256,10 +307,10 @@ test('full admission lifecycle: programme creation through provisional letters',
         for (let f = 0; f < count; f++) {
           await fields.nth(f).fill(String(score));
         }
-        await page.locator('button:has-text("Next Candidate")').click();
+        await page.locator('button:has-text("Submit & Lock Score")').click();
         await page.waitForTimeout(250);
       }
-      await expect(page.locator('text=All candidates completed')).toBeVisible();
+      await expect(page.locator('text=All candidates scored')).toBeVisible();
     });
   }
 

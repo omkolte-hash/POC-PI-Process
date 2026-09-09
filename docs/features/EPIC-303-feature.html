@@ -1,0 +1,488 @@
+<!-- ==FEATURE_ID== EPIC-303 -->
+<!-- ==EPIC_TITLE== Offer Management -->
+<!-- ==NAV_GROUP== Merit -->
+<!-- ==NAV_ITEMS_JSON== [["offer-management","Offer Management","file-badge-2"]] -->
+<!-- ==PAGE_TITLES_JSON== {"offer-management":["Merit","Offer Management"]} -->
+<!-- ==RENDERVALS_JSON== {"pageIsOfferManagement":"page === \"offer-management\""} -->
+<!-- ==BUILD_CALLS_START== -->
+    if (page === "offer-management") Object.assign(base, this.buildOfferManagement(d));
+<!-- ==BUILD_CALLS_END== -->
+<!-- ==HTML_START== -->
+<sc-if value="{{ pageIsOfferManagement }}">
+<div style="padding:24px;max-width:1200px">
+  <div class="d-flex align-items-center gap-2 mb-4">
+    <i data-lucide="file-badge-2" style="width:20px;height:20px;color:var(--color-accent-700)"></i>
+    <h5 class="mb-0">Offer Management</h5>
+  </div>
+
+  <!-- Tabs -->
+  <ul class="nav nav-tabs mb-4">
+    <li class="nav-item">
+      <button class="nav-link" onclick="{{ offerOnTabTemplates }}" style="{{ offerTabTemplatesStyle }}">Offer Templates</button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" onclick="{{ offerOnTabGenerate }}" style="{{ offerTabGenerateStyle }}">Generate Offers</button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" onclick="{{ offerOnTabStatus }}" style="{{ offerTabStatusStyle }}">Offer Status</button>
+    </li>
+  </ul>
+
+  <!-- TAB 1: Offer Templates -->
+  <sc-if value="{{ offerTabIsTemplates }}">
+    <div>
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="mb-0">Offer Letter Templates</h6>
+        <button class="btn btn-sm btn-primary" onclick="{{ offerOnNewTemplate }}">
+          <i data-lucide="plus" style="width:14px;height:14px"></i> New Template
+        </button>
+      </div>
+
+      <div class="table-responsive mb-4">
+        <table class="table table-hover table-sm align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Template Name</th>
+              <th>Programme</th>
+              <th>Subject</th>
+              <th>Last Updated</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{ offerTemplateRows }}" as="t" hint-placeholder-count="3">
+              <tr>
+                <td><strong>{{ t.name }}</strong></td>
+                <td><span class="badge bg-secondary">{{ t.programme }}</span></td>
+                <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ t.subject }}</td>
+                <td style="font-size:12px;color:#6c757d">{{ t.updatedAt }}</td>
+                <td>
+                  <button class="btn btn-sm btn-outline-primary me-1" onclick="{{ t.onEdit }}">
+                    <i data-lucide="pencil" style="width:12px;height:12px"></i> Edit
+                  </button>
+                  <button class="btn btn-sm btn-outline-secondary me-1" onclick="{{ t.onPreview }}">
+                    <i data-lucide="eye" style="width:12px;height:12px"></i> Preview
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger" onclick="{{ t.onDelete }}">
+                    <i data-lucide="trash-2" style="width:12px;height:12px"></i>
+                  </button>
+                </td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Inline form -->
+      <sc-if value="{{ offerTemplateFormVisible }}">
+        <div class="card border mb-4">
+          <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <span class="fw-semibold" style="font-size:14px">{{ offerTemplateFormTitle }}</span>
+            <button class="btn btn-sm btn-outline-secondary" onclick="{{ offerOnCancelTemplate }}">Cancel</button>
+          </div>
+          <div class="card-body">
+            <div class="row g-3 mb-3">
+              <div class="col-md-4">
+                <label class="form-label" style="font-size:13px">Template Name</label>
+                <input type="text" class="form-control form-control-sm" value="{{ offerTplName }}" oninput="{{ offerOnTplNameChange }}" placeholder="e.g. MBA Offer Letter" />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label" style="font-size:13px">Programme</label>
+                <select class="form-select form-select-sm" onchange="{{ offerOnTplProgChange }}">
+                  <option value="BSc AI" {{ offerTplProgBscAI }}>BSc AI</option>
+                  <option value="MBA" {{ offerTplProgMba }}>MBA</option>
+                  <option value="CSE" {{ offerTplProgCse }}>CSE</option>
+                </select>
+              </div>
+              <div class="col-md-5">
+                <label class="form-label" style="font-size:13px">Subject Line</label>
+                <input type="text" class="form-control form-control-sm" value="{{ offerTplSubject }}" oninput="{{ offerOnTplSubjectChange }}" placeholder="e.g. Congratulations — MBA Admission Offer" />
+              </div>
+            </div>
+            <div class="mb-2">
+              <label class="form-label" style="font-size:13px">Body</label>
+              <div class="mb-1" style="font-size:11px;color:#6c757d">
+                Merge fields: <code>{name}</code> <code>{rank}</code> <code>{programme}</code> <code>{deadline}</code> <code>{fee}</code>
+              </div>
+              <textarea class="form-control form-control-sm" rows="6" oninput="{{ offerOnTplBodyChange }}">{{ offerTplBody }}</textarea>
+            </div>
+            <div class="d-flex gap-2 mt-3">
+              <button class="btn btn-sm btn-outline-secondary" onclick="{{ offerOnPreviewTemplate }}">
+                <i data-lucide="eye" style="width:14px;height:14px"></i> Preview
+              </button>
+              <button class="btn btn-sm btn-primary" onclick="{{ offerOnSaveTemplate }}">
+                <i data-lucide="save" style="width:14px;height:14px"></i> Save Template
+              </button>
+            </div>
+            <sc-if value="{{ offerPreviewVisible }}">
+              <div class="border p-3 mt-3 rounded bg-light" style="font-size:13px;white-space:pre-wrap">{{ offerPreviewText }}</div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <!-- TAB 2: Generate Offers -->
+  <sc-if value="{{ offerTabIsGenerate }}">
+    <div>
+      <div class="row g-3 mb-4 align-items-end">
+        <div class="col-auto">
+          <label class="form-label" style="font-size:13px">Merit Batch</label>
+          <select class="form-select form-select-sm" onchange="{{ offerOnBatchFilter }}">
+            <option value="all" {{ offerBatchAllSel }}>All Batches</option>
+            <option value="Batch-001" {{ offerBatch001Sel }}>Batch-001</option>
+            <option value="Batch-002" {{ offerBatch002Sel }}>Batch-002</option>
+          </select>
+        </div>
+        <div class="col-auto">
+          <label class="form-label" style="font-size:13px">Programme</label>
+          <select class="form-select form-select-sm" onchange="{{ offerOnProgFilter }}">
+            <option value="all" {{ offerProgAllSel }}>All Programmes</option>
+            <option value="BSc AI" {{ offerProgBscAISel }}>BSc AI</option>
+            <option value="MBA" {{ offerProgMbaSel }}>MBA</option>
+            <option value="CSE" {{ offerProgCseSel }}>CSE</option>
+          </select>
+        </div>
+        <div class="col-auto">
+          <label class="form-label" style="font-size:13px">Use Template</label>
+          <select class="form-select form-select-sm" onchange="{{ offerOnTplSelect }}">
+            <sc-for list="{{ offerTemplateOptions }}" as="opt" hint-placeholder-count="3">
+              <option value="{{ opt.id }}" {{ opt.selected }}>{{ opt.label }}</option>
+            </sc-for>
+          </select>
+        </div>
+        <div class="col-auto">
+          <button class="btn btn-sm btn-primary" onclick="{{ offerOnGenerateAll }}">
+            <i data-lucide="zap" style="width:14px;height:14px"></i> Generate All Selected
+          </button>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover table-sm align-middle">
+          <thead class="table-light">
+            <tr>
+              <th><input type="checkbox" onchange="{{ offerOnSelectAll }}" /></th>
+              <th>Name</th>
+              <th>App No</th>
+              <th>Merit Rank</th>
+              <th>Programme</th>
+              <th>Category</th>
+              <th>Offer Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{ offerEligibleRows }}" as="c" hint-placeholder-count="8">
+              <tr>
+                <td><input type="checkbox" {{ c.checked }} onchange="{{ c.onCheck }}" /></td>
+                <td>{{ c.name }}</td>
+                <td style="font-size:12px;color:#6c757d">{{ c.appNo }}</td>
+                <td class="text-center"><strong>{{ c.rank }}</strong></td>
+                <td>{{ c.programme }}</td>
+                <td>{{ c.category }}</td>
+                <td>{{ c.offerStatusBadge }}</td>
+                <td>
+                  <sc-if value="{{ c.canGenerate }}">
+                    <button class="btn btn-sm btn-outline-success" onclick="{{ c.onGenerate }}">
+                      <i data-lucide="file-plus" style="width:12px;height:12px"></i> Generate
+                    </button>
+                  </sc-if>
+                  <sc-if value="{{ c.alreadyGenerated }}">
+                    <span style="font-size:12px;color:#6c757d">Done</span>
+                  </sc-if>
+                </td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- TAB 3: Offer Status -->
+  <sc-if value="{{ offerTabIsStatus }}">
+    <div>
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="mb-0">All Issued Offers</h6>
+        <div style="font-size:12px;color:#6c757d">
+          <span class="badge bg-primary me-1">Generated</span>
+          <span class="badge bg-success me-1">Released</span>
+          <span class="badge bg-danger">Revoked</span>
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover table-sm align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Candidate</th>
+              <th>App No</th>
+              <th>Programme</th>
+              <th>Offer Date</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{ offerStatusRows }}" as="o" hint-placeholder-count="8">
+              <tr>
+                <td>{{ o.name }}</td>
+                <td style="font-size:12px;color:#6c757d">{{ o.appNo }}</td>
+                <td>{{ o.programme }}</td>
+                <td style="font-size:12px">{{ o.offerDate }}</td>
+                <td>{{ o.statusBadge }}</td>
+                <td>
+                  <sc-if value="{{ o.canRelease }}">
+                    <button class="btn btn-sm btn-success me-1" onclick="{{ o.onRelease }}">Release</button>
+                  </sc-if>
+                  <sc-if value="{{ o.canRevoke }}">
+                    <button class="btn btn-sm btn-outline-danger" onclick="{{ o.onRevoke }}">Revoke</button>
+                  </sc-if>
+                  <sc-if value="{{ o.isRevoked }}">
+                    <span style="font-size:12px;color:#6c757d" title="{{ o.revokeReason }}">Revoked</span>
+                  </sc-if>
+                </td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</sc-if>
+<!-- ==HTML_END== -->
+<!-- ==JS_START== -->
+  buildOfferManagement(d) {
+    const TPL_KEY = 'geta_offer_templates';
+    const OFFERS_KEY = 'geta_offers';
+    const UI_KEY = 'geta_offer_mgmt_ui';
+
+    const defaultTemplates = [
+      { id: 1, programme: 'MBA',    name: 'MBA Offer Letter',    subject: 'Congratulations — MBA Admission Offer',    body: 'Dear {name},\n\nWe are pleased to offer you admission to the {programme} programme.\nYour merit rank is {rank}.\n\nPlease complete your fee payment of {fee} by {deadline} to secure your seat.\n\nWarm regards,\nAdmissions Office', updatedAt: '2026-08-20' },
+      { id: 2, programme: 'CSE',    name: 'CSE Offer Letter',    subject: 'Congratulations — CSE Admission Offer',    body: 'Dear {name},\n\nWe are pleased to offer you admission to the {programme} programme.\nYour merit rank is {rank}.\n\nPlease complete your fee payment of {fee} by {deadline} to secure your seat.\n\nWarm regards,\nAdmissions Office', updatedAt: '2026-08-20' },
+      { id: 3, programme: 'BSc AI', name: 'BSc AI Offer Letter', subject: 'Congratulations — BSc AI Admission Offer',  body: 'Dear {name},\n\nWe are pleased to offer you admission to the {programme} programme.\nYour merit rank is {rank}.\n\nPlease complete your fee payment of {fee} by {deadline} to secure your seat.\n\nWarm regards,\nAdmissions Office', updatedAt: '2026-08-20' },
+    ];
+
+    const defaultOffers = [
+      { id: 'o1', name: 'Aarav Mehta',     appNo: 'APP-2026-001', programme: 'MBA',    offerDate: '2026-08-21', status: 'Generated', revokeReason: '' },
+      { id: 'o2', name: 'Priya Sharma',    appNo: 'APP-2026-002', programme: 'CSE',    offerDate: '2026-08-21', status: 'Released',  revokeReason: '' },
+      { id: 'o3', name: 'Rohan Desai',     appNo: 'APP-2026-003', programme: 'BSc AI', offerDate: '2026-08-22', status: 'Released',  revokeReason: '' },
+      { id: 'o4', name: 'Sneha Patel',     appNo: 'APP-2026-004', programme: 'MBA',    offerDate: '2026-08-22', status: 'Generated', revokeReason: '' },
+      { id: 'o5', name: 'Kiran Nair',      appNo: 'APP-2026-005', programme: 'CSE',    offerDate: '2026-08-23', status: 'Revoked',   revokeReason: 'Document discrepancy' },
+      { id: 'o6', name: 'Divya Iyer',      appNo: 'APP-2026-006', programme: 'BSc AI', offerDate: '2026-08-23', status: 'Released',  revokeReason: '' },
+      { id: 'o7', name: 'Amit Joshi',      appNo: 'APP-2026-007', programme: 'MBA',    offerDate: '2026-08-24', status: 'Generated', revokeReason: '' },
+      { id: 'o8', name: 'Kavya Reddy',     appNo: 'APP-2026-008', programme: 'CSE',    offerDate: '2026-08-24', status: 'Revoked',   revokeReason: 'Candidate withdrew' },
+    ];
+
+    const defaultCandidates = [
+      { id: 'c1', name: 'Aarav Mehta',    appNo: 'APP-2026-001', rank: 1,  programme: 'MBA',    category: 'General', batch: 'Batch-001', offerStatus: 'Generated' },
+      { id: 'c2', name: 'Priya Sharma',   appNo: 'APP-2026-002', rank: 2,  programme: 'CSE',    category: 'General', batch: 'Batch-001', offerStatus: 'Generated' },
+      { id: 'c3', name: 'Rohan Desai',    appNo: 'APP-2026-003', rank: 3,  programme: 'BSc AI', category: 'OBC',     batch: 'Batch-001', offerStatus: 'Generated' },
+      { id: 'c4', name: 'Sneha Patel',    appNo: 'APP-2026-004', rank: 4,  programme: 'MBA',    category: 'SC',      batch: 'Batch-001', offerStatus: 'Generated' },
+      { id: 'c5', name: 'Kiran Nair',     appNo: 'APP-2026-005', rank: 5,  programme: 'CSE',    category: 'General', batch: 'Batch-002', offerStatus: 'None' },
+      { id: 'c6', name: 'Divya Iyer',     appNo: 'APP-2026-006', rank: 6,  programme: 'BSc AI', category: 'ST',      batch: 'Batch-002', offerStatus: 'None' },
+      { id: 'c7', name: 'Amit Joshi',     appNo: 'APP-2026-007', rank: 7,  programme: 'MBA',    category: 'OBC',     batch: 'Batch-002', offerStatus: 'None' },
+      { id: 'c8', name: 'Kavya Reddy',    appNo: 'APP-2026-008', rank: 8,  programme: 'CSE',    category: 'General', batch: 'Batch-002', offerStatus: 'None' },
+    ];
+
+    const defaultUI = {
+      tab: 'templates',
+      tplFormVisible: false, tplEditId: null,
+      tplName: '', tplProg: 'MBA', tplSubject: '', tplBody: '',
+      previewVisible: false,
+      batchFilter: 'all', progFilter: 'all', selectedTplId: 1,
+      checkedIds: []
+    };
+
+    let templates = JSON.parse(localStorage.getItem(TPL_KEY) || 'null') || defaultTemplates;
+    let offers    = JSON.parse(localStorage.getItem(OFFERS_KEY) || 'null') || defaultOffers;
+    let candidates = defaultCandidates; // ponytail: read-only seed, no separate key needed
+    let ui        = JSON.parse(localStorage.getItem(UI_KEY) || 'null') || defaultUI;
+
+    if (!localStorage.getItem(TPL_KEY))    localStorage.setItem(TPL_KEY,    JSON.stringify(templates));
+    if (!localStorage.getItem(OFFERS_KEY)) localStorage.setItem(OFFERS_KEY, JSON.stringify(offers));
+    if (!localStorage.getItem(UI_KEY))     localStorage.setItem(UI_KEY,     JSON.stringify(ui));
+
+    const save = () => {
+      localStorage.setItem(TPL_KEY,    JSON.stringify(templates));
+      localStorage.setItem(OFFERS_KEY, JSON.stringify(offers));
+      localStorage.setItem(UI_KEY,     JSON.stringify(ui));
+      this.setState({});
+    };
+
+    const samplePreview = (body) => body
+      .replace(/{name}/g, 'Aarav Mehta')
+      .replace(/{rank}/g, '1')
+      .replace(/{programme}/g, ui.tplProg || 'MBA')
+      .replace(/{deadline}/g, '2026-09-15')
+      .replace(/{fee}/g, '₹1,50,000');
+
+    const tabStyle = (t) => t === ui.tab
+      ? 'background:none;border:none;border-bottom:2px solid var(--color-accent-700,#2563eb);color:var(--color-accent-700,#2563eb);font-weight:600;padding:8px 16px;cursor:pointer'
+      : 'background:none;border:none;color:#6c757d;padding:8px 16px;cursor:pointer';
+
+    // Badge HTML returned as raw string — framework renders {{ }} as text, so use a wrapper approach
+    const statusBadgeHtml = (s) =>
+      s === 'Generated' ? '<span class="badge bg-primary">Generated</span>'
+      : s === 'Released' ? '<span class="badge bg-success">Released</span>'
+      : s === 'Revoked'  ? '<span class="badge bg-danger">Revoked</span>'
+      : '<span class="badge bg-secondary">None</span>';
+
+    // Template rows
+    const offerTemplateRows = templates.map(t => ({
+      ...t,
+      onEdit: () => {
+        ui.tplFormVisible = true; ui.tplEditId = t.id;
+        ui.tplName = t.name; ui.tplProg = t.programme; ui.tplSubject = t.subject; ui.tplBody = t.body;
+        ui.previewVisible = false;
+        save();
+      },
+      onPreview: () => {
+        ui.tplFormVisible = true; ui.tplEditId = t.id;
+        ui.tplName = t.name; ui.tplProg = t.programme; ui.tplSubject = t.subject; ui.tplBody = t.body;
+        ui.previewVisible = true;
+        save();
+      },
+      onDelete: () => {
+        if (!confirm(`Delete template "${t.name}"?`)) return;
+        templates = templates.filter(x => x.id !== t.id);
+        save();
+      }
+    }));
+
+    // Eligible candidates with filters applied
+    const filteredCandidates = candidates.filter(c =>
+      (ui.batchFilter === 'all' || c.batch === ui.batchFilter) &&
+      (ui.progFilter  === 'all' || c.programme === ui.progFilter)
+    );
+
+    const offerEligibleRows = filteredCandidates.map(c => ({
+      ...c,
+      checked: (ui.checkedIds || []).includes(c.id) ? 'checked' : '',
+      offerStatusBadge: statusBadgeHtml(c.offerStatus),
+      canGenerate: c.offerStatus === 'None',
+      alreadyGenerated: c.offerStatus !== 'None',
+      onCheck: () => {
+        const ids = ui.checkedIds || [];
+        ui.checkedIds = ids.includes(c.id) ? ids.filter(x => x !== c.id) : [...ids, c.id];
+        save();
+      },
+      onGenerate: () => {
+        c.offerStatus = 'Generated';
+        const now = new Date().toISOString().slice(0, 10);
+        offers.push({ id: 'o' + Date.now(), name: c.name, appNo: c.appNo, programme: c.programme, offerDate: now, status: 'Generated', revokeReason: '' });
+        save();
+        this.showToast('Offer generated for ' + c.name);
+      }
+    }));
+
+    // Offer status rows
+    const offerStatusRows = offers.map(o => ({
+      ...o,
+      statusBadge: statusBadgeHtml(o.status),
+      canRelease: o.status === 'Generated',
+      canRevoke:  o.status === 'Generated' || o.status === 'Released',
+      isRevoked:  o.status === 'Revoked',
+      onRelease: () => {
+        o.status = 'Released';
+        save();
+        this.showToast('Offer released for ' + o.name);
+      },
+      onRevoke: () => {
+        const reason = prompt('Reason for revoking offer for ' + o.name + '?');
+        if (!reason) return;
+        o.status = 'Revoked'; o.revokeReason = reason;
+        save();
+        this.showToast('Offer revoked');
+      }
+    }));
+
+    return {
+      offerTabIsTemplates: ui.tab === 'templates',
+      offerTabIsGenerate:  ui.tab === 'generate',
+      offerTabIsStatus:    ui.tab === 'status',
+      offerTabTemplatesStyle: tabStyle('templates'),
+      offerTabGenerateStyle:  tabStyle('generate'),
+      offerTabStatusStyle:    tabStyle('status'),
+      offerOnTabTemplates: () => { ui.tab = 'templates'; save(); },
+      offerOnTabGenerate:  () => { ui.tab = 'generate';  save(); },
+      offerOnTabStatus:    () => { ui.tab = 'status';    save(); },
+
+      // Templates tab
+      offerTemplateRows,
+      offerTemplateFormVisible: ui.tplFormVisible,
+      offerTemplateFormTitle: ui.tplEditId ? 'Edit Template' : 'New Template',
+      offerTplName:    ui.tplName,
+      offerTplSubject: ui.tplSubject,
+      offerTplBody:    ui.tplBody,
+      offerTplProgBscAI: ui.tplProg === 'BSc AI' ? 'selected' : '',
+      offerTplProgMba:   ui.tplProg === 'MBA'    ? 'selected' : '',
+      offerTplProgCse:   ui.tplProg === 'CSE'    ? 'selected' : '',
+      offerPreviewVisible: ui.previewVisible,
+      offerPreviewText: samplePreview(ui.tplBody || ''),
+      offerOnNewTemplate: () => {
+        ui.tplFormVisible = true; ui.tplEditId = null;
+        ui.tplName = ''; ui.tplProg = 'MBA'; ui.tplSubject = ''; ui.tplBody = '';
+        ui.previewVisible = false;
+        save();
+      },
+      offerOnCancelTemplate: () => { ui.tplFormVisible = false; ui.previewVisible = false; save(); },
+      offerOnTplNameChange:    (e) => { ui.tplName    = e.target.value; save(); },
+      offerOnTplProgChange:    (e) => { ui.tplProg    = e.target.value; save(); },
+      offerOnTplSubjectChange: (e) => { ui.tplSubject = e.target.value; save(); },
+      offerOnTplBodyChange:    (e) => { ui.tplBody    = e.target.value; save(); },
+      offerOnPreviewTemplate: () => { ui.previewVisible = true; save(); },
+      offerOnSaveTemplate: () => {
+        if (!ui.tplName.trim()) { this.showToast('Template name required'); return; }
+        if (ui.tplEditId) {
+          const t = templates.find(x => x.id === ui.tplEditId);
+          if (t) { t.name = ui.tplName; t.programme = ui.tplProg; t.subject = ui.tplSubject; t.body = ui.tplBody; t.updatedAt = new Date().toISOString().slice(0, 10); }
+        } else {
+          templates.push({ id: Date.now(), programme: ui.tplProg, name: ui.tplName, subject: ui.tplSubject, body: ui.tplBody, updatedAt: new Date().toISOString().slice(0, 10) });
+        }
+        ui.tplFormVisible = false; ui.previewVisible = false;
+        save();
+        this.showToast('Template saved');
+      },
+
+      // Generate tab
+      offerBatchAllSel:  ui.batchFilter === 'all'      ? 'selected' : '',
+      offerBatch001Sel:  ui.batchFilter === 'Batch-001' ? 'selected' : '',
+      offerBatch002Sel:  ui.batchFilter === 'Batch-002' ? 'selected' : '',
+      offerProgAllSel:   ui.progFilter  === 'all'      ? 'selected' : '',
+      offerProgBscAISel: ui.progFilter  === 'BSc AI'   ? 'selected' : '',
+      offerProgMbaSel:   ui.progFilter  === 'MBA'      ? 'selected' : '',
+      offerProgCseSel:   ui.progFilter  === 'CSE'      ? 'selected' : '',
+      offerOnBatchFilter: (e) => { ui.batchFilter = e.target.value; save(); },
+      offerOnProgFilter:  (e) => { ui.progFilter  = e.target.value; save(); },
+      offerOnTplSelect:   (e) => { ui.selectedTplId = +e.target.value; save(); },
+      offerTemplateOptions: templates.map(t => ({ id: t.id, label: t.name, selected: t.id === ui.selectedTplId ? 'selected' : '' })),
+      offerEligibleRows,
+      offerOnSelectAll: (e) => {
+        ui.checkedIds = e.target.checked ? filteredCandidates.map(c => c.id) : [];
+        save();
+      },
+      offerOnGenerateAll: () => {
+        const ids = ui.checkedIds || [];
+        if (!ids.length) { this.showToast('Select candidates first'); return; }
+        const now = new Date().toISOString().slice(0, 10);
+        let count = 0;
+        candidates.forEach(c => {
+          if (ids.includes(c.id) && c.offerStatus === 'None') {
+            c.offerStatus = 'Generated';
+            offers.push({ id: 'o' + Date.now() + count, name: c.name, appNo: c.appNo, programme: c.programme, offerDate: now, status: 'Generated', revokeReason: '' });
+            count++;
+          }
+        });
+        ui.checkedIds = [];
+        save();
+        this.showToast(count + ' offer(s) generated');
+      },
+
+      // Status tab
+      offerStatusRows,
+    };
+  }
+<!-- ==JS_END== -->

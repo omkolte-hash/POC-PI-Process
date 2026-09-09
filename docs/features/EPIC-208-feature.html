@@ -1,0 +1,233 @@
+<!-- ==FEATURE_ID== EPIC-208 -->
+<!-- ==EPIC_TITLE== Reopen & Correction Workflow -->
+<!-- ==NAV_GROUP== Corrections -->
+<!-- ==NAV_ITEMS_JSON== [["reopen-corrections","Reopen & Corrections","rotate-ccw"]] -->
+<!-- ==PAGE_TITLES_JSON== {"reopen-corrections":["Corrections","Reopen & Corrections"]} -->
+<!-- ==RENDERVALS_JSON== {"pageIsReopenCorrections":"page === \"reopen-corrections\""} -->
+<!-- ==BUILD_CALLS_START== -->
+    if (page === "reopen-corrections") Object.assign(base, this.buildReopenCorrections(d));
+<!-- ==BUILD_CALLS_END== -->
+<!-- ==HTML_START== -->
+<sc-if value="{{ pageIsReopenCorrections }}">
+<div style="padding:24px">
+
+  <!-- Section 1: Reopen Requests -->
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h5 class="mb-0 fw-semibold">Reopen Requests</h5>
+    <button type="button" class="btn btn-primary btn-sm" onclick="(function(){var el=document.getElementById('reopen-new-form');if(el)el.style.display=el.style.display==='none'?'block':'none';})()">
+      <i data-lucide="plus" style="width:14px;height:14px"></i> New Reopen Request
+    </button>
+  </div>
+
+  <!-- Inline new-request form -->
+  <div id="reopen-new-form" style="display:none;background:#f8f9fa;border:1px solid #dee2e6;border-radius:8px;padding:16px;margin-bottom:16px">
+    <div class="row g-3">
+      <div class="col-md-4">
+        <label class="form-label fw-medium" style="font-size:13px">Candidate</label>
+        <input type="text" id="reopen-candidate" class="form-control form-control-sm" placeholder="Type candidate name…" list="reopen-candidate-list">
+        <datalist id="reopen-candidate-list">
+          <sc-for items="{{ candidateOptions }}"><option value="{{ item.name }}"></option></sc-for>
+        </datalist>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label fw-medium" style="font-size:13px">Step to Reopen</label>
+        <select id="reopen-step" class="form-select form-select-sm">
+          <option value="">— select —</option>
+          <option value="Score Capture">Score Capture</option>
+          <option value="Attendance">Attendance</option>
+          <option value="Shortlist Assignment">Shortlist Assignment</option>
+          <option value="Verification">Verification</option>
+        </select>
+      </div>
+      <div class="col-md-5">
+        <label class="form-label fw-medium" style="font-size:13px">Reason <span class="text-danger">*</span></label>
+        <textarea id="reopen-reason" class="form-control form-control-sm" rows="1" placeholder="Explain why this step needs to be reopened…"></textarea>
+      </div>
+    </div>
+    <div class="mt-3 d-flex gap-2">
+      <button type="button" class="btn btn-primary btn-sm" onclick="{{ onSubmitReopenRequest }}">Submit Request</button>
+      <button type="button" class="btn btn-outline-secondary btn-sm" onclick="(function(){document.getElementById('reopen-new-form').style.display='none';})()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Requests table -->
+  <div class="card mb-4" style="border-radius:8px;overflow:hidden">
+    <table class="table table-sm table-hover mb-0">
+      <thead style="background:#f1f3f5;font-size:12px;text-transform:uppercase;letter-spacing:.04em">
+        <tr>
+          <th class="px-3 py-2">Candidate</th>
+          <th class="px-3 py-2">Step</th>
+          <th class="px-3 py-2">Reason</th>
+          <th class="px-3 py-2">Requested By</th>
+          <th class="px-3 py-2">Status</th>
+          <th class="px-3 py-2">Remarks</th>
+          <th class="px-3 py-2">Actions</th>
+        </tr>
+      </thead>
+      <tbody style="font-size:13px">
+        <sc-for items="{{ reopenRequests }}">
+          <tr>
+            <td class="px-3 py-2 fw-medium">{{ item.candidate }}</td>
+            <td class="px-3 py-2"><span class="badge" style="background:#e9ecef;color:#495057;font-weight:500">{{ item.step }}</span></td>
+            <td class="px-3 py-2" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="{{ item.reason }}">{{ item.reason }}</td>
+            <td class="px-3 py-2">{{ item.requestedBy }}</td>
+            <td class="px-3 py-2">{{ item.statusBadge }}</td>
+            <td class="px-3 py-2" style="color:#6c757d;font-size:12px">{{ item.remarks }}</td>
+            <td class="px-3 py-2">{{ item.actionButtons }}</td>
+          </tr>
+        </sc-for>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Approve/Reject remark modal (lightweight inline panel) -->
+  <div id="reopen-action-panel" style="display:none;background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:16px;margin-bottom:16px">
+    <div class="fw-medium mb-2" style="font-size:13px">Remarks for decision (optional)</div>
+    <textarea id="reopen-action-remarks" class="form-control form-control-sm mb-2" rows="2" placeholder="Enter remarks…"></textarea>
+    <div class="d-flex gap-2">
+      <button type="button" class="btn btn-success btn-sm" onclick="{{ onConfirmApprove }}">Approve</button>
+      <button type="button" class="btn btn-danger btn-sm" onclick="{{ onConfirmReject }}">Reject</button>
+      <button type="button" class="btn btn-outline-secondary btn-sm" onclick="(function(){document.getElementById('reopen-action-panel').style.display='none';window._poc_pendingActionId=null;})()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Section 2: Corrections History (collapsible) -->
+  <div class="d-flex align-items-center mb-2" style="cursor:pointer" onclick="(function(){var b=document.getElementById('corrections-body');var ic=document.getElementById('corrections-chevron');if(b){var open=b.style.display!=='none';b.style.display=open?'none':'block';ic.setAttribute('data-lucide',open?'chevron-right':'chevron-down');if(window.lucide)lucide.createIcons();}})()">
+    <i id="corrections-chevron" data-lucide="chevron-down" style="width:16px;height:16px;margin-right:6px;color:#6c757d"></i>
+    <h5 class="mb-0 fw-semibold">Corrections History</h5>
+    <span class="badge bg-secondary ms-2" style="font-size:11px">{{ correctionsCount }}</span>
+  </div>
+  <div id="corrections-body">
+    <div class="card" style="border-radius:8px;overflow:hidden">
+      <table class="table table-sm table-hover mb-0">
+        <thead style="background:#f1f3f5;font-size:12px;text-transform:uppercase;letter-spacing:.04em">
+          <tr>
+            <th class="px-3 py-2">Candidate</th>
+            <th class="px-3 py-2">Step</th>
+            <th class="px-3 py-2">Field</th>
+            <th class="px-3 py-2">Old Value</th>
+            <th class="px-3 py-2">New Value</th>
+            <th class="px-3 py-2">Corrected By</th>
+            <th class="px-3 py-2">Timestamp</th>
+          </tr>
+        </thead>
+        <tbody style="font-size:13px">
+          <sc-for items="{{ corrections }}">
+            <tr>
+              <td class="px-3 py-2 fw-medium">{{ item.candidate }}</td>
+              <td class="px-3 py-2"><span class="badge" style="background:#e9ecef;color:#495057;font-weight:500">{{ item.step }}</span></td>
+              <td class="px-3 py-2">{{ item.field }}</td>
+              <td class="px-3 py-2"><span style="color:#dc3545;text-decoration:line-through;font-size:12px">{{ item.oldValue }}</span></td>
+              <td class="px-3 py-2"><span style="color:#198754;font-size:12px">{{ item.newValue }}</span></td>
+              <td class="px-3 py-2">{{ item.correctedBy }}</td>
+              <td class="px-3 py-2" style="color:#6c757d;font-size:12px">{{ item.ts }}</td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+</sc-if>
+<!-- ==HTML_END== -->
+<!-- ==JS_START== -->
+  buildReopenCorrections(d) {
+    // ponytail: action state lives on window._poc_pendingActionId — no extra state layer needed for POC
+    const defaultRequests = [
+      { id: "rr1", candidate: "Aakash Mehta", step: "Score Capture", reason: "Panelist accidentally submitted wrong rubric score for Comm. Skills", requestedBy: "Dr. Priya Nair", status: "pending", remarks: "", ts: "2026-09-01 10:14" },
+      { id: "rr2", candidate: "Sneha Kulkarni", step: "Attendance", reason: "Candidate was marked absent but actually attended the remote session", requestedBy: "Ravi Teja", status: "pending", remarks: "", ts: "2026-09-02 14:30" },
+      { id: "rr3", candidate: "Rohan Desai", step: "Verification", reason: "Category certificate uploaded to wrong field; needs re-verification", requestedBy: "Admin Ops", status: "approved", remarks: "Verified with physical document. Proceed.", ts: "2026-08-29 09:05" },
+      { id: "rr4", candidate: "Meera Joshi", step: "Shortlist Assignment", reason: "Candidate shortlisted under wrong programme code due to data entry error", requestedBy: "Admission Coord.", status: "rejected", remarks: "Shortlist window already closed. Raise formal query.", ts: "2026-08-28 16:45" }
+    ];
+    const defaultCorrections = [
+      { id: "c1", candidate: "Rohan Desai", step: "Verification", field: "Category Certificate", oldValue: "General", newValue: "OBC-NCL", correctedBy: "Admin Ops", ts: "2026-08-30 11:20" },
+      { id: "c2", candidate: "Divya Sharma", step: "Score Capture", field: "Comm. Skills Score", oldValue: "62", newValue: "74", correctedBy: "Dr. Priya Nair", ts: "2026-08-25 15:10" },
+      { id: "c3", candidate: "Kunal Patil", step: "Attendance", field: "Attendance Status", oldValue: "Absent", newValue: "Present", correctedBy: "Ravi Teja", ts: "2026-08-22 09:55" }
+    ];
+
+    const requests = JSON.parse(localStorage.getItem('geta_reopen_requests') || 'null') || defaultRequests;
+    const corrections = JSON.parse(localStorage.getItem('geta_corrections') || 'null') || defaultCorrections;
+    localStorage.setItem('geta_reopen_requests', JSON.stringify(requests));
+    localStorage.setItem('geta_corrections', JSON.stringify(corrections));
+
+    const save = (reqs) => localStorage.setItem('geta_reopen_requests', JSON.stringify(reqs));
+
+    const statusBadge = (status) => {
+      const map = { pending: 'warning', approved: 'success', rejected: 'danger' };
+      return `<span class="badge bg-${map[status] || 'secondary'}">${status.charAt(0).toUpperCase() + status.slice(1)}</span>`;
+    };
+
+    const actionButtons = (req) => {
+      if (req.status !== 'pending') return '<span style="color:#adb5bd;font-size:12px">—</span>';
+      return `<div class="d-flex gap-1">
+        <button type="button" class="btn btn-outline-success btn-sm" style="font-size:11px;padding:2px 8px"
+          onclick="window._poc_pendingActionId='${req.id}';window._poc_pendingAction='approve';var el=document.getElementById('reopen-action-panel');if(el)el.style.display='block';">Approve</button>
+        <button type="button" class="btn btn-outline-danger btn-sm" style="font-size:11px;padding:2px 8px"
+          onclick="window._poc_pendingActionId='${req.id}';window._poc_pendingAction='reject';var el=document.getElementById('reopen-action-panel');if(el)el.style.display='block';">Reject</button>
+      </div>`;
+    };
+
+    // Candidates list for datalist autocomplete
+    const candidateNames = [
+      "Aakash Mehta", "Sneha Kulkarni", "Rohan Desai", "Meera Joshi",
+      "Divya Sharma", "Kunal Patil", "Rahul Verma", "Priya Singh",
+      "Arjun Reddy", "Nisha Patel"
+    ];
+
+    return {
+      candidateOptions: candidateNames.map(name => ({ name })),
+      reopenRequests: requests.map(r => ({
+        ...r,
+        statusBadge: statusBadge(r.status),
+        actionButtons: actionButtons(r)
+      })),
+      corrections: corrections,
+      correctionsCount: corrections.length,
+
+      onSubmitReopenRequest: () => {
+        const cand = (document.getElementById('reopen-candidate') || {}).value || '';
+        const step = (document.getElementById('reopen-step') || {}).value || '';
+        const reason = (document.getElementById('reopen-reason') || {}).value || '';
+        if (!cand || !step || !reason) { this.showToast('Please fill all fields before submitting.'); return; }
+        const reqs = JSON.parse(localStorage.getItem('geta_reopen_requests') || '[]');
+        reqs.unshift({ id: 'rr' + Date.now(), candidate: cand, step, reason, requestedBy: 'Current User', status: 'pending', remarks: '', ts: new Date().toISOString().slice(0,16).replace('T',' ') });
+        save(reqs);
+        document.getElementById('reopen-new-form').style.display = 'none';
+        document.getElementById('reopen-candidate').value = '';
+        document.getElementById('reopen-step').value = '';
+        document.getElementById('reopen-reason').value = '';
+        this.showToast('Reopen request submitted.');
+        this.setState && this.setState({});
+      },
+
+      onConfirmApprove: () => {
+        const id = window._poc_pendingActionId;
+        const remarks = (document.getElementById('reopen-action-remarks') || {}).value || '';
+        const reqs = JSON.parse(localStorage.getItem('geta_reopen_requests') || '[]');
+        const idx = reqs.findIndex(r => r.id === id);
+        if (idx !== -1) { reqs[idx].status = 'approved'; reqs[idx].remarks = remarks; }
+        save(reqs);
+        document.getElementById('reopen-action-panel').style.display = 'none';
+        document.getElementById('reopen-action-remarks').value = '';
+        window._poc_pendingActionId = null;
+        this.showToast('Request approved.');
+        this.setState && this.setState({});
+      },
+
+      onConfirmReject: () => {
+        const id = window._poc_pendingActionId;
+        const remarks = (document.getElementById('reopen-action-remarks') || {}).value || '';
+        const reqs = JSON.parse(localStorage.getItem('geta_reopen_requests') || '[]');
+        const idx = reqs.findIndex(r => r.id === id);
+        if (idx !== -1) { reqs[idx].status = 'rejected'; reqs[idx].remarks = remarks; }
+        save(reqs);
+        document.getElementById('reopen-action-panel').style.display = 'none';
+        document.getElementById('reopen-action-remarks').value = '';
+        window._poc_pendingActionId = null;
+        this.showToast('Request rejected.');
+        this.setState && this.setState({});
+      }
+    };
+  }
+<!-- ==JS_END== -->

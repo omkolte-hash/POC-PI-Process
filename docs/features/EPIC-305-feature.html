@@ -1,0 +1,467 @@
+<!-- ==FEATURE_ID== EPIC-305 -->
+<!-- ==EPIC_TITLE== Print Templates & Document Generation -->
+<!-- ==NAV_GROUP== Print -->
+<!-- ==NAV_ITEMS_JSON== [["print-templates","Print Templates","printer"]] -->
+<!-- ==PAGE_TITLES_JSON== {"print-templates":["Print","Print Templates"]} -->
+<!-- ==RENDERVALS_JSON== {"pageIsPrintTemplates":"page === \"print-templates\""} -->
+<!-- ==BUILD_CALLS_START== -->
+    if (page === "print-templates") Object.assign(base, this.buildPrintTemplates(d));
+<!-- ==BUILD_CALLS_END== -->
+<!-- ==HTML_START== -->
+<sc-if value="{{ pageIsPrintTemplates }}">
+<div style="padding:24px;max-width:1200px">
+
+  <div class="d-flex align-items-center gap-2 mb-4">
+    <i data-lucide="printer" style="width:20px;height:20px;color:var(--color-accent-700)"></i>
+    <h5 class="mb-0">Print Templates</h5>
+  </div>
+
+  <!-- Tab Nav -->
+  <ul class="nav nav-tabs mb-4">
+    <li class="nav-item">
+      <button class="nav-link" onclick="{{ onPtTab1 }}" style="{{ ptTab1Style }}">Templates</button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" onclick="{{ onPtTab2 }}" style="{{ ptTab2Style }}">Generate Documents</button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" onclick="{{ onPtTab3 }}" style="{{ ptTab3Style }}">Generation History</button>
+    </li>
+  </ul>
+
+  <!-- TAB 1: Templates -->
+  <sc-if value="{{ ptTabIsTemplates }}">
+    <div>
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="mb-0">Print Templates</h6>
+        <button class="btn btn-primary btn-sm" onclick="{{ onToggleNewTemplate }}">
+          <i data-lucide="plus" style="width:14px;height:14px"></i> New Template
+        </button>
+      </div>
+
+      <!-- New Template Form -->
+      <sc-if value="{{ ptShowNewForm }}">
+        <div class="card mb-4">
+          <div class="card-header fw-semibold" style="font-size:14px">New Template</div>
+          <div class="card-body">
+            <div class="row g-3 mb-3">
+              <div class="col-md-4">
+                <label class="form-label form-label-sm">Template Name</label>
+                <input type="text" class="form-control form-control-sm" placeholder="e.g. MBA Admit Card 2026"
+                  value="{{ ptNewName }}" oninput="{{ onPtNewNameChange }}" />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label form-label-sm">Document Type</label>
+                <select class="form-select form-select-sm" onchange="{{ onPtNewTypeChange }}">
+                  <option value="">Select type</option>
+                  <option value="Admit Card">Admit Card</option>
+                  <option value="Offer Letter">Offer Letter</option>
+                  <option value="Score Sheet">Score Sheet</option>
+                  <option value="Hall Ticket">Hall Ticket</option>
+                  <option value="Merit Certificate">Merit Certificate</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label form-label-sm">Programme</label>
+                <select class="form-select form-select-sm" onchange="{{ onPtNewProgChange }}">
+                  <option value="All">All Programmes</option>
+                  <option value="MBA">MBA</option>
+                  <option value="CSE">CSE</option>
+                  <option value="BSc AI">BSc AI</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label form-label-sm">Page Orientation</label>
+                <div class="d-flex gap-3 mt-1">
+                  <div class="form-check form-check-sm">
+                    <input class="form-check-input" type="radio" name="ptOrientation" value="Portrait"
+                      checked onchange="{{ onPtNewOrientChange }}" />
+                    <label class="form-check-label" style="font-size:12px">Portrait</label>
+                  </div>
+                  <div class="form-check form-check-sm">
+                    <input class="form-check-input" type="radio" name="ptOrientation" value="Landscape"
+                      onchange="{{ onPtNewOrientChange }}" />
+                    <label class="form-check-label" style="font-size:12px">Landscape</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label form-label-sm fw-semibold">Content Sections to Include</label>
+              <div class="row g-2">
+                <div class="col-md-4">
+                  <div class="form-check form-check-sm">
+                    <input class="form-check-input" type="checkbox" checked disabled />
+                    <label class="form-check-label" style="font-size:12px">Candidate Name &amp; Photo</label>
+                  </div>
+                  <div class="form-check form-check-sm">
+                    <input class="form-check-input" type="checkbox" checked disabled />
+                    <label class="form-check-label" style="font-size:12px">Application Number</label>
+                  </div>
+                  <div class="form-check form-check-sm">
+                    <input class="form-check-input" type="checkbox" checked disabled />
+                    <label class="form-check-label" style="font-size:12px">Barcode / QR Code</label>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-check form-check-sm">
+                    <input class="form-check-input" type="checkbox" checked disabled />
+                    <label class="form-check-label" style="font-size:12px">Programme Details</label>
+                  </div>
+                  <div class="form-check form-check-sm">
+                    <input class="form-check-input" type="checkbox" checked disabled />
+                    <label class="form-check-label" style="font-size:12px">Venue &amp; Date</label>
+                  </div>
+                  <div class="form-check form-check-sm">
+                    <input class="form-check-input" type="checkbox" checked disabled />
+                    <label class="form-check-label" style="font-size:12px">Instructions</label>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-check form-check-sm">
+                    <input class="form-check-input" type="checkbox" />
+                    <label class="form-check-label" style="font-size:12px">Score Summary</label>
+                  </div>
+                  <div class="form-check form-check-sm">
+                    <input class="form-check-input" type="checkbox" />
+                    <label class="form-check-label" style="font-size:12px">Panel Notes</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="alert alert-light border mb-3 p-2" style="font-size:12px">
+              <strong>Available merge fields:</strong>
+              <code>{name}</code>, <code>{app_no}</code>, <code>{programme}</code>,
+              <code>{venue}</code>, <code>{date}</code>, <code>{score}</code>
+            </div>
+
+            <div class="d-flex gap-2">
+              <button class="btn btn-primary btn-sm" onclick="{{ onSaveTemplate }}">Save Template</button>
+              <button class="btn btn-outline-secondary btn-sm" onclick="{{ onToggleNewTemplate }}">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- Templates Table -->
+      <div class="table-responsive">
+        <table class="table table-hover table-sm align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Template Name</th>
+              <th>Document Type</th>
+              <th>Programme</th>
+              <th>Orientation</th>
+              <th>Last Updated</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{ #ptTemplates }}
+            <tr>
+              <td class="fw-semibold">{{ name }}</td>
+              <td><span class="badge bg-secondary">{{ type }}</span></td>
+              <td>{{ programme }}</td>
+              <td>
+                <i data-lucide="{{ orientIcon }}" style="width:14px;height:14px;margin-right:4px"></i>{{ orientation }}
+              </td>
+              <td style="font-size:12px;color:#6c757d">{{ updated }}</td>
+              <td>
+                <button class="btn btn-outline-primary btn-sm py-0 px-2 me-1" onclick="{{ onPreview }}">Preview</button>
+                <button class="btn btn-outline-danger btn-sm py-0 px-2" onclick="{{ onDelete }}">Delete</button>
+              </td>
+            </tr>
+            {{ /ptTemplates }}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- TAB 2: Generate Documents -->
+  <sc-if value="{{ ptTabIsGenerate }}">
+    <div>
+      <h6 class="mb-3">Generate Documents</h6>
+      <div class="card mb-4">
+        <div class="card-body">
+          <div class="row g-3 mb-3">
+            <div class="col-md-4">
+              <label class="form-label form-label-sm fw-semibold">Template</label>
+              <select class="form-select form-select-sm" onchange="{{ onGenTemplateChange }}">
+                <option value="">Select a template</option>
+                {{ #ptTemplateOptions }}
+                <option value="{{ id }}">{{ name }}</option>
+                {{ /ptTemplateOptions }}
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label form-label-sm fw-semibold">Programme</label>
+              <select class="form-select form-select-sm" onchange="{{ onGenProgChange }}">
+                <option value="All">All Programmes</option>
+                <option value="MBA">MBA</option>
+                <option value="CSE">CSE</option>
+                <option value="BSc AI">BSc AI</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label form-label-sm fw-semibold">Category</label>
+              <select class="form-select form-select-sm" onchange="{{ onGenCatChange }}">
+                <option value="All">All Categories</option>
+                <option value="General">General</option>
+                <option value="OBC">OBC</option>
+                <option value="SC">SC</option>
+                <option value="ST">ST</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label form-label-sm fw-semibold">Stage</label>
+              <select class="form-select form-select-sm" onchange="{{ onGenStageChange }}">
+                <option value="All">All</option>
+                <option value="Shortlisted">Shortlisted</option>
+                <option value="Merit Listed">Merit Listed</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <span class="text-muted" style="font-size:13px">
+              Preview: <strong>{{ ptMatchCount }} candidates match</strong>
+            </span>
+            <button class="btn btn-primary btn-sm" onclick="{{ onGenerate }}">
+              <i data-lucide="file-down" style="width:14px;height:14px"></i> Generate Documents
+            </button>
+          </div>
+
+          <!-- Progress Bar -->
+          <sc-if value="{{ printGenerating }}">
+            <div class="mb-3">
+              <div class="d-flex justify-content-between mb-1">
+                <span style="font-size:12px">Generating documents…</span>
+                <span style="font-size:12px">{{ printProgress }}%</span>
+              </div>
+              <div class="progress" style="height:8px">
+                <div class="progress-bar progress-bar-striped progress-bar-animated"
+                  style="width:{{ printProgress }}%"></div>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- Completion -->
+          <sc-if value="{{ printDone }}">
+            <div class="alert alert-success d-flex align-items-center gap-2 py-2" style="font-size:13px">
+              <i data-lucide="check-circle" style="width:16px;height:16px"></i>
+              Generated {{ ptMatchCount }} documents successfully.
+              <button class="btn btn-outline-success btn-sm ms-auto" onclick="{{ onDownloadZip }}">
+                <i data-lucide="archive" style="width:14px;height:14px"></i> Download All (ZIP)
+              </button>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+
+      <h6 class="mb-2" style="font-size:14px">Recent Generations</h6>
+      <div class="table-responsive">
+        <table class="table table-hover table-sm align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Date</th>
+              <th>Template</th>
+              <th>Count</th>
+              <th>Duration</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{ #ptRecentGens }}
+            <tr>
+              <td style="font-size:12px;color:#6c757d">{{ date }}</td>
+              <td>{{ template }}</td>
+              <td><span class="badge bg-primary">{{ count }}</span></td>
+              <td style="font-size:12px">{{ duration }}</td>
+              <td>
+                <button class="btn btn-outline-secondary btn-sm py-0 px-2" onclick="{{ onRegen }}">Re-generate</button>
+              </td>
+            </tr>
+            {{ /ptRecentGens }}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- TAB 3: Generation History -->
+  <sc-if value="{{ ptTabIsHistory }}">
+    <div>
+      <h6 class="mb-3">Generation History</h6>
+      <div class="table-responsive">
+        <table class="table table-hover table-sm align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Date</th>
+              <th>Template</th>
+              <th>Programme</th>
+              <th>Count</th>
+              <th>Generated By</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{ #ptHistory }}
+            <tr>
+              <td style="font-size:12px;color:#6c757d">{{ date }}</td>
+              <td>{{ template }}</td>
+              <td>{{ programme }}</td>
+              <td><span class="badge bg-primary">{{ count }}</span></td>
+              <td style="font-size:12px">{{ generatedBy }}</td>
+              <td><span class="badge {{ statusBadge }}">{{ status }}</span></td>
+              <td>
+                <button class="btn btn-outline-secondary btn-sm py-0 px-2" onclick="{{ onHistRegen }}">Re-generate</button>
+              </td>
+            </tr>
+            {{ /ptHistory }}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</sc-if>
+<!-- ==HTML_END== -->
+<!-- ==JS_START== -->
+  buildPrintTemplates(d) {
+    const TPL_KEY  = 'geta_print_templates';
+    const HIST_KEY = 'geta_print_history';
+
+    const tplSeed = [
+      { id: 1, name: 'MBA Admit Card',    type: 'Admit Card',   programme: 'MBA', orientation: 'Portrait',  updated: '2026-08-10' },
+      { id: 2, name: 'CSE Offer Letter',  type: 'Offer Letter', programme: 'CSE', orientation: 'Portrait',  updated: '2026-08-15' },
+      { id: 3, name: 'Score Summary Sheet', type: 'Score Sheet', programme: 'All', orientation: 'Landscape', updated: '2026-08-20' }
+    ];
+
+    const histSeed = [
+      { id: 1, date: '2026-08-28 14:32', template: 'MBA Admit Card',      programme: 'MBA', count: 134, generatedBy: 'admin@geta.ai', status: 'Completed' },
+      { id: 2, date: '2026-08-25 10:05', template: 'CSE Offer Letter',    programme: 'CSE', count: 62,  generatedBy: 'admin@geta.ai', status: 'Completed' },
+      { id: 3, date: '2026-08-20 09:18', template: 'Score Summary Sheet', programme: 'All', count: 196, generatedBy: 'admin@geta.ai', status: 'Completed' },
+      { id: 4, date: '2026-08-14 16:45', template: 'MBA Admit Card',      programme: 'MBA', count: 118, generatedBy: 'admin@geta.ai', status: 'Completed' }
+    ];
+
+    let templates = JSON.parse(localStorage.getItem(TPL_KEY)  || 'null');
+    let history   = JSON.parse(localStorage.getItem(HIST_KEY) || 'null');
+    if (!templates) { templates = tplSeed; localStorage.setItem(TPL_KEY,  JSON.stringify(templates)); }
+    if (!history)   { history   = histSeed; localStorage.setItem(HIST_KEY, JSON.stringify(history)); }
+
+    const s = this.state;
+    const ptTab        = s.ptTab        || 'templates';
+    const ptShowForm   = s.ptShowForm   || false;
+    const ptNewName    = s.ptNewName    || '';
+    const ptNewType    = s.ptNewType    || '';
+    const ptNewProg    = s.ptNewProg    || 'All';
+    const ptNewOrient  = s.ptNewOrient  || 'Portrait';
+    const ptGenProg    = s.ptGenProg    || 'All';
+    const ptGenCat     = s.ptGenCat     || 'All';
+    const ptGenStage   = s.ptGenStage   || 'All';
+    const ptGenTplId   = s.ptGenTplId   || '';
+    const printGenerating = s.printGenerating || false;
+    const printProgress   = s.printProgress   || 0;
+    const printDone       = s.printDone       || false;
+
+    // ponytail: naive count; filter criteria are cosmetic in the POC
+    const ptMatchCount = ptGenProg === 'All' ? 196 : ptGenProg === 'MBA' ? 134 : ptGenProg === 'CSE' ? 62 : 48;
+
+    const tabStyle = (t) => t === ptTab
+      ? 'border-bottom:2px solid var(--color-accent-700);color:var(--color-accent-700);background:none;border-top:none;border-left:none;border-right:none;padding:8px 16px'
+      : 'border:none;background:none;padding:8px 16px;color:#6c757d';
+
+    const recentGens = history.slice(0, 3).map((h, i) => ({
+      ...h,
+      duration: `${2 + i}s`,
+      onRegen: () => this.showToast('Re-generating — POC: queued for background processing')
+    }));
+
+    return {
+      ptTab1Style: tabStyle('templates'),
+      ptTab2Style: tabStyle('generate'),
+      ptTab3Style: tabStyle('history'),
+      ptTabIsTemplates: ptTab === 'templates',
+      ptTabIsGenerate:  ptTab === 'generate',
+      ptTabIsHistory:   ptTab === 'history',
+      ptShowNewForm: ptShowForm,
+      ptNewName,
+
+      onPtTab1: () => this.setState({ ptTab: 'templates', ptShowForm: false }),
+      onPtTab2: () => this.setState({ ptTab: 'generate', printDone: false }),
+      onPtTab3: () => this.setState({ ptTab: 'history' }),
+
+      onToggleNewTemplate: () => this.setState({ ptShowForm: !ptShowForm, ptNewName: '', ptNewType: '', ptNewProg: 'All', ptNewOrient: 'Portrait' }),
+      onPtNewNameChange:   (e) => this.setState({ ptNewName:   e.target.value }),
+      onPtNewTypeChange:   (e) => this.setState({ ptNewType:   e.target.value }),
+      onPtNewProgChange:   (e) => this.setState({ ptNewProg:   e.target.value }),
+      onPtNewOrientChange: (e) => this.setState({ ptNewOrient: e.target.value }),
+
+      onSaveTemplate: () => {
+        if (!ptNewName || !ptNewType) { this.showToast('Enter template name and type'); return; }
+        const updated = JSON.parse(localStorage.getItem(TPL_KEY) || '[]');
+        updated.push({ id: Date.now(), name: ptNewName, type: ptNewType, programme: ptNewProg, orientation: ptNewOrient, updated: new Date().toISOString().slice(0,10) });
+        localStorage.setItem(TPL_KEY, JSON.stringify(updated));
+        this.setState({ ptShowForm: false, ptNewName: '', ptNewType: '' });
+        this.showToast('Template saved');
+      },
+
+      ptTemplates: templates.map(t => ({
+        ...t,
+        orientIcon: t.orientation === 'Landscape' ? 'rectangle-horizontal' : 'rectangle-vertical',
+        onPreview: () => this.showToast(`POC: Preview of "${t.name}" would open a PDF preview`),
+        onDelete: () => {
+          const upd = JSON.parse(localStorage.getItem(TPL_KEY) || '[]').filter(x => x.id !== t.id);
+          localStorage.setItem(TPL_KEY, JSON.stringify(upd));
+          this.setState({ ptTab: 'templates' });
+          this.showToast('Template deleted');
+        }
+      })),
+
+      ptTemplateOptions: templates.map(t => ({ id: t.id, name: t.name })),
+      ptMatchCount,
+      printGenerating,
+      printProgress,
+      printDone,
+
+      onGenTemplateChange: (e) => this.setState({ ptGenTplId: e.target.value }),
+      onGenProgChange:     (e) => this.setState({ ptGenProg:  e.target.value }),
+      onGenCatChange:      (e) => this.setState({ ptGenCat:   e.target.value }),
+      onGenStageChange:    (e) => this.setState({ ptGenStage: e.target.value }),
+
+      onGenerate: () => {
+        if (!ptGenTplId) { this.showToast('Select a template first'); return; }
+        this.setState({ printGenerating: true, printProgress: 0, printDone: false });
+        // ponytail: fake progress, real impl would poll a job endpoint
+        const iv = setInterval(() => {
+          const cur = (this.state.printProgress || 0);
+          if (cur >= 100) {
+            clearInterval(iv);
+            const hist = JSON.parse(localStorage.getItem(HIST_KEY) || '[]');
+            const tpl  = templates.find(t => String(t.id) === String(ptGenTplId)) || { name: 'Unknown' };
+            hist.unshift({ id: Date.now(), date: new Date().toLocaleString(), template: tpl.name, programme: ptGenProg, count: ptMatchCount, generatedBy: 'admin@geta.ai', status: 'Completed' });
+            localStorage.setItem(HIST_KEY, JSON.stringify(hist));
+            this.setState({ printGenerating: false, printProgress: 100, printDone: true });
+          } else {
+            this.setState({ printProgress: Math.min(cur + 10, 100) });
+          }
+        }, 200);
+      },
+
+      onDownloadZip: () => this.showToast('POC: In production this would download a ZIP file'),
+
+      ptRecentGens: recentGens,
+
+      ptHistory: history.map(h => ({
+        ...h,
+        statusBadge: h.status === 'Completed' ? 'bg-success' : h.status === 'Failed' ? 'bg-danger' : 'bg-warning text-dark',
+        onHistRegen: () => this.showToast('Re-generating — POC: queued for background processing')
+      }))
+    };
+  }
+<!-- ==JS_END== -->

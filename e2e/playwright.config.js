@@ -12,8 +12,8 @@ export default defineConfig({
     // Runs against the deployed GitHub Pages site, not a local server — keep the trailing
     // slash: relative navigations/fetches (e.g. `page.goto('index.html')`) resolve against
     // this as a directory. Without it they'd drop the /POC-PI-Process/ path segment entirely.
-    baseURL: 'https://omkolte-hash.github.io/POC-PI-Process/',
-    headless: false,
+    baseURL: process.env.E2E_BASE_URL || 'https://omkolte-hash.github.io/POC-PI-Process/',
+    headless: process.env.E2E_HEADLESS === '1' ? true : false,
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',

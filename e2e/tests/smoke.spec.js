@@ -43,14 +43,15 @@ test.describe('Role sidebar smoke tests', () => {
     await expect(page.locator('main')).not.toBeEmpty();
 
     const groups = [
-      { group: 'Programmes', links: ['Programmes', 'Academic Years', 'Assessment / PI Configuration', 'Assessment Parameter'] },
-      { group: 'Candidates', links: ['Import Candidates', 'Candidates', 'Shortlisting', 'Approvals'] },
+      { group: 'Programmes', links: ['Programmes'] },
+      { group: 'Candidates', links: ['Candidates', 'Shortlisting', 'Approvals'] },
       { group: 'PI Management', links: ['Sessions', 'Groups', 'Candidate Allocation', 'Zoom Rooms', 'Panelists', 'Panelist Allocation', 'Barcode Labels'] },
       { group: 'Interview Day', links: ['PI Attendance', 'PI Scoring'] },
       { group: 'Verification', links: ['Category Verification'] },
       { group: 'Merit', links: ['Final Scores', 'Merit Processing', 'Merit Approval', 'Merit Releases', 'Waiting List', 'Provisional Letters'] },
       { group: 'Reports', links: ['Dashboard', 'Candidate Reports', 'Session Reports'] },
       { group: 'Approvals', links: ['Sent Mail', 'Pending Approvals'] },
+      { group: 'Settings', links: ['Academic Years', 'Assessment / PI Configuration', 'Assessment Parameter', 'Admission Cycles', 'Fee Structure', 'Document Requirements', 'Roles & Permissions', 'User Memberships', 'Email Templates', 'Print Templates'] },
     ];
     await page.locator('.apsSideLink', { hasText: 'Dashboard' }).click();
     await page.waitForTimeout(300);

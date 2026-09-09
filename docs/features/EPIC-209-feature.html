@@ -1,0 +1,297 @@
+<!-- ==FEATURE_ID== EPIC-209 -->
+<!-- ==EPIC_TITLE== Score Formula Builder -->
+<!-- ==NAV_GROUP== Merit -->
+<!-- ==NAV_ITEMS_JSON== [["formula-builder","Formula Builder","function-square"]] -->
+<!-- ==PAGE_TITLES_JSON== {"formula-builder":["Merit","Formula Builder"]} -->
+<!-- ==RENDERVALS_JSON== {"pageIsFormulaBuilder":"page === \"formula-builder\""} -->
+<!-- ==BUILD_CALLS_START== -->
+    if (page === "formula-builder") Object.assign(base, this.buildFormulaBuilder(d));
+<!-- ==BUILD_CALLS_END== -->
+<!-- ==HTML_START== -->
+<sc-if value="{{ pageIsFormulaBuilder }}">
+<div style="padding:24px;max-width:1400px">
+  <div style="display:flex;gap:24px;align-items:flex-start">
+
+    <!-- LEFT COLUMN: Formula Configuration -->
+    <div style="width:380px;flex-shrink:0;display:flex;flex-direction:column;gap:16px">
+
+      <!-- Score Inputs chip list -->
+      <div class="card">
+        <div class="card-header py-2 fw-semibold" style="font-size:13px">Score Inputs</div>
+        <div class="card-body py-2" style="display:flex;flex-wrap:wrap;gap:6px">
+          <sc-for value="{{ formulaInputChips }}" item="chip">
+            <span class="badge rounded-pill border"
+              style="cursor:pointer;font-size:12px;padding:5px 10px;background:var(--color-accent-50,#eef2ff);color:var(--color-accent-700,#4338ca);border-color:var(--color-accent-200,#c7d2fe)!important"
+              onclick="{{ chip.onInsert }}">{{ chip.label }}</span>
+          </sc-for>
+        </div>
+      </div>
+
+      <!-- Formula Steps -->
+      <div class="card">
+        <div class="card-header py-2 fw-semibold d-flex justify-content-between align-items-center" style="font-size:13px">
+          Formula Steps
+        </div>
+        <div class="card-body p-2" style="display:flex;flex-direction:column;gap:10px">
+          <sc-for value="{{ formulaStepCards }}" item="step">
+            <div class="border rounded p-2" style="font-size:13px;background:#fafafa">
+              <div class="mb-2 d-flex align-items-center gap-2">
+                <label style="font-size:12px;font-weight:600;white-space:nowrap;min-width:90px">Output Column</label>
+                <input type="text" class="form-control form-control-sm" value="{{ step.outputName }}"
+                  oninput="{{ step.onOutputNameChange }}" placeholder="e.g. Final Score" style="font-size:12px">
+              </div>
+              <div style="font-size:11px;font-weight:600;color:#666;margin-bottom:4px">Inputs &amp; Weights</div>
+              <sc-for value="{{ step.weightRows }}" item="wr">
+                <div class="d-flex align-items-center gap-1 mb-1">
+                  <input type="checkbox" checked="{{ wr.included }}" onchange="{{ wr.onToggle }}" style="margin:0">
+                  <span style="flex:1;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ wr.label }}</span>
+                  <input type="number" class="form-control form-control-sm" value="{{ wr.weight }}"
+                    min="0" max="1" step="0.05" oninput="{{ wr.onWeightChange }}"
+                    style="width:60px;font-size:12px;padding:2px 4px" {{ wr.disabledAttr }}>
+                </div>
+              </sc-for>
+              <div class="text-end mt-2">
+                <span style="color:#dc3545;cursor:pointer;font-size:12px" onclick="{{ step.onRemove }}">Remove Step</span>
+              </div>
+            </div>
+          </sc-for>
+          <sc-if value="{{ formulaNoSteps }}">
+            <div class="text-muted text-center py-2" style="font-size:12px">No steps yet. Add one below.</div>
+          </sc-if>
+          <button class="btn btn-sm btn-outline-primary w-100" onclick="{{ onAddFormulaStep }}" style="font-size:12px">
+            <i data-lucide="plus" style="width:13px;height:13px"></i> Add Formula Step
+          </button>
+        </div>
+      </div>
+
+      <!-- Final Score column picker -->
+      <div class="card">
+        <div class="card-header py-2 fw-semibold" style="font-size:13px">Final Score Column</div>
+        <div class="card-body py-2 px-3" style="display:flex;flex-direction:column;gap:6px">
+          <sc-for value="{{ formulaFinalColOptions }}" item="fco">
+            <div class="form-check form-check-sm">
+              <input class="form-check-input" type="radio" name="finalColRadio" value="{{ fco.value }}"
+                checked="{{ fco.selected }}" onchange="{{ fco.onSelect }}" style="cursor:pointer">
+              <label class="form-check-label" style="font-size:13px;cursor:pointer">{{ fco.label }}</label>
+            </div>
+          </sc-for>
+          <sc-if value="{{ formulaNoSteps }}">
+            <div class="text-muted" style="font-size:12px">Add a step first.</div>
+          </sc-if>
+        </div>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="d-flex gap-2">
+        <button class="btn btn-sm btn-outline-secondary flex-fill" onclick="{{ onFormulaPreview }}" style="font-size:13px">
+          <i data-lucide="play" style="width:13px;height:13px"></i> Preview
+        </button>
+        <button class="btn btn-sm btn-primary flex-fill" onclick="{{ onFormulaSave }}" style="font-size:13px">
+          <i data-lucide="save" style="width:13px;height:13px"></i> Save Formula
+        </button>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: Preview & Results -->
+    <div style="flex:1;min-width:0">
+      <div class="card h-100">
+        <div class="card-header py-2 d-flex justify-content-between align-items-center">
+          <span class="fw-semibold" style="font-size:13px">Preview &amp; Results</span>
+          <sc-if value="{{ formulaPreviewReady }}">
+            <button class="btn btn-sm btn-success" onclick="{{ onFormulaCommit }}" style="font-size:12px">
+              <i data-lucide="check-circle" style="width:13px;height:13px"></i> Commit Formula
+            </button>
+          </sc-if>
+        </div>
+        <div class="card-body">
+
+          <!-- Empty state -->
+          <sc-if value="{{ formulaPreviewEmpty }}">
+            <div class="d-flex flex-column align-items-center justify-content-center text-muted"
+              style="min-height:280px;gap:12px">
+              <i data-lucide="bar-chart-2" style="width:48px;height:48px;opacity:0.25"></i>
+              <p class="mb-0" style="font-size:14px">Click <strong>Preview</strong> to run the formula against sample candidates.</p>
+            </div>
+          </sc-if>
+
+          <!-- Results table -->
+          <sc-if value="{{ formulaPreviewReady }}">
+            <div class="table-responsive">
+              <table class="table table-hover table-sm mb-0" style="font-size:13px">
+                <thead class="table-light">
+                  <tr>
+                    <th style="width:48px">Rank</th>
+                    <th>Name</th>
+                    <th class="text-end">Interview</th>
+                    <th class="text-end">GD</th>
+                    <th class="text-end">Written</th>
+                    <th class="text-end fw-bold">Final Score</th>
+                    <th style="width:160px"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <sc-for value="{{ formulaPreviewRows }}" item="pr">
+                    <tr>
+                      <td class="text-center">
+                        <sc-if value="{{ pr.rankOne }}"><span class="badge bg-warning text-dark">1</span></sc-if>
+                        <sc-if value="{{ pr.rankNotOne }}"><span class="text-muted">{{ pr.rank }}</span></sc-if>
+                      </td>
+                      <td class="fw-semibold">{{ pr.name }}</td>
+                      <td class="text-end">{{ pr.interview }}</td>
+                      <td class="text-end">{{ pr.gd }}</td>
+                      <td class="text-end">{{ pr.written }}</td>
+                      <td class="text-end fw-bold" style="color:var(--color-accent-700,#4338ca)">{{ pr.finalScore }}</td>
+                      <td>
+                        <div style="background:#e9ecef;border-radius:4px;height:10px;overflow:hidden">
+                          <div style="height:10px;border-radius:4px;background:var(--bs-primary,#0d6efd);width:{{ pr.barPct }}%"></div>
+                        </div>
+                      </td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+            </div>
+            <div class="text-muted mt-3" style="font-size:11px">
+              <i data-lucide="info" style="width:11px;height:11px"></i>
+              Final score = weighted sum of included inputs. Weights are applied as-configured; they need not sum to 1.
+            </div>
+          </sc-if>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</sc-if>
+<!-- ==HTML_END== -->
+<!-- ==JS_START== -->
+  buildFormulaBuilder(d) {
+    const KEY = 'geta_formula_config';
+    const INPUTS = [
+      { key: 'interview', label: 'Interview Score' },
+      { key: 'gd',        label: 'GD Score' },
+      { key: 'written',   label: 'Written Test Score' },
+      { key: 'qual',      label: 'Qualifying %' },
+      { key: 'tenth',     label: '10th %' },
+      { key: 'twelfth',   label: '12th %' },
+      { key: 'technical', label: 'Technical Score' }
+    ];
+    const SAMPLES = [
+      { name: 'Alice Kumar',  interview: 88, gd: 82, written: 79, qual: 91, tenth: 85, twelfth: 87, technical: 84 },
+      { name: 'Bob Sharma',   interview: 74, gd: 68, written: 82, qual: 76, tenth: 72, twelfth: 74, technical: 70 },
+      { name: 'Carol Singh',  interview: 92, gd: 88, written: 85, qual: 95, tenth: 90, twelfth: 88, technical: 91 },
+      { name: 'David Rao',    interview: 65, gd: 71, written: 69, qual: 72, tenth: 68, twelfth: 70, technical: 63 },
+      { name: 'Eva Patel',    interview: 80, gd: 76, written: 83, qual: 85, tenth: 82, twelfth: 79, technical: 77 }
+    ];
+    const DEFAULT_CONFIG = {
+      steps: [{ id: 1, output: 'Final Score', weights: { interview: 0.4, gd: 0.3, written: 0.3 }, included: { interview: true, gd: true, written: true } }],
+      finalCol: 'Final Score'
+    };
+
+    // ponytail: config lives in localStorage; normalise missing `included` from older saves
+    let cfg = JSON.parse(localStorage.getItem(KEY) || 'null');
+    if (!cfg) { cfg = DEFAULT_CONFIG; localStorage.setItem(KEY, JSON.stringify(cfg)); }
+    cfg.steps.forEach(s => {
+      if (!s.included) {
+        s.included = {};
+        INPUTS.forEach(i => { s.included[i.key] = !!(s.weights && s.weights[i.key]); });
+      }
+    });
+
+    const save = () => localStorage.setItem(KEY, JSON.stringify(cfg));
+    const refresh = () => this.setState({ formulaKey: Date.now() });
+
+    // Chip list
+    const formulaInputChips = INPUTS.map(inp => ({
+      label: inp.label,
+      onInsert: () => this.showToast(`Insert "${inp.label}" into your step weights above.`)
+    }));
+
+    // Step cards
+    const formulaStepCards = cfg.steps.map((step, si) => ({
+      outputName: step.output,
+      onOutputNameChange: (e) => {
+        cfg.steps[si].output = e.target.value;
+        // also update finalCol if it matched the old value
+        if (cfg.finalCol === step.output) cfg.finalCol = e.target.value;
+        save(); refresh();
+      },
+      onRemove: () => {
+        cfg.steps.splice(si, 1);
+        if (!cfg.steps.some(s => s.output === cfg.finalCol)) cfg.finalCol = cfg.steps[0] ? cfg.steps[0].output : '';
+        save(); refresh();
+      },
+      weightRows: INPUTS.map(inp => ({
+        label: inp.label,
+        included: !!step.included[inp.key],
+        disabledAttr: step.included[inp.key] ? '' : 'disabled',
+        weight: step.weights[inp.key] !== undefined ? step.weights[inp.key] : 0,
+        onToggle: (e) => {
+          cfg.steps[si].included[inp.key] = e.target.checked;
+          if (!e.target.checked) cfg.steps[si].weights[inp.key] = 0;
+          save(); refresh();
+        },
+        onWeightChange: (e) => {
+          cfg.steps[si].weights[inp.key] = parseFloat(e.target.value) || 0;
+          save(); refresh();
+        }
+      }))
+    }));
+
+    // Final col radio options
+    const formulaFinalColOptions = cfg.steps.map(s => ({
+      value: s.output,
+      label: s.output,
+      selected: cfg.finalCol === s.output,
+      onSelect: () => { cfg.finalCol = s.output; save(); refresh(); }
+    }));
+
+    // Preview state (stored in component state to survive re-renders without persisting)
+    const previewRows = this.state.formulaPreviewRows || null;
+
+    const computeScore = (cand) => {
+      const step = cfg.steps.find(s => s.output === cfg.finalCol);
+      if (!step) return 0;
+      let score = 0;
+      INPUTS.forEach(inp => {
+        if (step.included[inp.key]) score += (cand[inp.key] || 0) * (step.weights[inp.key] || 0);
+      });
+      return Math.round(score * 10) / 10;
+    };
+
+    const formulaPreviewRows = previewRows ? (() => {
+      const scored = SAMPLES.map((c, i) => ({ ...c, finalScore: computeScore(c) }))
+        .sort((a, b) => b.finalScore - a.finalScore)
+        .map((c, i) => ({ ...c, rank: i + 1, rankOne: i === 0, rankNotOne: i !== 0, barPct: Math.round(c.finalScore) }));
+      return scored;
+    })() : [];
+
+    return {
+      formulaInputChips,
+      formulaStepCards,
+      formulaNoSteps: cfg.steps.length === 0,
+      formulaFinalColOptions,
+      formulaPreviewEmpty: !previewRows,
+      formulaPreviewReady: !!previewRows,
+      formulaPreviewRows,
+      onAddFormulaStep: () => {
+        const newId = Date.now();
+        cfg.steps.push({ id: newId, output: 'Score ' + (cfg.steps.length + 1), weights: { interview: 0.5, gd: 0.5 }, included: { interview: true, gd: true } });
+        if (!cfg.finalCol) cfg.finalCol = cfg.steps[0].output;
+        save(); refresh();
+      },
+      onFormulaPreview: () => {
+        this.setState({ formulaPreviewRows: true, formulaKey: Date.now() });
+      },
+      onFormulaSave: () => {
+        save();
+        this.showToast('Formula saved.');
+      },
+      onFormulaCommit: () => {
+        save();
+        this.showToast('Formula committed and ready for merit processing.');
+      }
+    };
+  }
+<!-- ==JS_END== -->
