@@ -1214,35 +1214,6 @@ a:hover{color:var(--color-accent);text-decoration:underline}
             </div>
           </sc-for>
         </div></sc-if>
-        <sc-if value="{{ pageIsBarcodeLabels }}"><div>
-          <div style="display:flex;gap:var(--space-4);margin-bottom:var(--space-4);flex-wrap:wrap;align-items:flex-end">
-            <div class="field" style="margin:0;max-width:320px"><label>Session</label><select class="input" value="{{ blSessionId }}" onChange="{{ onBlSessionChange }}">
-              <sc-for list="{{ blSessions }}" as="s" hint-placeholder-count="5"><option value="{{ s.id }}">{{ s.label }}</option></sc-for>
-            </select></div>
-            <div class="field" style="margin:0;max-width:280px"><label>Group</label><select class="input" value="{{ blGroupId }}" onChange="{{ onBlGroupChange }}">
-              <sc-for list="{{ blGroups }}" as="g" hint-placeholder-count="4"><option value="{{ g.id }}">{{ g.label }}</option></sc-for>
-            </select></div>
-          </div>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-2)">
-            <div style="font-size:13px;opacity:0.6">{{ blResultCount }} candidate(s)</div>
-            <div style="display:flex;gap:var(--space-2)">
-              <button type="button" class="btn btn-secondary" onClick="{{ onBlPrintSelected }}">Print</button>
-              <button type="button" class="btn btn-primary" onClick="{{ onBlPrintAll }}">Print All</button>
-            </div>
-          </div>
-          <table class="table"><thead><tr>
-            <th><input type="checkbox" checked="{{ blAllSelected }}" onChange="{{ onBlToggleSelectAll }}" /></th>
-            <th>S.No.</th><th>Applicant ID</th><th>Name</th><th>PI ID</th>
-          </tr></thead><tbody>
-            <sc-for list="{{ blRows }}" as="r" hint-placeholder-count="8">
-              <tr>
-                <td><input type="checkbox" checked="{{ r.checked }}" onChange="{{ r.onToggle }}" /></td>
-                <td>{{ r.sno }}</td><td>{{ r.id }}</td><td>{{ r.name }}</td><td>{{ r.piId }}</td>
-              </tr>
-            </sc-for>
-          </tbody></table>
-          <sc-if value="{{ blNoResults }}"><p style="font-size:13px;opacity:0.6">No candidates allocated to this group yet.</p></sc-if>
-        </div></sc-if>
         <sc-if value="{{ pageIsPiAttendance }}"><div>
           <sc-if value="{{ atCanMark }}"><p style="font-size:12px;opacity:0.6;margin-top:0">Mark attendance here, or panelists can mark it themselves from the Panelist Portal.</p></sc-if>
           <sc-if value="{{ atReadOnly }}"><p style="font-size:12px;opacity:0.6;margin-top:0">Read-only &mdash; only Coordinator/Institute Admin can mark attendance.</p></sc-if>
@@ -4239,7 +4210,7 @@ const PAGE_RESTORE_FALLBACK = {
 const CYCLE_GATED_PAGES = new Set([
   "import-candidates", "import-wizard", "candidate-list", "candidate-profile",
   "shortlist", "shortlist-approvals", "shortlist-detail",
-  "sessions", "candidate-allocation", "zoom-rooms", "panelist-allocation", "barcode-labels",
+  "sessions", "candidate-allocation", "zoom-rooms", "panelist-allocation",
   "pi-attendance", "pi-scoring", "verification",
   "final-scores", "merit-processing", "merit-approval", "merit-batch-detail", "merit-releases", "waiting-list", "provisional-letters",
   "reports-candidates", "reports-sessions"
@@ -4579,7 +4550,6 @@ class Component extends DCLogic {
     cvSearch: "", cvCategoryFilter: "ALL", cvInstituteStatusFilter: "ALL",
     cvModalCandidateId: null, cvModalDocType: null, cvModalChecked: false, cvModalStatus: "",
     maCategory: "ALL", mrCategory: "ALL", mrDates: {}, mrWlCategory: "OPEN", mrWlCount: "", mrWlLastFeeDate: "", mrWlNextDate: "", wlCategory: "ALL",
-    blSessionId: "", blGroupId: "", blSelectedIds: [],
     pgFeeProgrammeId: null, pgFeeDraft: null,
     plSelectedIds: [],
     rcCategory: "ALL",
@@ -5361,7 +5331,7 @@ class Component extends DCLogic {
     return [
       { title: "Programmes", items: [["programmes", "Programmes", "book-open"]] },
       { title: "Candidates", items: [["candidate-list", "Candidates", "users"], ["shortlist", "Create Shortlist", "filter"], ["shortlist-approvals", "Shortlist Approval", "circle-check"]] },
-      { title: "PI Management", items: [["sessions", "Sessions", "calendar-clock"], ["sessions", "Groups", "layout-grid"], ["candidate-allocation", "Candidate Allocation", "shuffle"], ["zoom-rooms", "Zoom Rooms", "video"], ["panelists", "Panelists", "user-check"], ["barcode-labels", "Barcode Labels", "barcode"], ["panelist-allocation", "Panelist Allocation", "user-cog"]] },
+      { title: "PI Management", items: [["sessions", "Sessions", "calendar-clock"], ["sessions", "Groups", "layout-grid"], ["candidate-allocation", "Candidate Allocation", "shuffle"], ["zoom-rooms", "Zoom Rooms", "video"], ["panelists", "Panelists", "user-check"], ["panelist-allocation", "Panelist Allocation", "user-cog"]] },
       { title: "Interview Day", items: [["pi-attendance", "PI Attendance", "clipboard-check"], ["pi-scoring", "PI Scoring", "star"]] },
       { title: "Verification", items: [["verification", "Category Verification", "shield-check"]] },
       { title: "Merit", items: [["final-scores", "Final Scores", "award"], ["merit-processing", "Merit Processing", "cog"], ["merit-approval", "Merit Approval", "badge-check"], ["merit-releases", "Merit Releases", "megaphone"], ["waiting-list", "Waiting List", "list-ordered"], ["provisional-letters", "Provisional Letters", "mail"], ["seat-allocation", "Seat Allocation", "grid"], ["formula-builder", "Formula Builder", "function-square"], ["offer-management", "Offer Management", "file-badge-2"]] },
@@ -5446,7 +5416,7 @@ class Component extends DCLogic {
       shortlist: ["Candidates", "Create Shortlist"], "shortlist-approvals": ["Candidates", "Shortlist Approval"],
       sessions: ["PI Management", "PI Session Management"], "candidate-allocation": ["PI Management", "Candidate Allocation"],
       "zoom-rooms": ["PI Management", "Zoom Room Allocation"], panelists: ["PI Management", "Panelist Management"], "panelist-allocation": ["PI Management", "Panelist Allocation"],
-      "panelist-detail": ["PI Management", "Panelist Detail"], "barcode-labels": ["PI Management", "Barcode Labels"],
+      "panelist-detail": ["PI Management", "Panelist Detail"],
       "pi-attendance": ["Interview Day", "PI Attendance"], "pi-scoring": ["Interview Day", "PI Scoring"],
       verification: ["Verification", "Merit Readiness"],
       "final-scores": ["Merit", "Candidate Final Score"], "merit-processing": ["Merit", "Merit Processing"], "merit-approval": ["Merit", "Merit Approval"], "merit-batch-detail": ["Merit", "Merit Batch Detail"], "merit-releases": ["Merit", "Merit List Releases"], "waiting-list": ["Merit", "Waiting List"], "provisional-letters": ["Merit", "Provisional Letters"],
@@ -5620,7 +5590,6 @@ class Component extends DCLogic {
       pageIsShortlistDetail: page === "shortlist-detail" && !cycleGateBlocked,
       pageIsSessions: page === "sessions" && !cycleGateBlocked, pageIsCandidateAllocation: page === "candidate-allocation" && !cycleGateBlocked, pageIsZoomRooms: page === "zoom-rooms" && !cycleGateBlocked,
       pageIsPanelists: page === "panelists", pageIsPanelistDetail: page === "panelist-detail", pageIsPanelistAllocation: page === "panelist-allocation" && !cycleGateBlocked,
-      pageIsBarcodeLabels: page === "barcode-labels" && !cycleGateBlocked,
       pageIsPiAttendance: page === "pi-attendance" && !cycleGateBlocked, pageIsPiScoring: page === "pi-scoring" && !cycleGateBlocked,
       pageIsVerification: page === "verification" && !cycleGateBlocked, pageIsFinalScores: page === "final-scores" && !cycleGateBlocked, pageIsMeritProcessing: page === "merit-processing" && !cycleGateBlocked,
       pageIsMeritApproval: page === "merit-approval" && !cycleGateBlocked, pageIsMeritBatchDetail: page === "merit-batch-detail" && !cycleGateBlocked, pageIsMeritReleases: page === "merit-releases" && !cycleGateBlocked, pageIsWaitingList: page === "waiting-list" && !cycleGateBlocked,
@@ -5666,7 +5635,6 @@ class Component extends DCLogic {
     if (page === "panelists") Object.assign(base, this.buildPanelists(d));
     if (page === "panelist-detail") Object.assign(base, this.buildPanelistDetail(d));
     if (page === "panelist-allocation") Object.assign(base, this.buildPanelistAllocation(d));
-    if (page === "barcode-labels") Object.assign(base, this.buildBarcodeLabels(d));
     if (page === "pi-attendance") Object.assign(base, this.buildAttendance(d));
     if (page === "pi-scoring") Object.assign(base, this.buildPiScoring(d));
     if (page === "verification") Object.assign(base, this.buildVerification(d));
@@ -8865,98 +8833,6 @@ class Component extends DCLogic {
           onAssign: () => this.onAssignPanelist(session.id, g.id)
         };
       }) : []
-    };
-  }
-
-  onBlSessionChange(e) { this.setState({ blSessionId: e.target.value, blGroupId: "", blSelectedIds: [] }); }
-  onBlGroupChange(e) { this.setState({ blGroupId: e.target.value, blSelectedIds: [] }); }
-  onBlToggleSelect(id) {
-    const ids = this.state.blSelectedIds;
-    this.setState({ blSelectedIds: ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id] });
-  }
-  onBlToggleSelectAll(allIds) {
-    const ids = this.state.blSelectedIds;
-    const allSelected = allIds.length > 0 && allIds.every((id) => ids.includes(id));
-    this.setState({ blSelectedIds: allSelected ? [] : allIds });
-  }
-  onBlPrintSelected(candidates) {
-    const chosen = candidates.filter((c) => this.state.blSelectedIds.includes(c.id));
-    if (!chosen.length) { this.showToast("Select at least one candidate."); return; }
-    this.printBarcodeLabels(chosen);
-  }
-  onBlPrintAll(candidates) {
-    if (!candidates.length) { this.showToast("No candidates allocated to this group yet."); return; }
-    this.printBarcodeLabels(candidates);
-  }
-  // Opens a dedicated print tab, one label per candidate (Admissions header, PI ID, name, then a barcode
-  // encoding the Applicant ID with the Applicant ID printed underneath — scanning the barcode reads the
-  // Applicant ID). Built via createElement/textContent rather than string-concatenated HTML so a candidate
-  // name or ID containing markup can never inject into the print tab.
-  printBarcodeLabels(candidates) {
-    const w = window.open("", "_blank");
-    if (!w) { this.showToast("Pop-up blocked — allow pop-ups for this site to print labels."); return; }
-    // The embedded closing html/body tags below are escaped so their raw source text never literally
-    // spells one out — some dev-server live-reload injectors (e.g. VS Code Live Server) do a naive string
-    // search for the file's first such closing tag to splice their reload script into, and would otherwise
-    // match this JS string's fake one instead of the real document's closing tag near the end of the file.
-    w.document.write(`<!DOCTYPE html><html><head><title>Barcode Labels</title><style>
-      body { font-family: Arial, sans-serif; margin: 24px; }
-      .label { border: 1px solid #333; width: 340px; padding: 16px; text-align: center; margin-bottom: 16px; page-break-inside: avoid; }
-      .label-head { font-weight: 700; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; }
-      .label-piid { font-weight: 700; font-size: 22px; margin-bottom: 4px; }
-      .label-name { font-weight: 700; font-size: 14px; margin-bottom: 10px; }
-      .barcode { display: block; margin: 0 auto; }
-      .label-code { font-size: 12px; margin-top: 4px; }
-      .noprint { margin-bottom: 16px; }
-      @media print { .noprint { display: none; } }
-    </style><script src="https://unpkg.com/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"><\/script></head>
-    <body><div class="noprint"><button id="printBtn" type="button">Print</button></div><div id="labels"></div><\/body><\/html>`);
-    w.document.close();
-    const printBtn = w.document.getElementById("printBtn");
-    if (printBtn) printBtn.addEventListener("click", () => w.print());
-    const build = () => {
-      const root = w.document.getElementById("labels");
-      candidates.forEach((c) => {
-        const label = w.document.createElement("div"); label.className = "label";
-        const head = w.document.createElement("div"); head.className = "label-head"; head.textContent = "Admissions";
-        const piid = w.document.createElement("div"); piid.className = "label-piid"; piid.textContent = c.piId || "—";
-        const name = w.document.createElement("div"); name.className = "label-name"; name.textContent = c.name;
-        const svg = w.document.createElementNS("http://www.w3.org/2000/svg", "svg"); svg.setAttribute("class", "barcode");
-        const code = w.document.createElement("div"); code.className = "label-code"; code.textContent = c.id;
-        label.append(head, piid, name, svg, code);
-        root.appendChild(label);
-        w.JsBarcode(svg, c.id, { format: "CODE128", displayValue: false, height: 50, margin: 0 });
-      });
-    };
-    if (w.JsBarcode) build();
-    else w.addEventListener("load", build);
-  }
-  buildBarcodeLabels(d) {
-    const pid = d.activeProgrammeId;
-    const ayid = d.activeAcademicYearByProgramme[pid];
-    const cid = this.engine.activeCycleId(d, pid, ayid);
-    const sessions = d.sessions.filter((s) => s.programmeId === pid && s.cycleId === cid);
-    const sid = this.state.blSessionId || (sessions[0] && sessions[0].id) || "";
-    const session = sessions.find((s) => s.id === sid);
-    const groups = session ? session.groups : [];
-    const gid = this.state.blGroupId || (groups[0] && groups[0].id) || "";
-    const group = groups.find((g) => g.id === gid);
-    const candidates = group && session ? group.candidateIds.map((id) => d.candidates.find((c) => c.id === id && c.programmeId === session.programmeId && c.academicYearId === session.academicYearId && c.cycleId === session.cycleId)).filter(Boolean) : [];
-    const candidateIds = candidates.map((c) => c.id);
-    return {
-      blSessions: sessions.map((s, i) => ({ id: s.id, label: `Session ${String(i + 1).padStart(2, "0")} — ${this.engine.fmtDate(s.date)}` })),
-      blSessionId: sid, onBlSessionChange: (e) => this.onBlSessionChange(e),
-      blGroups: groups.map((g) => ({ id: g.id, label: `${g.name} (${g.candidateIds.length} candidate(s))` })),
-      blGroupId: gid, onBlGroupChange: (e) => this.onBlGroupChange(e),
-      blAllSelected: candidateIds.length > 0 && candidateIds.every((id) => this.state.blSelectedIds.includes(id)),
-      onBlToggleSelectAll: () => this.onBlToggleSelectAll(candidateIds),
-      blResultCount: candidates.length, blNoResults: candidates.length === 0,
-      blRows: candidates.map((c, i) => ({
-        sno: i + 1, id: c.id, name: c.name, piId: c.piId || "—",
-        checked: this.state.blSelectedIds.includes(c.id), onToggle: () => this.onBlToggleSelect(c.id)
-      })),
-      onBlPrintSelected: () => this.onBlPrintSelected(candidates),
-      onBlPrintAll: () => this.onBlPrintAll(candidates)
     };
   }
 
