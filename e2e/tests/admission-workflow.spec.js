@@ -143,7 +143,7 @@ test('full admission lifecycle: programme creation through provisional letters',
       await row.locator('button:has-text("View")').first().click();
       const modal = page.locator('.dialog', { hasText: 'View Document' });
       await expect(modal).toBeVisible();
-      await modal.locator('select').selectOption({ label: 'Valid' });
+      await modal.locator('button:has-text("Mark as Valid")').click();
       await modal.locator('input[type="checkbox"]').check();
       await modal.locator('button:has-text("Submit")').click();
       await expect(modal).toBeHidden();

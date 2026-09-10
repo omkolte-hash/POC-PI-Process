@@ -22,6 +22,13 @@ a:hover{color:var(--color-accent);text-decoration:underline}
 .apsSideGroup{justify-content:space-between;font-size:13px;font-weight:600;padding:8px 20px;color:color-mix(in srgb, var(--color-text) 75%, transparent)}
 .apsSideGroup:hover{background:var(--color-neutral-100)}
 .apsSideGroup:focus-visible{outline:2px solid var(--color-accent);outline-offset:-2px}
+.doc-verify-btn{border-width:1px;border-style:solid;background:var(--color-surface)}
+.doc-verify-valid{color:#16a34a;border-color:#16a34a}
+.doc-verify-valid:hover{background:#16a34a;color:#fff}
+.doc-verify-valid.is-active{background:#16a34a;color:#fff}
+.doc-verify-invalid{color:#dc2626;border-color:#dc2626}
+.doc-verify-invalid:hover{background:#dc2626;color:#fff}
+.doc-verify-invalid.is-active{background:#dc2626;color:#fff}
 </style>
 </helmet>
 <div style="display:flex;height:100vh;width:100%;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);overflow:hidden">
@@ -1359,11 +1366,12 @@ a:hover{color:var(--color-accent);text-decoration:underline}
                   </tr>
                 </tbody></table>
                 <sc-if value="{{ cvModal.hasDoc }}"><div>
-                  <div class="field" style="max-width:280px"><label>Document Status *</label><select class="input" value="{{ cvModal.status }}" onChange="{{ cvModal.onStatusChange }}">
-                    <option value="">---Select---</option>
-                    <option value="valid">Valid</option>
-                    <option value="invalid">InValid</option>
-                  </select></div>
+                  <div class="field"><label>Document Status *</label>
+                    <div style="display:flex;gap:var(--space-2)">
+                      <button type="button" class="btn doc-verify-btn doc-verify-valid {{ cvModal.validActiveCls }}" onClick="{{ cvModal.onMarkValid }}">Mark as Valid</button>
+                      <button type="button" class="btn doc-verify-btn doc-verify-invalid {{ cvModal.invalidActiveCls }}" onClick="{{ cvModal.onMarkInvalid }}">Mark as Invalid</button>
+                    </div>
+                  </div>
                   <label style="display:flex;align-items:center;gap:6px;font-size:13px;margin-top:var(--space-2);cursor:pointer">
                     <input type="checkbox" checked="{{ cvModal.checked }}" onChange="{{ cvModal.onCheckToggle }}" />I have reviewed this document.
                   </label>
@@ -9150,7 +9158,9 @@ class Component extends DCLogic {
         hasDoc: !!doc.fileName, noDoc: !doc.fileName, fileName: doc.fileName, dataUrl: doc.dataUrl,
         statusBadgeCls, statusBadgeLabel,
         checked: this.state.cvModalChecked, onCheckToggle: () => this.setState({ cvModalChecked: !this.state.cvModalChecked }),
-        status: this.state.cvModalStatus, onStatusChange: (e) => this.setState({ cvModalStatus: e.target.value }),
+        status: this.state.cvModalStatus,
+        onMarkValid: () => this.setState({ cvModalStatus: "valid" }), onMarkInvalid: () => this.setState({ cvModalStatus: "invalid" }),
+        validActiveCls: this.state.cvModalStatus === "valid" ? "is-active" : "", invalidActiveCls: this.state.cvModalStatus === "invalid" ? "is-active" : "",
         showSubmit: this.state.cvModalChecked, onSubmit: () => this.onCvSubmitStatus(),
         onClose: () => this.onCvCloseModal()
       };
