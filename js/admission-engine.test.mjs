@@ -9,7 +9,7 @@ import {
   setActiveCycle, deleteAdmissionCycle, buildCandidateDocuments, approveShortlistList, revertShortlist,
   runMeritProcessing, approveMeritBatch, savePanelist, approvePanelist, fmtDateTime,
   unassignPanelist, panelistInstituteId, panelistServesProgramme,
-  sendGroupMeetingNotification, placeholderCandidateEmail, markAttendance
+  sendGroupMeetingNotification, placeholderCandidateEmail, markAttendance, editLockedAttendance
 } from "./admission-engine.js";
 
 function makeReadyCandidate(ds, programmeId, academicYearId, overrides) {
@@ -156,6 +156,36 @@ test("markAttendance locks the candidate when marked with lock=true, and a locke
   const res2 = markAttendance(ds, "C20", "pi", "present", prog.id, ay, undefined);
   assert.ok(res2 && res2.error, "a locked candidate's PI attendance must be refused");
   assert.equal(c.piAttendance, "absent", "attendance must stay whatever it was locked at");
+});
+
+// Follow-up: Institute Admin can override a locked PI attendance record (see index.html
+// canEditLockedAttendance) via editLockedAttendance, without weakening markAttendance's lock for
+// everyone else.
+test("editLockedAttendance overrides a locked candidate's status, keeps it locked, and logs a timeline entry", () => {
+  const ds = generateDataset();
+  const inst = createInstitute(ds, { name: "Test Institute", code: "TI" });
+  const prog = createProgramme(ds, { instituteId: inst.id, name: "Test Programme", code: "TP" });
+  const ay = ds.activeAcademicYearByProgramme[prog.id];
+  const c = makeReadyCandidate(ds, prog.id, ay, { id: "C22" });
+
+  markAttendance(ds, "C22", "pi", "present", prog.id, ay, undefined, true);
+  assert.equal(c.piAttendanceLocked, true);
+
+  const res = editLockedAttendance(ds, "C22", "absent", prog.id, ay, undefined);
+  assert.equal(res, undefined, "a successful override returns no error");
+  assert.equal(c.piAttendance, "absent");
+  assert.equal(c.piAttendanceLocked, true, "the override must not unlock the candidate");
+  assert.deepEqual(c.piScores, {}, "switching to absent must clear scores, same as markAttendance");
+  assert.equal(c.piTotal, null);
+  assert.ok(
+    c.timeline.some((t) => t.label === "Attendance changed to Absent by Institute Admin"),
+    "the override must be logged on the candidate's timeline"
+  );
+
+  // markAttendance itself must still refuse the (still-locked) candidate.
+  const res2 = markAttendance(ds, "C22", "pi", "present", prog.id, ay, undefined);
+  assert.ok(res2 && res2.error, "the normal mark path must still be refused for a locked candidate");
+  assert.equal(c.piAttendance, "absent", "attendance must stay whatever the override left it at");
 });
 
 // moveCandidatesAllocation already clears piAttendance back to "pending" for a re-allocated
