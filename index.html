@@ -1058,6 +1058,7 @@ a:hover{color:var(--color-accent);text-decoration:underline}
                     <td>{{ g.panelistNames }}</td>
                     <td style="white-space:nowrap">
                       <button type="button" class="btn btn-outline-secondary btn-sm me-1" onClick="{{ g.onSaveLink }}">Save Link</button>
+                      <button type="button" class="btn btn-outline-secondary btn-sm" onClick="{{ g.onSendNotification }}" disabled="{{ g.notifyDisabled }}">Send Notification</button>
                     </td>
                   </tr>
                 </sc-for>
@@ -8650,6 +8651,10 @@ class Component extends DCLogic {
     const link = (this.state.zrLinkDrafts && this.state.zrLinkDrafts[groupId]) || "";
     this.mutate((ds) => this.engine.setZoomRoomLink(ds, sessionId, groupId, link), (r) => r.error ? r.error : "Zoom Room link saved.");
   }
+  onSendGroupMeetingNotification(sessionId, groupId) {
+    this.mutate((ds) => this.engine.sendGroupMeetingNotification(ds, sessionId, groupId),
+      (r) => r.error ? r.error : `Demo notification recorded for ${r.sent} candidate(s) (placeholder addresses) — see Sent Mail.`);
+  }
   buildZoomRooms(d) {
     const pid = d.activeProgrammeId;
     const ayid = d.activeAcademicYearByProgramme[pid];
@@ -8666,6 +8671,8 @@ class Component extends DCLogic {
             linkDraft: drafts[g.id] != null ? drafts[g.id] : (g.zoomRoom.link || ""),
             onLinkDraftChange: (e) => this.setState({ zrLinkDrafts: { ...drafts, [g.id]: e.target.value } }),
             onSaveLink: () => this.onSaveZoomLink(s.id, g.id),
+            onSendNotification: () => this.onSendGroupMeetingNotification(s.id, g.id),
+            notifyDisabled: !g.zoomRoom.link || !g.candidateIds.length,
             panelistNames: assignedIds.map((pid2) => (d.panelists.find((p) => p.id === pid2) || {}).name).join(", ") || "No panelists assigned yet"
           };
         })
