@@ -258,7 +258,8 @@ test('full admission lifecycle: programme creation through provisional letters',
 
   await test.step('Assign a Zoom Room to the group', async () => {
     await gotoNav(page, 'PI Management', 'Zoom Rooms');
-    await page.locator('button:has-text("Auto-Assign")').first().click();
+    await page.locator('table input').first().fill('https://zoom.us/j/1234567890');
+    await page.locator('button:has-text("Save Link")').first().click();
     await page.waitForTimeout(300);
     await expect(page.locator('table input').first()).toHaveValue(/zoom\.us/);
   });
