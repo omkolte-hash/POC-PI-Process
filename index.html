@@ -776,7 +776,9 @@ a:hover{color:var(--color-accent);text-decoration:underline}
               </div>
               <div style="margin-top:var(--space-4);display:flex;gap:var(--space-2);align-items:center">
                 <sc-if value="{{ sdShowSend }}"><button type="button" class="btn btn-primary" onClick="{{ sdOnSendForApproval }}">Send for Approval</button></sc-if>
+                <sc-if value="{{ sdShowRevert }}"><button type="button" class="btn btn-secondary" onClick="{{ sdOnRevertShortlist }}">Revert Shortlist</button></sc-if>
                 <sc-if value="{{ sdApprovalTagLabel }}"><span style="font-size:13px;opacity:0.7">{{ sdApprovalTagLabel }}</span></sc-if>
+                <sc-if value="{{ sdRevertedLabel }}"><span style="font-size:13px;opacity:0.7">{{ sdRevertedLabel }}</span></sc-if>
                 <button type="button" class="btn btn-ghost" onClick="{{ sdOnDownloadCsv }}"><i data-lucide="download" style="width:14px;height:14px"></i>Download CSV</button>
               </div>
             </div>
@@ -8017,6 +8019,9 @@ class Component extends DCLogic {
     }), (res) => res.list ? `${res.list.id} created with ${res.count} candidate(s). Director approval required next.` : "No eligible candidates matched — nothing shortlisted.");
     this.setState({ slPreviewed: false });
   }
+  onRevertShortlist(listId) {
+    this.mutate((ds) => this.engine.revertShortlist(ds, listId), (r) => r.error ? r.error : `Shortlist reverted — ${r.count} candidate(s) set to Draft.`);
+  }
   buildShortlist(d) {
     const pid = d.activeProgrammeId;
     const ayid = d.activeAcademicYearByProgramme[pid];
@@ -8123,6 +8128,9 @@ class Component extends DCLogic {
       sdShowSend: btn.showSend && l.status !== "rejected", sdApprovalTagLabel: btn.tagLabel,
       sdOnSendForApproval: () => this.onSendForApproval("shortlist", l.id, l.programmeId, l.academicYearId, `Shortlist ${l.id} \u2014 ${criteriaLabel}, ${l.candidateIds.length} candidate(s)`, "shortlist-detail",
         `Criteria: ${criteriaLabel}\n\n${this.formatCandidateListForMail(d, l.candidateIds, l.programmeId, l.academicYearId, l.rankField || "Rank", (c) => (l.rankField ? c[l.rankField] : "\u2014"))}`, l.cycleId),
+      sdShowRevert: l.status === "rejected" && !l.reverted,
+      sdOnRevertShortlist: () => this.onRevertShortlist(l.id),
+      sdRevertedLabel: l.reverted ? "Shortlist reverted \u2014 candidates set to Draft." : "",
       sdCandidateRows,
       sdOnDownloadCsv: () => this.downloadCsv(`${l.id}-candidates.csv`,
         ["Applicant ID", "Name", "Category", "SLAT Score", "Status"],

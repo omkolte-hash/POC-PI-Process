@@ -587,6 +587,21 @@ export function approveShortlistList(ds, listId, levelIndex, decision, comments)
   }
 }
 
+// Explicit Director/SIU action once a shortlist has been rejected at any level — puts every candidate
+// on it back into the "yet-to-shortlist" pool (the same bucket confirmShortlist draws from), i.e. Draft.
+export function revertShortlist(ds, listId) {
+  const list = ds.shortlists.find((l) => l.id === listId);
+  if (!list) return { error: "Shortlist not found." };
+  if (list.status !== "rejected") return { error: "Only a rejected shortlist can be reverted." };
+  const date = nowISO().slice(0, 10);
+  const candidates = list.candidateIds
+    .map((id) => ds.candidates.find((c) => c.id === id && c.programmeId === list.programmeId && c.academicYearId === list.academicYearId && c.cycleId === list.cycleId))
+    .filter(Boolean);
+  candidates.forEach((c) => { c.shortlistStatus = "yet-to-shortlist"; c.shortlistId = null; c.timeline.push({ label: `Shortlist Reverted (${listId}) — status set to Draft`, date }); });
+  list.reverted = true;
+  return { ok: true, count: candidates.length };
+}
+
 export function computeReportingTime(startTime, minutesBefore) {
   const start = parseTimeToMinutes(startTime);
   if (start == null) return null;
