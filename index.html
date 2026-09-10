@@ -146,6 +146,10 @@ a:hover{color:var(--color-accent);text-decoration:underline}
         </select></div></sc-if>
         <sc-if value="{{ fileName }}"><span class="tag tag-neutral" title="Saving to this file on every change"><i data-lucide="file-json" style="width:12px;height:12px"></i>{{ fileName }}</span></sc-if>
         <sc-if value="{{ notFileConnected }}"><span class="tag tag-accent" title="Changes are not being saved to disk">Not Saving</span></sc-if>
+        <sc-if value="{{ currentUserName }}"><div style="font-size:12px;text-align:right;line-height:1.3">
+          <div style="font-weight:600">{{ currentUserName }}</div>
+          <div style="opacity:0.6">{{ currentUserRoleLabel }}</div>
+        </div></sc-if>
         <button type="button" class="btn btn-ghost" onClick="{{ onLogout }}">Log Out</button>
       </div>
     </header>
@@ -4055,7 +4059,7 @@ a:hover{color:var(--color-accent);text-decoration:underline}
     <header style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:var(--space-4);padding:var(--space-3) var(--space-6);border-bottom:1px solid var(--color-divider);background:var(--color-surface)">
       <div>
         <div style="font-family:var(--font-heading);font-weight:var(--font-heading-weight);font-size:18px">Panelist Portal</div>
-        <div style="font-size:12px;opacity:0.6">{{ pnName }}</div>
+        <div style="font-size:12px;opacity:0.6">{{ pnName }} &middot; Panelist</div>
       </div>
       <button type="button" class="btn btn-ghost" onClick="{{ onLogout }}">Log Out</button>
     </header>
@@ -5521,12 +5525,23 @@ class Component extends DCLogic {
       dashboardLinkStyle: linkStyle(page === "dashboard" || page === "super-admin-dashboard"),
       goDashboard: () => this.goTo(roleIsSuperAdmin ? "super-admin-dashboard" : "dashboard"),
       pageIsDashboard: page === "dashboard",
-      instituteLabel: roleIsSuperAdmin ? "Super Admin \u00b7 Platform Console" : ""
+      instituteLabel: roleIsSuperAdmin ? "Super Admin \u00b7 Platform Console" : "",
+      currentUserName: roleIsSuperAdmin ? "Super Admin" : "",
+      currentUserRoleLabel: roleIsSuperAdmin ? "Super Admin" : ""
     };
     if (!this.state.loaded) return base;
     const d = this.state.data;
     const institute = roleIsInstitute ? d.institutes.find((i) => i.id === auth.instituteId) : null;
     base.instituteLabel = roleIsSuperAdmin ? "Super Admin \u00b7 Platform Console" : (institute ? institute.name : "");
+    if (roleIsInstituteAdmin) {
+      base.currentUserName = institute ? institute.adminName : "";
+      base.currentUserRoleLabel = "Institute Admin";
+    } else if (auth.role === "institute-staff") {
+      const staffMember = (d.staff || []).find((s) => s.id === auth.staffId);
+      const staffRole = (d.roles || []).find((r) => r.id === auth.roleId);
+      base.currentUserName = staffMember ? staffMember.name : "";
+      base.currentUserRoleLabel = staffRole ? staffRole.name : "Institute Staff";
+    }
     const instProgrammes = roleIsInstitute ? d.programmes.filter((p) => p.instituteId === auth.instituteId) : d.programmes;
     base.activeProgrammeId = d.activeProgrammeId;
     base.programmeOptions = instProgrammes.map((p) => ({ ...p, selected: p.id === d.activeProgrammeId }));
