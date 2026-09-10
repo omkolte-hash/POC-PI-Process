@@ -999,6 +999,7 @@ export function moveCandidatesAllocation(ds, candidateIds, toSessionId, toGroupI
     // Any PI attendance/score already recorded belongs to the old group's panel — it means nothing for the
     // new one, so clear it rather than letting a stale score/lock silently ride along to a different panel.
     c.piAttendance = "pending";
+    c.piAttendanceLocked = false;
     c.piScores = {};
     c.piScoreLocked = {};
     c.piNotes = {};
@@ -1246,10 +1247,14 @@ export function deletePanelistApprovalLevel(ds, id) {
   ds.panelistApprovalChain = (ds.panelistApprovalChain || []).filter((l) => l.id !== id);
 }
 
-export function markAttendance(ds, candidateId, kind, status, programmeId, academicYearId, cycleId) {
+// `lock` is set by the PI Attendance page's confirm-and-mark flow (see buildAttendance) — once set,
+// PI attendance is frozen until a re-allocation clears it (see moveCandidatesAllocation), so any
+// other caller (e.g. the Panelist Portal) marking the same candidate afterwards gets refused below.
+export function markAttendance(ds, candidateId, kind, status, programmeId, academicYearId, cycleId, lock) {
   const c = ds.candidates.find((x) => x.id === candidateId && x.programmeId === programmeId && x.academicYearId === academicYearId && x.cycleId === cycleId);
   if (!c) return;
   if (kind === "registration") { c.registrationAttendance = status; return; }
+  if (c.piAttendanceLocked) return { error: "Attendance is locked for this candidate." };
   c.piAttendance = status;
   if (status === "absent") {
     // An absent candidate was never actually scored by the panel — any score/lock recorded before
@@ -1264,6 +1269,7 @@ export function markAttendance(ds, candidateId, kind, status, programmeId, acade
   } else {
     recomputeOutcome(ds, c);
   }
+  if (lock) c.piAttendanceLocked = true;
 }
 
 // Each assigned panelist submits their own score independently; piTotal is the

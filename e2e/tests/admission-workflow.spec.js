@@ -289,10 +289,15 @@ test('full admission lifecycle: programme creation through provisional letters',
     await page.waitForTimeout(300);
     const presentButtons = page.locator('table button:has-text("Present")');
     await expect(presentButtons).toHaveCount(OPEN_IDS.length);
+    // Present/Absent open a confirm popup; "Mark" records the attendance and locks it, so the
+    // row's buttons disappear afterward — always take the first one still showing.
     for (let i = 0; i < OPEN_IDS.length; i++) {
-      await presentButtons.nth(i).click();
+      await presentButtons.first().click();
+      await page.waitForTimeout(150);
+      await page.locator('.dialog', { hasText: 'Confirm Attendance' }).locator('button:has-text("Mark")').click();
       await page.waitForTimeout(150);
     }
+    await expect(presentButtons).toHaveCount(0);
   });
 
   for (let i = 0; i < 2; i++) {

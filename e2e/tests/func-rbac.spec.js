@@ -242,9 +242,9 @@ test('Coordinator can mark PI attendance; the staff-role Panelist sees the same 
   await page.waitForTimeout(200);
   await page.locator('button:has-text("Join Meeting")').click();
   await page.waitForTimeout(300);
-  // Zoom card renders regardless of whether a real link is assigned yet (shared demo data may or
-  // may not have one) — either the join button or the "not assigned" message is always shown.
-  await expect(page.locator('text=/Join Zoom Meeting|No Zoom link assigned/')).toBeVisible();
+  // No in-app video window anymore — top-right is a disabled "Join Meeting" button plus this
+  // note when the group has no Zoom link yet (setupProgrammeWithAllocatedCandidate never sets one).
+  await expect(page.locator('text=No Zoom link assigned to this group yet.')).toBeVisible();
   await expect(page.locator('table button:has-text("Present")').first()).toBeVisible();
 
   // Staff-role Panelist: identical Zoom-window layout, but read-only — no mark buttons.
@@ -261,8 +261,8 @@ test('Coordinator can mark PI attendance; the staff-role Panelist sees the same 
   await page.waitForTimeout(200);
   await page.locator('button:has-text("Join Meeting")').click();
   await page.waitForTimeout(300);
-  // Zoom card renders regardless of whether a real link is assigned yet (shared demo data may or
-  // may not have one) — either the join button or the "not assigned" message is always shown.
-  await expect(page.locator('text=/Join Zoom Meeting|No Zoom link assigned/')).toBeVisible();
+  // No in-app video window anymore — top-right is a disabled "Join Meeting" button plus this
+  // note when the group has no Zoom link yet (setupProgrammeWithAllocatedCandidate never sets one).
+  await expect(page.locator('text=No Zoom link assigned to this group yet.')).toBeVisible();
   await expect(page.locator('button:has-text("Present")')).toHaveCount(0);
 });

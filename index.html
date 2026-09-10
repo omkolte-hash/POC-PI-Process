@@ -1220,35 +1220,58 @@ a:hover{color:var(--color-accent);text-decoration:underline}
           <sc-if value="{{ atReadOnly }}"><p style="font-size:12px;opacity:0.6;margin-top:0">Read-only &mdash; only Coordinator/Institute Admin can mark attendance.</p></sc-if>
 
           <sc-if value="{{ atJoined }}"><div>
-            <button type="button" class="btn btn-ghost" onClick="{{ onAtLeave }}" style="margin-bottom:var(--space-3)">&larr; Back to Sessions</button>
-            <div style="font-size:16px;font-weight:600;margin-bottom:var(--space-4)">{{ atGroupLabel }}</div>
-            <sc-if value="{{ atNoCandidates }}"><p style="font-size:13px;opacity:0.6">No candidates have been allocated to this group yet.</p></sc-if>
-            <div style="display:flex;gap:var(--space-4);align-items:flex-start">
-              <div style="flex:3;min-width:0;aspect-ratio:16/9;border-radius:var(--radius-md);background:#eef2ff;border:1px solid #c7d2fe;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:16px;text-align:center">
-                <i data-lucide="video" style="width:32px;height:32px;color:#4338ca"></i>
-                <sc-if value="{{ atHasZoomLink }}"><div>
-                  <a href="{{ atZoomLink }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">
-                    <i data-lucide="external-link" style="width:14px;height:14px"></i> Join Zoom Meeting
-                  </a>
-                </div></sc-if>
-                <sc-if value="{{ atNoZoomLink }}"><div style="font-size:13px;opacity:0.6">No Zoom link assigned to this group yet.</div></sc-if>
-                <sc-if value="{{ atHasZoomLink }}"><div style="font-size:11px;opacity:0.5;font-family:monospace;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ atZoomLink }}</div></sc-if>
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:var(--space-3);flex-wrap:wrap;margin-bottom:var(--space-4)">
+              <div>
+                <button type="button" class="btn btn-ghost" onClick="{{ onAtLeave }}" style="margin-bottom:var(--space-2)">&larr; Back to Sessions</button>
+                <div style="font-size:16px;font-weight:600">{{ atGroupLabel }}</div>
               </div>
-              <div style="flex:2;min-width:280px">
-                <table class="table"><thead><tr><th>Applicant ID</th><th>Name</th><th>Category</th><th>Attendance</th><sc-if value="{{ atCanMark }}"><th>Actions</th></sc-if></tr></thead><tbody>
-                  <sc-for list="{{ atRows }}" as="r" hint-placeholder-count="6">
-                    <tr>
-                      <td>{{ r.id }}</td><td>{{ r.name }}</td><td>{{ r.category }}</td>
-                      <td><span class="{{ r.attCls }}">{{ r.attLabel }}</span></td>
-                      <sc-if value="{{ atCanMark }}"><td>
-                        <button type="button" class="btn btn-sm btn-outline-success me-1" onClick="{{ r.onMarkPresent }}">Present</button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" onClick="{{ r.onMarkAbsent }}">Absent</button>
-                      </td></sc-if>
-                    </tr>
-                  </sc-for>
-                </tbody></table>
+              <div style="text-align:right">
+                <sc-if value="{{ atHasZoomLink }}"><a href="{{ atZoomLink }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+                  <i data-lucide="video" style="width:14px;height:14px"></i> Join Meeting
+                </a></sc-if>
+                <sc-if value="{{ atNoZoomLink }}"><div>
+                  <button type="button" class="btn btn-primary" disabled>Join Meeting</button>
+                  <div style="font-size:11px;opacity:0.6;margin-top:4px">No Zoom link assigned to this group yet.</div>
+                </div></sc-if>
               </div>
             </div>
+            <sc-if value="{{ atNoCandidates }}"><p style="font-size:13px;opacity:0.6">No candidates have been allocated to this group yet.</p></sc-if>
+            <div style="display:flex;gap:var(--space-3);margin-bottom:var(--space-3);flex-wrap:wrap;align-items:flex-end">
+              <div class="field" style="margin:0;flex:1;max-width:280px"><label>Search</label><input class="input" placeholder="Applicant ID or name" value="{{ atSearch }}" onChange="{{ onAtSearch }}" /></div>
+              <div class="field" style="margin:0;max-width:200px"><label>Attendance</label><select class="input" value="{{ atStatusFilter }}" onChange="{{ onAtStatusFilter }}">
+                <option value="ALL">All</option>
+                <option value="pending">Not marked</option>
+                <option value="present">Present</option>
+                <option value="absent">Absent</option>
+              </select></div>
+            </div>
+            <table class="table"><thead><tr><th>Applicant ID</th><th>Name</th><th>Category</th><th>Attendance</th><sc-if value="{{ atCanMark }}"><th>Actions</th></sc-if></tr></thead><tbody>
+              <sc-for list="{{ atRows }}" as="r" hint-placeholder-count="6">
+                <tr>
+                  <td>{{ r.id }}</td><td>{{ r.name }}</td><td>{{ r.category }}</td>
+                  <td><span class="{{ r.attCls }}">{{ r.attLabel }}</span> <sc-if value="{{ r.locked }}"><i data-lucide="lock" style="width:12px;height:12px;opacity:0.6;vertical-align:middle" title="Locked"></i></sc-if></td>
+                  <sc-if value="{{ atCanMark }}"><td>
+                    <sc-if value="{{ r.locked }}"><span style="font-size:12px;opacity:0.5">Locked</span></sc-if>
+                    <sc-if value="{{ r.unlocked }}"><div>
+                      <button type="button" class="btn btn-sm btn-outline-success me-1" onClick="{{ r.onMarkPresent }}">Present</button>
+                      <button type="button" class="btn btn-sm btn-outline-secondary" onClick="{{ r.onMarkAbsent }}">Absent</button>
+                    </div></sc-if>
+                  </td></sc-if>
+                </tr>
+              </sc-for>
+            </tbody></table>
+            <sc-if value="{{ atNoResults }}"><p style="font-size:13px;opacity:0.6">No candidates match the current filters.</p></sc-if>
+
+            <sc-if value="{{ atConfirm }}"><div class="dialog-backdrop">
+              <div class="dialog" style="width:min(420px,100%)">
+                <div class="dialog-title">Confirm Attendance</div>
+                <div class="dialog-body"><p>Do you want to mark <strong>{{ atConfirm.name }}</strong> as {{ atConfirm.statusLabel }}?</p></div>
+                <div class="dialog-actions">
+                  <button type="button" class="btn btn-primary" onClick="{{ atConfirm.onConfirm }}">Mark</button>
+                  <button type="button" class="btn btn-ghost" onClick="{{ atConfirm.onCancel }}">Cancel</button>
+                </div>
+              </div>
+            </div></sc-if>
           </div></sc-if>
 
           <sc-if value="{{ atNotJoined }}"><div>
@@ -4220,7 +4243,7 @@ const CYCLE_GATED_PAGES = new Set([
 // happens to produce.
 const CANDIDATE_SYSTEM_FIELDS = new Set([
   "id", "programmeId", "academicYearId", "category", "shortlistStatus", "shortlistId",
-  "allocation", "piId", "registrationAttendance", "piAttendance", "piScores", "piNotes",
+  "allocation", "piId", "registrationAttendance", "piAttendance", "piAttendanceLocked", "piScores", "piNotes",
   "piScoreLocked", "piTotal", "apvScore", "verification", "outcome", "finalScore",
   "meritCategory", "meritBatchId", "rank", "waitingListNumber", "meritApproval",
   "meritListReleaseId", "timeline", "importLineage"
@@ -4542,6 +4565,7 @@ class Component extends DCLogic {
     scCandidateId: "",
     scSessionFilter: "ALL", scGroupFilter: "ALL", scSearch: "",
     atSessionFilter: "ALL", atGroupFilter: "ALL", atJoinedSessionId: null, atJoinedGroupId: null,
+    atSearch: "", atStatusFilter: "ALL", atConfirm: null,
     vCandidateId: "", fsCategory: "ALL", mpCategory: "OPEN", mpCriteria: "count", mpCount: "", mpCutoff: "", mpWaitingSize: "",
     cvSearch: "", cvCategoryFilter: "ALL", cvInstituteStatusFilter: "ALL",
     cvModalCandidateId: null, cvModalDocType: null, cvModalChecked: false, cvModalStatus: "",
@@ -4872,7 +4896,7 @@ class Component extends DCLogic {
   fillSampleCred(role, cred) {
     this.setState({ loginRole: role, loginEmail: cred.email, loginPassword: cred.password, loginError: "" });
   }
-  onLogout() { this.setState({ auth: null, loginEmail: "", loginPassword: "", page: "dashboard", pnJoinedSessionId: null, pnJoinedGroupId: null, pnSelectedCandidateId: null, atJoinedSessionId: null, atJoinedGroupId: null, atSessionFilter: "ALL", atGroupFilter: "ALL" }); }
+  onLogout() { this.setState({ auth: null, loginEmail: "", loginPassword: "", page: "dashboard", pnJoinedSessionId: null, pnJoinedGroupId: null, pnSelectedCandidateId: null, atJoinedSessionId: null, atJoinedGroupId: null, atSessionFilter: "ALL", atGroupFilter: "ALL", atSearch: "", atStatusFilter: "ALL", atConfirm: null }); }
   statusTag(key) {
     const m = (this.engine && this.engine.STATUS_META[key]) || { label: key, cls: "tag-neutral" };
     return { tagCls: `tag ${m.cls}`, statusLabel: m.label };
@@ -8837,15 +8861,25 @@ class Component extends DCLogic {
     };
   }
 
-  // Join-a-meeting flow, same shape as the Panelist Portal (pick -> Join Meeting -> split view),
-  // except Coordinator picks any session/group in the programme rather than only their own
-  // assigned ones. Once joined: the simulated Zoom window on one side, a plain list of every
-  // student in that group and their attendance status on the other \u2014 nothing else. Coordinator/
-  // Institute Admin can mark present/absent from the list; everyone else who can see this page
-  // (Director/Registrar/Admission Officer/staff-role Panelist) gets the identical read-only view.
+  // Join-a-meeting flow, same shape as the Panelist Portal (pick -> Join Meeting -> full-screen
+  // list). Once joined: no in-app video window \u2014 "Join Meeting" top-right opens the group's own
+  // Zoom link in a new tab, and the rest of the screen is a searchable/filterable list of every
+  // student in that group with their attendance status. Coordinator/Institute Admin can mark
+  // present/absent (via a confirm popup that locks the status once marked); everyone else who can
+  // see this page (Director/Registrar/Admission Officer/staff-role Panelist) gets the identical
+  // read-only view, locked rows included.
   onAtSessionFilterChange(e) { this.setState({ atSessionFilter: e.target.value, atGroupFilter: "ALL" }); }
   onAtJoin() { this.setState({ atJoinedSessionId: this.state.atSessionFilter, atJoinedGroupId: this.state.atGroupFilter }); }
-  onAtLeave() { this.setState({ atJoinedSessionId: null, atJoinedGroupId: null }); }
+  onAtLeave() { this.setState({ atJoinedSessionId: null, atJoinedGroupId: null, atSearch: "", atStatusFilter: "ALL", atConfirm: null }); }
+  onAtSearch(e) { this.setState({ atSearch: e.target.value }); }
+  onAtStatusFilterChange(e) { this.setState({ atStatusFilter: e.target.value }); }
+  onAtMarkCancel() { this.setState({ atConfirm: null }); }
+  // "Mark" is the only way to set PI attendance from this page \u2014 it both calls markAttendance and
+  // locks the result (the `true` trailing arg); there's no unlock UI, so this can't be undone here.
+  onAtMarkConfirm(candidateId, name, status, pid, ayid, cid) {
+    this.mutate((ds) => this.engine.markAttendance(ds, candidateId, "pi", status, pid, ayid, cid, true), (r) => (r && r.error) ? r.error : `${name} marked ${status} and locked.`);
+    this.setState({ atConfirm: null });
+  }
   buildAttendance(d) {
     const pid = d.activeProgrammeId;
     const ayid = d.activeAcademicYearByProgramme[pid];
@@ -8881,14 +8915,34 @@ class Component extends DCLogic {
 
     const cands = d.candidates.filter((c) => c.allocation && c.allocation.sessionId === session.id && c.allocation.groupId === group.id);
     base.atNoCandidates = cands.length === 0;
-    base.atRows = cands.map((c) => {
+
+    const search = (this.state.atSearch || "").trim().toLowerCase();
+    const statusFilter = this.state.atStatusFilter || "ALL";
+    base.atSearch = this.state.atSearch || "";
+    base.onAtSearch = (e) => this.onAtSearch(e);
+    base.atStatusFilter = statusFilter;
+    base.onAtStatusFilter = (e) => this.onAtStatusFilterChange(e);
+    let filtered = cands;
+    if (search) filtered = filtered.filter((c) => c.id.toLowerCase().includes(search) || c.name.toLowerCase().includes(search));
+    if (statusFilter !== "ALL") filtered = filtered.filter((c) => (c.piAttendance || "pending") === statusFilter);
+    base.atNoResults = cands.length > 0 && filtered.length === 0;
+
+    base.atRows = filtered.map((c) => {
       const tag = this.statusTag(c.piAttendance);
+      const locked = !!c.piAttendanceLocked;
+      const askMark = (status) => this.setState({ atConfirm: {
+        name: c.name, statusLabel: status,
+        onConfirm: () => this.onAtMarkConfirm(c.id, c.name, status, pid, ayid, cid),
+        onCancel: () => this.onAtMarkCancel()
+      } });
       return {
         id: c.id, name: c.name, category: c.category, attCls: tag.tagCls, attLabel: tag.statusLabel,
-        onMarkPresent: () => this.mutate((ds) => this.engine.markAttendance(ds, c.id, "pi", "present", pid, ayid, cid), `${c.name} marked present.`),
-        onMarkAbsent: () => this.mutate((ds) => this.engine.markAttendance(ds, c.id, "pi", "absent", pid, ayid, cid), `${c.name} marked absent.`)
+        locked, unlocked: !locked,
+        onMarkPresent: () => askMark("present"),
+        onMarkAbsent: () => askMark("absent")
       };
     });
+    base.atConfirm = this.state.atConfirm;
     return base;
   }
 
