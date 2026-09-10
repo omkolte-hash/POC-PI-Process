@@ -219,9 +219,27 @@ export function parseCsvText(text) {
 // there's nowhere a real certificate could actually come from before an admin reviews it. To keep the real
 // workflow — documents already exist, the admin only approves/rejects them — a placeholder document is
 // attached automatically at import time, standing in for whatever was submitted during the real application.
+// It's a real minimal PDF (hand-built, no library) rather than a text stub, so "View Document" opens an
+// actual document in the browser's PDF viewer instead of a bare disclaimer string.
 function placeholderDocument(candidateId, label) {
-  const text = `Placeholder ${label} document for ${candidateId}. No real file was submitted — this stands in for whatever document would have been uploaded during the actual application, for prototype purposes.`;
-  return { fileName: `${candidateId}_${label.replace(/\s+/g, "_")}.pdf`, dataUrl: `data:text/plain;charset=utf-8,${encodeURIComponent(text)}` };
+  const esc = (s) => String(s).replace(/[\\()]/g, (c) => `\\${c}`);
+  const lines = [esc(label), `Candidate: ${esc(candidateId)}`, "Placeholder document for prototype purposes.", "No real file was submitted for this candidate."];
+  const content = lines.map((line, i) => `BT /F1 ${i === 0 ? 16 : 11} Tf 50 ${700 - i * 22} Td (${line}) Tj ET`).join("\n");
+  const objects = [
+    "<</Type/Catalog/Pages 2 0 R>>",
+    "<</Type/Pages/Kids[3 0 R]/Count 1>>",
+    "<</Type/Page/Parent 2 0 R/Resources<</Font<</F1 4 0 R>>>>/MediaBox[0 0 612 792]/Contents 5 0 R>>",
+    "<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>",
+    `<</Length ${content.length}>>\nstream\n${content}\nendstream`
+  ];
+  let pdf = "%PDF-1.4\n";
+  const offsets = [];
+  objects.forEach((obj, i) => { offsets.push(pdf.length); pdf += `${i + 1} 0 obj\n${obj}\nendobj\n`; });
+  const xrefAt = pdf.length;
+  pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+  offsets.forEach((off) => { pdf += `${String(off).padStart(10, "0")} 00000 n \n`; });
+  pdf += `trailer<</Size ${objects.length + 1}/Root 1 0 R>>\nstartxref\n${xrefAt}\n%%EOF`;
+  return { fileName: `${candidateId}_${label.replace(/\s+/g, "_")}.pdf`, dataUrl: `data:application/pdf;base64,${btoa(pdf)}` };
 }
 
 // Builds the verification.documents map for one candidate: one entry per programme.requiredDocuments

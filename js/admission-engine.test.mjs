@@ -6,7 +6,7 @@ import {
   generateDataset, createInstitute, createProgramme, setApvScore, setScoringFormula,
   moveCandidatesAllocation, confirmShortlist, createApprovalRequest, sendApprovalMail,
   generateMailOtp, verifyMailOtp, createAdmissionCycle, activeCycleId, cyclesForScope,
-  setActiveCycle, deleteAdmissionCycle
+  setActiveCycle, deleteAdmissionCycle, buildCandidateDocuments
 } from "./admission-engine.js";
 
 function makeReadyCandidate(ds, programmeId, academicYearId, overrides) {
@@ -170,4 +170,15 @@ test("deleteAdmissionCycle refuses to delete a cycle with candidates, and reassi
   assert.ok(res.ok);
   assert.equal(cyclesForScope(ds, prog.id, ay).length, 1);
   assert.equal(activeCycleId(ds, prog.id, ay), r1.id, "active slot still points at the remaining cycle");
+});
+
+// Category Verification's "View Document" opens verification.documents[key].dataUrl directly in a new
+// tab — it must be an actual, openable document (not a plaintext stub) for the preview to look valid.
+test("buildCandidateDocuments seeds a real PDF, not a plaintext stub", () => {
+  const docs = buildCandidateDocuments("C1", "SC", [{ key: "category", label: "Category Certificate", appliesToCategories: ["SC"] }]);
+  const doc = docs.category;
+  assert.match(doc.dataUrl, /^data:application\/pdf;base64,/, "must be a PDF data URL, not data:text/plain");
+  const pdfBytes = Buffer.from(doc.dataUrl.split(",")[1], "base64").toString("latin1");
+  assert.match(pdfBytes, /^%PDF-1\.4/, "decoded bytes must start with the PDF magic header");
+  assert.ok(pdfBytes.includes("%%EOF"), "decoded bytes must have a PDF end-of-file marker");
 });
