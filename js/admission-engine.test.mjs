@@ -8,7 +8,8 @@ import {
   generateMailOtp, verifyMailOtp, createAdmissionCycle, activeCycleId, cyclesForScope,
   setActiveCycle, deleteAdmissionCycle, buildCandidateDocuments, approveShortlistList, revertShortlist,
   runMeritProcessing, approveMeritBatch, savePanelist, approvePanelist, fmtDateTime,
-  unassignPanelist, panelistInstituteId, panelistServesProgramme
+  unassignPanelist, panelistInstituteId, panelistServesProgramme,
+  sendGroupMeetingNotification, placeholderCandidateEmail
 } from "./admission-engine.js";
 
 function makeReadyCandidate(ds, programmeId, academicYearId, overrides) {
@@ -427,4 +428,50 @@ test("panelistInstituteId falls back to a linked programme's institute when inst
 
   const p = ds.panelists.find((x) => x.id === "P-legacy");
   assert.equal(panelistInstituteId(ds, p), inst.id);
+});
+
+// Feedback: Zoom Rooms "Send Notification" — candidates have no email field on file, so mails go to
+// a placeholder@example.invalid address (see placeholderCandidateEmail's ponytail comment).
+test("sendGroupMeetingNotification sends one mail per candidate with link/session/slot in the body", () => {
+  const ds = generateDataset();
+  makeSessionWithGroup(ds, { candidateIds: ["C1", "C2"], zoomRoom: { id: "ZR1", link: "https://zoom.us/j/123", panelistIds: ["PAN1"] } });
+  makeReadyCandidate(ds, "P1", "AY1", { id: "C1" });
+  makeReadyCandidate(ds, "P1", "AY1", { id: "C2" });
+  const before = ds.sentMails.length;
+
+  const res = sendGroupMeetingNotification(ds, "S1", "G1");
+
+  assert.ok(res.ok);
+  assert.equal(res.sent, 2);
+  assert.equal(ds.sentMails.length, before + 2);
+  const mails = ds.sentMails.slice(before);
+  assert.equal(mails[0].to, placeholderCandidateEmail({ id: "C1" }));
+  assert.equal(mails[1].to, placeholderCandidateEmail({ id: "C2" }));
+  for (const mail of mails) {
+    assert.ok(mail.body.includes("https://zoom.us/j/123"), "body must include the meeting link");
+    assert.ok(mail.body.includes("Group 1"), "body must include the group name");
+    assert.ok(mail.body.includes("10:00 AM") && mail.body.includes("11:00 AM"), "body must include the slot (session start-end)");
+  }
+});
+
+test("sendGroupMeetingNotification refuses when the group has no saved link", () => {
+  const ds = generateDataset();
+  makeSessionWithGroup(ds, { candidateIds: ["C1"], zoomRoom: { id: "ZR1", link: "", panelistIds: ["PAN1"] } });
+  const before = ds.sentMails.length;
+
+  const res = sendGroupMeetingNotification(ds, "S1", "G1");
+
+  assert.ok(res.error);
+  assert.equal(ds.sentMails.length, before, "refusal must not send any mail");
+});
+
+test("sendGroupMeetingNotification refuses when the group has no candidates", () => {
+  const ds = generateDataset();
+  makeSessionWithGroup(ds, { candidateIds: [], zoomRoom: { id: "ZR1", link: "https://zoom.us/j/123", panelistIds: ["PAN1"] } });
+  const before = ds.sentMails.length;
+
+  const res = sendGroupMeetingNotification(ds, "S1", "G1");
+
+  assert.ok(res.error);
+  assert.equal(ds.sentMails.length, before, "refusal must not send any mail");
 });

@@ -1108,6 +1108,35 @@ export function setZoomRoomLink(ds, sessionId, groupId, link) {
   return { ok: true, link: group.zoomRoom.link };
 }
 
+// ponytail: candidates have no email field on file in this dataset — this is a reserved-TLD (.invalid,
+// RFC 2606) placeholder so demo mail never risks reaching a real inbox. Swap in a real candidate email
+// field once one exists.
+export function placeholderCandidateEmail(c) { return `${c.id}@example.invalid`; }
+
+// Sends one meeting-notification mail (via the same sentMails record shape as the other non-approval
+// writers, e.g. saveStaffMember above) per candidate in the group — link, session date, slot and group name.
+export function sendGroupMeetingNotification(ds, sessionId, groupId) {
+  const session = ds.sessions.find((s) => s.id === sessionId);
+  const group = session && session.groups.find((g) => g.id === groupId);
+  if (!group) return { error: "Group not found." };
+  if (!group.zoomRoom.link) return { error: "Save a meeting link for this group first." };
+  if (!group.candidateIds.length) return { error: "This group has no candidates." };
+  const slot = `${session.startTime}–${session.endTime}`;
+  let sent = 0;
+  group.candidateIds.forEach((cid) => {
+    const c = ds.candidates.find((x) => x.id === cid);
+    if (!c) return;
+    ds.sentMails.push({
+      id: `MAIL-${ds.sentMails.length + 1}`, approvalRequestId: null, levelIndex: null, levelLabel: "Info",
+      to: placeholderCandidateEmail(c), subject: `PI Meeting Details — ${group.name}`,
+      body: `Hi ${c.name},\n\nYour Personal Interview meeting details:\n\nDate: ${fmtDate(session.date)}\nSlot: ${slot}\nGroup: ${group.name}\nMeeting Link: ${group.zoomRoom.link}\n\n(Demo placeholder address — candidates have no email on file in this prototype.)`,
+      sentOn: nowISO().slice(0, 10), token: null, otp: null, status: "delivered", summary: `Meeting notification — ${group.name}`
+    });
+    sent++;
+  });
+  return { ok: true, sent };
+}
+
 function genPassword() {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
   let out = "";
