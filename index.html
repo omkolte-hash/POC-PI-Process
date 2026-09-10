@@ -1142,7 +1142,7 @@ a:hover{color:var(--color-accent);text-decoration:underline}
           <table class="table"><thead><tr><th>Panelist ID</th><th>Name</th><th>Type</th><th style="text-align:right">Experience</th><sc-for list="{{ panelistLevelColumns }}" as="col" hint-placeholder-count="2"><th>{{ col.name }}</th></sc-for><th></th></tr></thead><tbody>
             <sc-for list="{{ panelistRows }}" as="p" hint-placeholder-count="8">
               <tr><td>{{ p.id }}</td><td><a href="javascript:void(0)" onClick="{{ p.onView }}">{{ p.name }}</a></td><td>{{ p.type }}</td><td style="text-align:right">{{ p.experienceYears }}</td>
-                <sc-for list="{{ p.levels }}" as="lvl" hint-placeholder-count="2"><td><span class="{{ lvl.tagCls }}">{{ lvl.label }}</span></td></sc-for>
+                <sc-for list="{{ p.levels }}" as="lvl" hint-placeholder-count="2"><td><span class="{{ lvl.tagCls }}">{{ lvl.label }}</span><sc-if value="{{ lvl.decidedAtLabel }}"><div style="font-size:11px;opacity:0.6">{{ lvl.decidedAtLabel }}</div></sc-if></td></sc-for>
                 <td style="white-space:nowrap">
                   <button type="button" class="btn btn-ghost" onClick="{{ p.onView }}">View</button>
                   <button type="button" class="btn btn-ghost" onClick="{{ p.onEdit }}">Edit</button>
@@ -1167,7 +1167,7 @@ a:hover{color:var(--color-accent);text-decoration:underline}
                 </div>
               </div>
               <div style="display:flex;gap:6px">
-                <sc-for list="{{ pdLevels }}" as="lvl" hint-placeholder-count="2"><span class="{{ lvl.tagCls }}">{{ lvl.name }}: {{ lvl.label }}</span></sc-for>
+                <sc-for list="{{ pdLevels }}" as="lvl" hint-placeholder-count="2"><span class="{{ lvl.tagCls }}">{{ lvl.name }}: {{ lvl.label }}<sc-if value="{{ lvl.decidedAtLabel }}"> · {{ lvl.decidedAtLabel }}</sc-if></span></sc-for>
               </div>
             </div>
             <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-4);margin-bottom:var(--space-4)">
@@ -8175,7 +8175,9 @@ class Component extends DCLogic {
       sdTagCls: meta.cls, sdStatusLabel: meta.label,
       sdApprovalLevels: chain.map((lvl, i) => ({
         name: `Level ${i + 1} Approval (${lvl.name})`,
-        statusLabel: l.approvals[i] ? `${l.approvals[i].status} \u00b7 ${l.approvals[i].date}` : (i === l.currentLevelIndex && l.status === "pending" ? "Pending" : "\u2014")
+        // decidedAt is only present on approvals recorded after timestamp capture was added; older/seed
+        // records fall back to the date-only value rather than fabricating a time (see approveShortlistList).
+        statusLabel: l.approvals[i] ? `${l.approvals[i].status} \u00b7 ${l.approvals[i].decidedAt ? this.engine.fmtDateTime(l.approvals[i].decidedAt) : l.approvals[i].date}` : (i === l.currentLevelIndex && l.status === "pending" ? "Pending" : "\u2014")
       })),
       sdShowSend: btn.showSend && l.status !== "rejected", sdApprovalTagLabel: btn.tagLabel,
       sdOnSendForApproval: () => this.onSendForApproval("shortlist", l.id, l.programmeId, l.academicYearId, `Shortlist ${l.id} \u2014 ${criteriaLabel}, ${l.candidateIds.length} candidate(s)`, "shortlist-detail",
@@ -8700,8 +8702,10 @@ class Component extends DCLogic {
     return chain.map((lvl, i) => {
       const status = (p.approval && p.approval[i]) || "pending";
       const tag = this.statusTag(status);
+      const decidedAt = p.approvalDecidedAt && p.approvalDecidedAt[i];
       return {
         name: lvl.name, tagCls: tag.tagCls, label: tag.statusLabel,
+        decidedAtLabel: decidedAt ? this.engine.fmtDateTime(decidedAt) : "",
         showActions: status === "pending" && (i === 0 || (p.approval && p.approval[i - 1] === "approved")),
         onApprove: () => this.approvePanelistAction(p.id, i, "approved"),
         onReject: () => this.approvePanelistAction(p.id, i, "disapproved")
@@ -9429,7 +9433,7 @@ class Component extends DCLogic {
       mbTagCls: meta.cls, mbStatusLabel: meta.label,
       mbApprovalLevels: chain.map((lvl, i) => ({
         name: lvl.name,
-        statusLabel: b.approvals[i] ? `${b.approvals[i].status} \u00b7 ${b.approvals[i].date}` : (i === b.currentLevelIndex && b.status === "pending" ? "Pending" : "\u2014")
+        statusLabel: b.approvals[i] ? `${b.approvals[i].status} \u00b7 ${b.approvals[i].decidedAt ? this.engine.fmtDateTime(b.approvals[i].decidedAt) : b.approvals[i].date}` : (i === b.currentLevelIndex && b.status === "pending" ? "Pending" : "\u2014")
       })),
       mbShowSend: btn.showSend && b.status !== "rejected", mbApprovalTagLabel: btn.tagLabel,
       mbOnSendForApproval: () => this.onSendForApproval("merit", b.id, b.programmeId, b.academicYearId, `Merit List ${b.id} \u2014 ${b.category}, ${b.candidateIds.length} candidate(s)`, "merit-batch-detail",
