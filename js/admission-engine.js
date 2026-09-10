@@ -1247,14 +1247,9 @@ export function deletePanelistApprovalLevel(ds, id) {
   ds.panelistApprovalChain = (ds.panelistApprovalChain || []).filter((l) => l.id !== id);
 }
 
-// `lock` is set by the PI Attendance page's confirm-and-mark flow (see buildAttendance) — once set,
-// PI attendance is frozen until a re-allocation clears it (see moveCandidatesAllocation), so any
-// other caller (e.g. the Panelist Portal) marking the same candidate afterwards gets refused below.
-export function markAttendance(ds, candidateId, kind, status, programmeId, academicYearId, cycleId, lock) {
-  const c = ds.candidates.find((x) => x.id === candidateId && x.programmeId === programmeId && x.academicYearId === academicYearId && x.cycleId === cycleId);
-  if (!c) return;
-  if (kind === "registration") { c.registrationAttendance = status; return; }
-  if (c.piAttendanceLocked) return { error: "Attendance is locked for this candidate." };
+// Shared by markAttendance and editLockedAttendance below — applies the actual status change and
+// its side effects, without touching the lock itself.
+function applyPiAttendance(ds, c, status) {
   c.piAttendance = status;
   if (status === "absent") {
     // An absent candidate was never actually scored by the panel — any score/lock recorded before
@@ -1269,7 +1264,33 @@ export function markAttendance(ds, candidateId, kind, status, programmeId, acade
   } else {
     recomputeOutcome(ds, c);
   }
+}
+
+// `lock` is set by the PI Attendance page's confirm-and-mark flow (see buildAttendance) — once set,
+// PI attendance is frozen until a re-allocation clears it (see moveCandidatesAllocation), so any
+// other caller (e.g. the Panelist Portal) marking the same candidate afterwards gets refused below.
+// Institute Admin can still correct a locked candidate via editLockedAttendance below.
+export function markAttendance(ds, candidateId, kind, status, programmeId, academicYearId, cycleId, lock) {
+  const c = ds.candidates.find((x) => x.id === candidateId && x.programmeId === programmeId && x.academicYearId === academicYearId && x.cycleId === cycleId);
+  if (!c) return;
+  if (kind === "registration") { c.registrationAttendance = status; return; }
+  if (c.piAttendanceLocked) return { error: "Attendance is locked for this candidate." };
+  applyPiAttendance(ds, c, status);
   if (lock) c.piAttendanceLocked = true;
+}
+
+// Admin-only override for a candidate whose PI attendance is already locked (gated in the UI by
+// canEditLockedAttendance — Institute Admin only). Applies the same side effects as markAttendance
+// (Absent still clears scores) but leaves the candidate locked afterwards and logs the change,
+// since this bypasses the normal one-time confirm-and-lock flow.
+export function editLockedAttendance(ds, candidateId, status, programmeId, academicYearId, cycleId) {
+  const c = ds.candidates.find((x) => x.id === candidateId && x.programmeId === programmeId && x.academicYearId === academicYearId && x.cycleId === cycleId);
+  if (!c) return;
+  if (!c.piAttendanceLocked) return { error: "Attendance is not locked for this candidate." };
+  applyPiAttendance(ds, c, status);
+  c.piAttendanceLocked = true;
+  const label = status === "present" ? "Present" : "Absent";
+  c.timeline.push({ label: `Attendance changed to ${label} by Institute Admin`, date: nowISO().slice(0, 10) });
 }
 
 // Each assigned panelist submits their own score independently; piTotal is the
