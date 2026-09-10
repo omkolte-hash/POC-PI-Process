@@ -162,13 +162,13 @@ async function setupProgrammeWithAllocatedCandidate(page, context, programmeName
   await expect(page.locator('.toast-pop')).toContainText('new candidate');
 
   // Candidate Allocation only lists candidates whose shortlist cleared both approval levels.
-  await gotoNav(page, 'Candidates', 'Shortlisting');
+  await gotoNav(page, 'Candidates', 'Create Shortlist');
   await page.locator('label.radio:has-text("All Matching")').click();
   await page.locator('button:has-text("Preview Shortlist")').click();
   await page.locator('button:has-text("Confirm Shortlist")').click();
   await expect(page.locator('.toast-pop')).toBeVisible();
   await approveTwice(page, context, {
-    returnToOrigin: () => gotoNav(page, 'Candidates', 'Approvals'),
+    returnToOrigin: () => gotoNav(page, 'Candidates', 'Shortlist Approval'),
     mailTo: 'director@qa-rbac.test',
   });
 

@@ -154,7 +154,7 @@ test('full admission lifecycle: programme creation through provisional letters',
   await test.step('Shortlist all 6 OPEN candidates', async () => {
     // Shortlisting is a generic filter now (any field, any operator), not a fixed category dropdown —
     // build "category = OPEN" as one condition and select "All Matching" instead of a top-N count.
-    await gotoNav(page, 'Candidates', 'Shortlisting');
+    await gotoNav(page, 'Candidates', 'Create Shortlist');
     await page.locator('button:has-text("+ Add OR Group")').click();
     await page.locator('button:has-text("+ Add Condition (AND)")').click();
     // hasText is substring-matching by default, and "Rank / Sort Field" would also match a plain
@@ -170,10 +170,10 @@ test('full admission lifecycle: programme creation through provisional letters',
 
   await test.step('Approve the shortlist (Director, then SIU)', async () => {
     await approveTwice(page, context, {
-      returnToOrigin: () => gotoNav(page, 'Candidates', 'Approvals'),
+      returnToOrigin: () => gotoNav(page, 'Candidates', 'Shortlist Approval'),
       mailTo: 'director@e2e.test',
     });
-    await gotoNav(page, 'Candidates', 'Approvals');
+    await gotoNav(page, 'Candidates', 'Shortlist Approval');
     await expect(page.locator('table')).toContainText('Approved');
   });
 
