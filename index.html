@@ -1351,6 +1351,11 @@ a:hover{color:var(--color-accent);text-decoration:underline}
               <div class="dialog-title">View Document</div>
               <div class="dialog-body">
                 <div style="font-size:13px;opacity:0.7;margin-bottom:var(--space-3)">{{ cvModal.candidateId }} &middot; {{ cvModal.candidateName }}</div>
+                <sc-if value="{{ cvModal.showDocNav }}"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-3)">
+                  <button type="button" class="btn btn-secondary btn-sm" onClick="{{ cvModal.onPrev }}" disabled="{{ cvModal.prevDisabled }}"><i data-lucide="chevron-left" style="width:14px;height:14px"></i> Previous</button>
+                  <span style="font-size:12px;opacity:0.6">{{ cvModal.docPositionLabel }}</span>
+                  <button type="button" class="btn btn-secondary btn-sm" onClick="{{ cvModal.onNext }}" disabled="{{ cvModal.nextDisabled }}">Next <i data-lucide="chevron-right" style="width:14px;height:14px"></i></button>
+                </div></sc-if>
                 <table class="table" style="margin-bottom:var(--space-3)"><thead><tr><th>Document Type</th><th>View Document</th><th>Document Name</th><th>Status</th></tr></thead><tbody>
                   <tr>
                     <td>{{ cvModal.docTypeLabel }}</td>
@@ -9152,11 +9157,20 @@ class Component extends DCLogic {
       const docStatus = doc.status || "pending";
       const statusBadgeCls = docStatus === "valid" ? "badge bg-success" : docStatus === "invalid" ? "badge bg-danger" : "badge bg-warning text-dark";
       const statusBadgeLabel = docStatus === "valid" ? "Valid" : docStatus === "invalid" ? "Invalid" : "Draft";
+      // Lets the reviewer step through this candidate's other applicable documents without closing
+      // and re-opening the modal from a different table cell each time.
+      const mcDocList = applicableDocs(mc);
+      const docIdx = mcDocList.findIndex((c) => c.key === docType);
       cvModal = {
         candidateId: mc.id, candidateName: mc.name,
         docTypeLabel: docCfg ? docCfg.label : "Document",
         hasDoc: !!doc.fileName, noDoc: !doc.fileName, fileName: doc.fileName, dataUrl: doc.dataUrl,
         statusBadgeCls, statusBadgeLabel,
+        showDocNav: mcDocList.length > 1,
+        docPositionLabel: `Document ${docIdx + 1} of ${mcDocList.length}`,
+        prevDisabled: docIdx <= 0, nextDisabled: docIdx < 0 || docIdx >= mcDocList.length - 1,
+        onPrev: () => this.onCvOpenModal(mc.id, mcDocList[docIdx - 1].key),
+        onNext: () => this.onCvOpenModal(mc.id, mcDocList[docIdx + 1].key),
         checked: this.state.cvModalChecked, onCheckToggle: () => this.setState({ cvModalChecked: !this.state.cvModalChecked }),
         status: this.state.cvModalStatus,
         onMarkValid: () => this.setState({ cvModalStatus: "valid" }), onMarkInvalid: () => this.setState({ cvModalStatus: "invalid" }),
