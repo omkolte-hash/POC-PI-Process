@@ -1216,7 +1216,7 @@ a:hover{color:var(--color-accent);text-decoration:underline}
           </sc-for>
         </div></sc-if>
         <sc-if value="{{ pageIsPiAttendance }}"><div>
-          <sc-if value="{{ atCanMark }}"><p style="font-size:12px;opacity:0.6;margin-top:0">Mark attendance here, or panelists can mark it themselves from the Panelist Portal.</p></sc-if>
+          <sc-if value="{{ atCanMark }}"><p style="font-size:12px;opacity:0.6;margin-top:0">Mark attendance here.</p></sc-if>
           <sc-if value="{{ atReadOnly }}"><p style="font-size:12px;opacity:0.6;margin-top:0">Read-only &mdash; only Coordinator/Institute Admin can mark attendance.</p></sc-if>
 
           <sc-if value="{{ atJoined }}"><div>
@@ -4119,13 +4119,8 @@ a:hover{color:var(--color-accent);text-decoration:underline}
                 <div>Attendance: <span class="{{ pnCandidate.attCls }}">{{ pnCandidate.attLabel }}</span></div>
               </div>
               <sc-if value="{{ pnPendingWarning }}"><div class="card elev-sm" style="padding:var(--space-3);margin-bottom:var(--space-3);background:#fff8e6;border-color:#f0c36d">
-                <div style="font-size:13px;margin-bottom:8px">&#9888; <strong>{{ pnCandidate.name }}</strong> is not marked present yet. Do you want to mark them present?</div>
-                <button type="button" class="btn btn-primary btn-sm" onClick="{{ pnCandidate.onPresent }}">Yes, mark present</button>
+                <div style="font-size:13px">&#9888; Waiting for the coordinator to mark <strong>{{ pnCandidate.name }}</strong>'s attendance.</div>
               </div></sc-if>
-              <div style="display:flex;gap:var(--space-2);margin-bottom:var(--space-3)">
-                <button type="button" class="btn btn-secondary" onClick="{{ pnCandidate.onPresent }}">Present</button>
-                <button type="button" class="btn btn-ghost" onClick="{{ pnCandidate.onAbsent }}">Absent</button>
-              </div>
               <sc-if value="{{ pnShowMarking }}"><div class="card elev-sm" style="padding:var(--space-3);margin-bottom:var(--space-3)">
                 <div class="card-title" style="margin-bottom:var(--space-2)">Marking Panel</div>
                 <sc-if value="{{ pnScoreLocked }}"><div>
@@ -5362,12 +5357,11 @@ class Component extends DCLogic {
   // Institute staff (auth.role === "institute-staff") only ever see the pages their assigned role
   // grants — Configuration is never among them (see saveRole). Institute Admin (auth.role ===
   // "institute") and Super Admin are unrestricted, so this returns null for them.
-  // Institute Admin and the Coordinator staff role can mark PI attendance directly from the
-  // main-shell PI Attendance page (see buildAttendance) — every other role viewing that page (it's
-  // also granted to Director/Registrar/Admission Officer/staff-role Panelist) sees it read-only.
-  // Real panelists keep marking attendance from their own Panelist Portal exactly as before; this
-  // is an additional, independent way to mark the same underlying data (markAttendance), not a
-  // replacement for it.
+  // Institute Admin and the Coordinator staff role are the only ones who can mark PI attendance —
+  // directly from the main-shell PI Attendance page (see buildAttendance). Every other role that
+  // can view that page (also granted to Director/Registrar/Admission Officer/staff-role Panelist)
+  // sees it read-only, and the Panelist Portal (see buildPanelistPortal) shows the same read-only
+  // status to real panelists — they no longer mark their own attendance there.
   canMarkAttendance() {
     const auth = this.state.auth;
     if (!auth) return false;
@@ -9005,10 +8999,6 @@ class Component extends DCLogic {
     this.setState({ pnSelectedCandidateId: candidateId });
   }
   onPnToggleCollapse() { this.setState({ pnPanelCollapsed: !this.state.pnPanelCollapsed }); }
-  onPnAttendance(candidateId, status) {
-    const { programmeId, academicYearId, cycleId } = this.pnScope();
-    this.mutate((ds) => this.engine.markAttendance(ds, candidateId, "pi", status, programmeId, academicYearId, cycleId), `PI attendance marked ${status}.`);
-  }
   onPnScoreField(candidateId, panelistId, fieldKey, val) {
     const { programmeId, academicYearId, cycleId } = this.pnScope();
     const c = this.state.data.candidates.find((x) => x.id === candidateId && x.programmeId === programmeId && x.academicYearId === academicYearId && x.cycleId === cycleId);
@@ -9101,12 +9091,11 @@ class Component extends DCLogic {
     base.pnCandidate = {
       id: c.id, name: c.name, category: c.category, education: c.educationBackground || "\u2014",
       slat: c.slatScore != null ? c.slatScore : "\u2014",
-      attCls: att.tagCls, attLabel: att.statusLabel,
-      onPresent: () => this.onPnAttendance(c.id, "present"), onAbsent: () => this.onPnAttendance(c.id, "absent")
+      attCls: att.tagCls, attLabel: att.statusLabel
     };
-    // Selecting a not-yet-marked candidate surfaces a warning with a one-click way to mark them
-    // present, instead of just silently hiding the scoring panel — Coordinator may not have
-    // reached this candidate yet, but the panelist can still act instead of being stuck.
+    // Selecting a not-yet-marked candidate surfaces a status message instead of just silently
+    // hiding the scoring panel — only the Coordinator/Institute Admin can mark attendance
+    // (canMarkAttendance), so the panelist can only wait, not act.
     base.pnPendingWarning = c.piAttendance === "pending";
     const scores = (c.piScores && c.piScores[panelist.id]) || {};
     const locked = !!(c.piScoreLocked && c.piScoreLocked[panelist.id]);

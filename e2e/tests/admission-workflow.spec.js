@@ -276,8 +276,27 @@ test('full admission lifecycle: programme creation through provisional letters',
     await expect(page.locator('.toast-pop')).toContainText('allocated');
   });
 
+  // Only the Coordinator/Institute Admin can mark PI attendance (canMarkAttendance) — panelists
+  // see it read-only from their own portal — so the institute admin marks everyone present here,
+  // before either panelist logs in to score.
+  await test.step('Institute Admin marks all 6 candidates present in PI Attendance', async () => {
+    await gotoNav(page, 'Interview Day', 'PI Attendance');
+    await fieldByLabel(page, 'Session').locator('select').selectOption({ index: 1 });
+    await page.waitForTimeout(200);
+    await fieldByLabel(page, 'Group').locator('select').selectOption({ index: 1 });
+    await page.waitForTimeout(200);
+    await page.locator('button:has-text("Join Meeting")').click();
+    await page.waitForTimeout(300);
+    const presentButtons = page.locator('table button:has-text("Present")');
+    await expect(presentButtons).toHaveCount(OPEN_IDS.length);
+    for (let i = 0; i < OPEN_IDS.length; i++) {
+      await presentButtons.nth(i).click();
+      await page.waitForTimeout(150);
+    }
+  });
+
   for (let i = 0; i < 2; i++) {
-    await test.step(`Panelist ${i + 1}: mark attendance (first panelist only) and submit PI scores`, async () => {
+    await test.step(`Panelist ${i + 1}: submit PI scores`, async () => {
       await page.locator('button:has-text("Log Out")').click();
       await page.waitForTimeout(400);
       await loginPanelist(page, { email: panelists[i].email, password: panelists[i].password });
@@ -293,15 +312,6 @@ test('full admission lifecycle: programme creation through provisional letters',
         await candidateSelect.selectOption(candidateId);
         await page.waitForTimeout(250);
         await expect(page.locator('.card strong').first()).toHaveText(candidateId);
-        if (i === 0) {
-          // Selecting a not-yet-marked candidate must surface the warning banner (not silently
-          // hide the scoring panel) — its CTA does the same mark-present action as the regular
-          // "Present" button below it, so clicking whichever matches first works either way.
-          await expect(page.locator('text=is not marked present yet')).toBeVisible();
-          await page.locator('button:has-text("Present")').first().click();
-          await page.waitForTimeout(200);
-          await expect(page.locator('text=is not marked present yet')).not.toBeVisible();
-        }
         const score = RUBRIC_SCORE_BY_ID[candidateId];
         expect(score, `no expected rubric score for candidate "${candidateId}"`).toBeTruthy();
         const fields = page.locator('.field input[type="number"]');
