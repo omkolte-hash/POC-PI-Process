@@ -6,7 +6,7 @@ import {
   generateDataset, createInstitute, createProgramme, setApvScore, setScoringFormula,
   moveCandidatesAllocation, confirmShortlist, createApprovalRequest, sendApprovalMail,
   generateMailOtp, verifyMailOtp, createAdmissionCycle, activeCycleId, cyclesForScope,
-  setActiveCycle, deleteAdmissionCycle, buildCandidateDocuments
+  setActiveCycle, deleteAdmissionCycle, buildCandidateDocuments, approveShortlistList, revertShortlist
 } from "./admission-engine.js";
 
 function makeReadyCandidate(ds, programmeId, academicYearId, overrides) {
@@ -181,4 +181,31 @@ test("buildCandidateDocuments seeds a real PDF, not a plaintext stub", () => {
   const pdfBytes = Buffer.from(doc.dataUrl.split(",")[1], "base64").toString("latin1");
   assert.match(pdfBytes, /^%PDF-1\.4/, "decoded bytes must start with the PDF magic header");
   assert.ok(pdfBytes.includes("%%EOF"), "decoded bytes must have a PDF end-of-file marker");
+});
+
+// Feedback: once any approval level rejects a shortlist, Director/SIU can click "Revert Shortlist"
+// to put its candidates back to Draft (yet-to-shortlist), and can't do it twice or on a live list.
+test("revertShortlist resets a rejected shortlist's candidates to yet-to-shortlist", () => {
+  const ds = generateDataset();
+  const inst = createInstitute(ds, { name: "Test Institute", code: "TI" });
+  const prog = createProgramme(ds, { instituteId: inst.id, name: "Test Programme", code: "TP" });
+  const ay = ds.activeAcademicYearByProgramme[prog.id];
+  const c = makeReadyCandidate(ds, prog.id, ay, { id: "C5", piTotal: 30, slatScore: 50 });
+  c.shortlistStatus = "yet-to-shortlist";
+
+  const { list } = confirmShortlist(ds, { programmeId: prog.id, academicYearId: ay, filter: { groups: [] }, rankField: null, mode: "all", value: null });
+
+  const blocked = revertShortlist(ds, list.id);
+  assert.ok(blocked.error, "cannot revert a shortlist that hasn't been rejected");
+
+  approveShortlistList(ds, list.id, 0, "rejected", "");
+  assert.equal(list.status, "rejected");
+  assert.equal(c.shortlistStatus, "yet-to-shortlist", "rejection already returns candidates to the pool");
+
+  const res = revertShortlist(ds, list.id);
+  assert.ok(res.ok);
+  assert.equal(res.count, 1);
+  assert.equal(c.shortlistStatus, "yet-to-shortlist", "reverted candidate lands in the Draft/yet-to-shortlist bucket");
+  assert.equal(c.shortlistId, null);
+  assert.ok(list.reverted, "list is flagged reverted so the button doesn't offer itself again");
 });
