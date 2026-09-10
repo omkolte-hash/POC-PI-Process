@@ -921,12 +921,39 @@ a:hover{color:var(--color-accent);text-decoration:underline}
                 </div>
                 <div class="dialog-body">
                   <div style="font-size:12px;opacity:0.65;margin-bottom:var(--space-3)">{{ groupsDrawerActiveGroupMeta }}</div>
-                  <table class="table table-sm"><thead><tr><th>Applicant ID</th><th>Name</th><th>Category</th></tr></thead><tbody>
-                    <sc-for list="{{ groupsDrawerCandidates }}" as="gc" hint-placeholder-count="5">
-                      <tr><td>{{ gc.id }}</td><td>{{ gc.name }}</td><td>{{ gc.category }}</td></tr>
+                  <sc-if value="{{ gcgShowCandidateTable }}"><div>
+                    <table class="table table-sm"><thead><tr>
+                      <sc-if value="{{ gcgSelectModeActive }}"><th><input type="checkbox" checked="{{ gcgAllSelected }}" onChange="{{ onGcgToggleSelectAll }}" /></th></sc-if>
+                      <th>Applicant ID</th><th>Name</th><th>Category</th>
+                    </tr></thead><tbody>
+                      <sc-for list="{{ groupsDrawerCandidates }}" as="gc" hint-placeholder-count="5">
+                        <tr>
+                          <sc-if value="{{ gcgSelectModeActive }}"><td><input type="checkbox" checked="{{ gc.checked }}" onChange="{{ gc.onToggle }}" /></td></sc-if>
+                          <td>{{ gc.id }}</td><td>{{ gc.name }}</td><td>{{ gc.category }}</td>
+                        </tr>
+                      </sc-for>
+                    </tbody></table>
+                    <sc-if value="{{ groupsDrawerNoCandidates }}"><div style="font-size:12px;opacity:0.5">No candidates allocated yet.</div></sc-if>
+                    <sc-if value="{{ gcgSelectModeActive }}"><div style="display:flex;gap:var(--space-2);margin-top:var(--space-3)">
+                      <button type="button" class="btn btn-primary" onClick="{{ onGcgNext }}" disabled="{{ gcgNextDisabled }}">Next</button>
+                      <button type="button" class="btn btn-ghost" onClick="{{ onGcgCancel }}">Cancel</button>
+                    </div></sc-if>
+                    <sc-if value="{{ gcgShowChangeGroupBtn }}"><button type="button" class="btn btn-ghost" style="margin-top:var(--space-3)" onClick="{{ onGcgStart }}" disabled="{{ gcgChangeGroupDisabled }}">Change Group</button></sc-if>
+                  </div></sc-if>
+                  <sc-if value="{{ gcgStepIsTarget }}"><div>
+                    <p style="font-size:12px;opacity:0.7;margin-top:0">Move {{ gcgSelectedCount }} candidate(s) to:</p>
+                    <sc-for list="{{ gcgTargetGroups }}" as="tg" hint-placeholder-count="3">
+                      <div style="{{ tg.style }}" onClick="{{ tg.onClick }}">
+                        <div style="font-weight:600">{{ tg.name }}</div>
+                        <div style="font-size:12px;opacity:0.7">Capacity {{ tg.capacity }} &middot; Allocated {{ tg.allocated }} &middot; Available {{ tg.available }}</div>
+                      </div>
                     </sc-for>
-                  </tbody></table>
-                  <sc-if value="{{ groupsDrawerNoCandidates }}"><div style="font-size:12px;opacity:0.5">No candidates allocated yet.</div></sc-if>
+                    <sc-if value="{{ gcgNoTargetGroups }}"><div style="font-size:12px;opacity:0.5">No other groups in this session to move to.</div></sc-if>
+                    <div style="display:flex;gap:var(--space-2);margin-top:var(--space-4)">
+                      <button type="button" class="btn btn-primary" onClick="{{ onGcgMoveStudents }}" disabled="{{ gcgMoveDisabled }}">Move Students</button>
+                      <button type="button" class="btn btn-ghost" onClick="{{ onGcgBack }}">Back</button>
+                    </div>
+                  </div></sc-if>
                 </div>
               </div>
             </div>
@@ -4563,6 +4590,7 @@ class Component extends DCLogic {
     sfToDate: "", sfToTime: "", sfToPickerOpen: false, sfToViewMonth: "",
     sfReportingMinutes: "", sfCapacity: "", sfGroups: "", sfGroupDrafts: [], sfAutoGroupNames: false,
     groupsDrawerSessionId: null, groupsDrawerActiveGroupId: null,
+    gcgStep: null, gcgSelectedIds: [], gcgTargetGroupId: null,
     caSessionId: "", caGroupId: "",
     caFilterCategory: "ALL", caSelectedIds: [], caGroupSelectedIds: [],
     aaMode: false, aaPreview: null, dragCandidateIds: [],
@@ -8364,7 +8392,7 @@ class Component extends DCLogic {
           id: sess.id, label: `Session ${String(i + 1).padStart(2, "0")}`, date: this.engine.fmtDate(sess.date), time: `${sess.startTime} \u2013 ${sess.endTime}`,
           capacity: sess.capacity, numGroups: sess.groups.length, allocated, available: sess.capacity - allocated,
           toggleLabel: "View Groups",
-          onToggle: () => this.setState({ groupsDrawerSessionId: sess.id, groupsDrawerActiveGroupId: sess.groups[0] ? sess.groups[0].id : null })
+          onToggle: () => this.setState({ groupsDrawerSessionId: sess.id, groupsDrawerActiveGroupId: sess.groups[0] ? sess.groups[0].id : null, gcgStep: null, gcgSelectedIds: [], gcgTargetGroupId: null })
         };
       }),
       ...this.buildGroupsDrawer(d, sessions)
@@ -8381,15 +8409,81 @@ class Component extends DCLogic {
     return {
       groupsDrawerOpen: true,
       groupsDrawerTitle: `Groups \u2013 Session ${this.engine.fmtDate(session.date)}`,
-      onGroupsDrawerClose: () => this.setState({ groupsDrawerSessionId: null, groupsDrawerActiveGroupId: null }),
+      onGroupsDrawerClose: () => this.setState({ groupsDrawerSessionId: null, groupsDrawerActiveGroupId: null, gcgStep: null, gcgSelectedIds: [], gcgTargetGroupId: null }),
       groupsDrawerTabs: session.groups.map((g) => ({
         id: g.id, label: g.name, style: g.id === activeGroupId ? activeTabStyle : inactiveTabStyle,
-        onClick: () => this.setState({ groupsDrawerActiveGroupId: g.id })
+        onClick: () => this.setState({ groupsDrawerActiveGroupId: g.id, gcgStep: null, gcgSelectedIds: [], gcgTargetGroupId: null })
       })),
       groupsDrawerActiveGroupMeta: activeGroup ? `Capacity ${activeGroup.capacity} \u00b7 Allocated ${activeGroup.candidateIds.length} \u00b7 Available ${activeGroup.capacity - activeGroup.candidateIds.length}` : "",
-      groupsDrawerCandidates: cands.map((c) => ({ id: c.id, name: c.name, category: c.category })),
-      groupsDrawerNoCandidates: cands.length === 0
+      ...this.buildGroupsChangeGroup(session, activeGroup, cands)
     };
+  }
+  // Change Group flow, scoped to the drawer's currently selected group tab. Target groups are limited to
+  // other groups within this same session (not other sessions) - the drawer is already session-scoped, and
+  // a cross-session move would also imply a different date/time for the moved candidates, which is a bigger
+  // decision than this quick reallocation control should make on the user's behalf.
+  buildGroupsChangeGroup(session, activeGroup, cands) {
+    const step = this.state.gcgStep;
+    const selectedIds = this.state.gcgSelectedIds;
+    const candIds = cands.map((c) => c.id);
+    const otherGroups = activeGroup ? session.groups.filter((g) => g.id !== activeGroup.id) : [];
+    const gcgTargetGroups = otherGroups.map((g) => {
+      const available = g.capacity - g.candidateIds.length;
+      const disabled = available < selectedIds.length;
+      const selected = this.state.gcgTargetGroupId === g.id;
+      let style = "padding:10px 12px;border:1px solid var(--color-divider);border-radius:var(--radius-sm);margin-bottom:8px;";
+      style += disabled ? "opacity:0.45;cursor:not-allowed;" : "cursor:pointer;";
+      if (selected) style += "border-color:var(--color-accent-700);background:color-mix(in srgb, var(--color-accent) 8%, transparent);";
+      return {
+        id: g.id, name: g.name, capacity: g.capacity, allocated: g.candidateIds.length, available, style,
+        onClick: disabled ? null : () => this.onGcgSelectTarget(g.id)
+      };
+    });
+    return {
+      gcgSelectModeActive: step === "select",
+      gcgStepIsTarget: step === "target",
+      gcgShowCandidateTable: step !== "target",
+      gcgShowChangeGroupBtn: step === null,
+      gcgChangeGroupDisabled: cands.length === 0,
+      onGcgStart: () => this.onGcgStart(),
+      groupsDrawerCandidates: cands.map((c) => ({
+        id: c.id, name: c.name, category: c.category,
+        checked: selectedIds.includes(c.id), onToggle: () => this.onGcgToggleSelect(c.id)
+      })),
+      groupsDrawerNoCandidates: cands.length === 0,
+      gcgAllSelected: candIds.length > 0 && candIds.every((id) => selectedIds.includes(id)),
+      onGcgToggleSelectAll: () => this.onGcgToggleSelectAll(candIds),
+      gcgNextDisabled: selectedIds.length === 0,
+      onGcgNext: () => this.onGcgNext(), onGcgCancel: () => this.onGcgCancel(), onGcgBack: () => this.onGcgBack(),
+      gcgSelectedCount: selectedIds.length,
+      gcgTargetGroups, gcgNoTargetGroups: gcgTargetGroups.length === 0,
+      gcgMoveDisabled: !this.state.gcgTargetGroupId,
+      onGcgMoveStudents: () => this.onGcgMoveStudents()
+    };
+  }
+  onGcgStart() { this.setState({ gcgStep: "select", gcgSelectedIds: [] }); }
+  onGcgCancel() { this.setState({ gcgStep: null, gcgSelectedIds: [], gcgTargetGroupId: null }); }
+  onGcgToggleSelect(id) {
+    const ids = this.state.gcgSelectedIds;
+    this.setState({ gcgSelectedIds: ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id] });
+  }
+  onGcgToggleSelectAll(allIds) {
+    const ids = this.state.gcgSelectedIds;
+    const allSelected = allIds.length > 0 && allIds.every((id) => ids.includes(id));
+    this.setState({ gcgSelectedIds: allSelected ? [] : allIds });
+  }
+  onGcgNext() {
+    if (!this.state.gcgSelectedIds.length) return;
+    this.setState({ gcgStep: "target", gcgTargetGroupId: null });
+  }
+  onGcgBack() { this.setState({ gcgStep: "select", gcgTargetGroupId: null }); }
+  onGcgSelectTarget(id) { this.setState({ gcgTargetGroupId: id }); }
+  onGcgMoveStudents() {
+    const { gcgSelectedIds, gcgTargetGroupId, groupsDrawerSessionId } = this.state;
+    if (!gcgSelectedIds.length || !gcgTargetGroupId) return;
+    const res = this.mutate((ds) => this.engine.moveCandidatesAllocation(ds, gcgSelectedIds, groupsDrawerSessionId, gcgTargetGroupId),
+      (r) => r.error ? r.error : `Moved ${r.moved} candidate(s).`);
+    if (res && res.ok) this.setState({ gcgStep: null, gcgSelectedIds: [], gcgTargetGroupId: null });
   }
 
   onCaFilterCategory(e) { this.setState({ caFilterCategory: e.target.value, caSelectedIds: [] }); }
