@@ -4105,8 +4105,21 @@ a:hover{color:var(--color-accent);text-decoration:underline}
         </tbody></table></sc-if>
       </div></sc-if>
       <sc-if value="{{ pnJoined }}"><div>
-        <button type="button" class="btn btn-ghost" onClick="{{ onPnLeave }}" style="margin-bottom:var(--space-3)">&larr; Back to Sessions</button>
-        <div style="font-size:16px;font-weight:600;margin-bottom:var(--space-4)">{{ pnGroupLabel }}</div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:var(--space-3);flex-wrap:wrap;margin-bottom:var(--space-4)">
+          <div>
+            <button type="button" class="btn btn-ghost" onClick="{{ onPnLeave }}" style="margin-bottom:var(--space-2)">&larr; Back to Sessions</button>
+            <div style="font-size:16px;font-weight:600">{{ pnGroupLabel }}</div>
+          </div>
+          <div style="text-align:right">
+            <sc-if value="{{ pnHasZoomLink }}"><a href="{{ pnZoomLink }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+              <i data-lucide="video" style="width:14px;height:14px"></i> Join Meeting
+            </a></sc-if>
+            <sc-if value="{{ pnNoZoomLink }}"><div>
+              <button type="button" class="btn btn-primary" disabled>Join Meeting</button>
+              <div style="font-size:11px;opacity:0.6;margin-top:4px">No Zoom link assigned to this group yet.</div>
+            </div></sc-if>
+          </div>
+        </div>
         <sc-if value="{{ pnQueueEmpty }}"><p style="font-size:13px;opacity:0.6">No candidates have been allocated to this group yet.</p></sc-if>
         <sc-if value="{{ pnAllScored }}"><div class="card elev-sm" style="padding:var(--space-3) var(--space-4);margin-bottom:var(--space-3);background:var(--color-accent-50,#f0fdf4)">
           <strong>All candidates scored.</strong> Pick anyone below to review or re-check their entry.
@@ -4120,49 +4133,31 @@ a:hover{color:var(--color-accent);text-decoration:underline}
               </sc-for>
             </select>
           </div>
-        <div style="display:flex;gap:var(--space-4);align-items:flex-start">
-          <div style="flex:3;min-width:0;aspect-ratio:16/9;border-radius:var(--radius-md);background:#eef2ff;border:1px solid #c7d2fe;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:16px;text-align:center">
-            <i data-lucide="video" style="width:32px;height:32px;color:#4338ca"></i>
-            <div style="font-size:13px;font-weight:600">{{ pnCandidate.name }}</div>
-            <sc-if value="{{ pnHasZoomLink }}"><div>
-              <a href="{{ pnZoomLink }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">
-                <i data-lucide="external-link" style="width:14px;height:14px"></i> Join Zoom Meeting
-              </a>
-            </div></sc-if>
-            <sc-if value="{{ pnNoZoomLink }}"><div style="font-size:13px;opacity:0.6">No Zoom link assigned to this group yet.</div></sc-if>
-            <sc-if value="{{ pnHasZoomLink }}"><div style="font-size:11px;opacity:0.5;font-family:monospace;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ pnZoomLink }}</div></sc-if>
+          <div style="font-size:13px;opacity:0.6;margin-bottom:var(--space-2)">{{ pnProgress }}</div>
+          <div class="card elev-sm" style="padding:var(--space-3);margin-bottom:var(--space-3);font-size:13px;display:flex;flex-direction:column;gap:4px">
+            <div><strong>{{ pnCandidate.id }}</strong> &middot; {{ pnCandidate.name }}</div>
+            <div>Category: {{ pnCandidate.category }}</div><div>Education: {{ pnCandidate.education }}</div><div>SLAT Score: {{ pnCandidate.slat }}</div>
+            <div>Attendance: <span class="{{ pnCandidate.attCls }}">{{ pnCandidate.attLabel }}</span></div>
           </div>
-          <div style="{{ pnPanelStyle }}">
-            <button type="button" class="btn btn-ghost" onClick="{{ onPnToggleCollapse }}" style="margin-bottom:var(--space-2)"><i data-lucide="{{ pnToggleIcon }}" style="width:16px;height:16px"></i></button>
-            <sc-if value="{{ pnPanelExpanded }}"><div>
-              <div style="font-size:13px;opacity:0.6;margin-bottom:var(--space-2)">{{ pnProgress }}</div>
-              <div class="card elev-sm" style="padding:var(--space-3);margin-bottom:var(--space-3);font-size:13px;display:flex;flex-direction:column;gap:4px">
-                <div><strong>{{ pnCandidate.id }}</strong> &middot; {{ pnCandidate.name }}</div>
-                <div>Category: {{ pnCandidate.category }}</div><div>Education: {{ pnCandidate.education }}</div><div>SLAT Score: {{ pnCandidate.slat }}</div>
-                <div>Attendance: <span class="{{ pnCandidate.attCls }}">{{ pnCandidate.attLabel }}</span></div>
-              </div>
-              <sc-if value="{{ pnPendingWarning }}"><div class="card elev-sm" style="padding:var(--space-3);margin-bottom:var(--space-3);background:#fff8e6;border-color:#f0c36d">
-                <div style="font-size:13px">&#9888; Waiting for the coordinator to mark <strong>{{ pnCandidate.name }}</strong>'s attendance.</div>
-              </div></sc-if>
-              <sc-if value="{{ pnShowMarking }}"><div class="card elev-sm" style="padding:var(--space-3);margin-bottom:var(--space-3)">
-                <div class="card-title" style="margin-bottom:var(--space-2)">Marking Panel</div>
-                <sc-if value="{{ pnScoreLocked }}"><div>
-                  <p style="font-size:12px;opacity:0.6;margin-top:0">Submitted &mdash; scores are locked and can no longer be edited.</p>
-                  <sc-for list="{{ pnFields }}" as="f" hint-placeholder-count="4">
-                    <div class="field"><label>{{ f.name }} (/{{ f.max }})</label><div style="font-size:14px">{{ f.value }}</div></div>
-                  </sc-for>
-                </div></sc-if>
-                <sc-if value="{{ pnScoreEditable }}"><div>
-                  <sc-for list="{{ pnFields }}" as="f" hint-placeholder-count="4">
-                    <div class="field"><label>{{ f.name }} (/{{ f.max }})</label><input class="input" type="number" min="0" max="{{ f.max }}" value="{{ f.value }}" onChange="{{ f.onChange }}" /></div>
-                  </sc-for>
-                </div></sc-if>
-                <div class="field"><label>Notes</label><textarea class="input" value="{{ pnNotes }}" onChange="{{ onPnNotesChange }}" placeholder="Optional remarks about this candidate&hellip;"></textarea></div>
-                <sc-if value="{{ pnCanSubmit }}"><button type="button" class="btn btn-primary btn-block" onClick="{{ onPnSubmit }}">Submit &amp; Lock Score</button></sc-if>
-              </div></sc-if>
+          <sc-if value="{{ pnPendingWarning }}"><div class="card elev-sm" style="padding:var(--space-3);margin-bottom:var(--space-3);background:#fff8e6;border-color:#f0c36d">
+            <div style="font-size:13px">&#9888; Waiting for the coordinator to mark <strong>{{ pnCandidate.name }}</strong>'s attendance.</div>
+          </div></sc-if>
+          <sc-if value="{{ pnShowMarking }}"><div class="card elev-sm" style="padding:var(--space-3);margin-bottom:var(--space-3)">
+            <div class="card-title" style="margin-bottom:var(--space-2)">Marking Panel</div>
+            <sc-if value="{{ pnScoreLocked }}"><div>
+              <p style="font-size:12px;opacity:0.6;margin-top:0">Submitted &mdash; scores are locked and can no longer be edited.</p>
+              <sc-for list="{{ pnFields }}" as="f" hint-placeholder-count="4">
+                <div class="field"><label>{{ f.name }} (/{{ f.max }})</label><div style="font-size:14px">{{ f.value }}</div></div>
+              </sc-for>
             </div></sc-if>
-          </div>
-        </div>
+            <sc-if value="{{ pnScoreEditable }}"><div>
+              <sc-for list="{{ pnFields }}" as="f" hint-placeholder-count="4">
+                <div class="field"><label>{{ f.name }} (/{{ f.max }})</label><input class="input" type="number" min="0" max="{{ f.max }}" value="{{ f.value }}" onChange="{{ f.onChange }}" /></div>
+              </sc-for>
+            </div></sc-if>
+            <div class="field"><label>Notes</label><textarea class="input" value="{{ pnNotes }}" onChange="{{ onPnNotesChange }}" placeholder="Optional remarks about this candidate&hellip;"></textarea></div>
+            <sc-if value="{{ pnCanSubmit }}"><button type="button" class="btn btn-primary btn-block" onClick="{{ onPnSubmit }}">Submit &amp; Lock Score</button></sc-if>
+          </div></sc-if>
         </div></sc-if>
       </div></sc-if>
     </main>
@@ -4591,7 +4586,7 @@ class Component extends DCLogic {
     afSequenceNo: "", afPanelistsPerPanel: "", afTotalMarks: "", afScoreEntryModel: "", afScaling: "No", afTotalMarksScaling: "",
     apProgrammeId: "", apTab: "PI", apAcademicYearId: "", apBannerDismissed: false, apEditId: null,
     apName: "", apSequenceNo: "", apMaxWeightage: "", apAllowZero: "No", apAllowDecimal: "No",
-    pnJoinedSessionId: null, pnJoinedGroupId: null, pnSelectedCandidateId: null, pnPanelCollapsed: false
+    pnJoinedSessionId: null, pnJoinedGroupId: null, pnSelectedCandidateId: null
   };
 
   componentDidMount() {
@@ -9025,8 +9020,8 @@ class Component extends DCLogic {
   }
 
   // ---------- Panelist Portal ----------
-  onPnJoin(sessionId, groupId) { this.setState({ pnJoinedSessionId: sessionId, pnJoinedGroupId: groupId, pnSelectedCandidateId: null, pnPanelCollapsed: false }); }
-  onPnLeave() { this.setState({ pnJoinedSessionId: null, pnJoinedGroupId: null, pnSelectedCandidateId: null, pnPanelCollapsed: false }); }
+  onPnJoin(sessionId, groupId) { this.setState({ pnJoinedSessionId: sessionId, pnJoinedGroupId: groupId, pnSelectedCandidateId: null }); }
+  onPnLeave() { this.setState({ pnJoinedSessionId: null, pnJoinedGroupId: null, pnSelectedCandidateId: null }); }
   // The joined session is the scope every candidate lookup below needs — a candidate's Applicant ID
   // alone isn't unique across programmes/academic years, so every mutation must be scoped to it too.
   pnScope() {
@@ -9052,7 +9047,6 @@ class Component extends DCLogic {
     if (prevId && prevId !== candidateId) this.pnMaybeLockScore(prevId, panelistId);
     this.setState({ pnSelectedCandidateId: candidateId });
   }
-  onPnToggleCollapse() { this.setState({ pnPanelCollapsed: !this.state.pnPanelCollapsed }); }
   onPnScoreField(candidateId, panelistId, fieldKey, val) {
     const { programmeId, academicYearId, cycleId } = this.pnScope();
     const c = this.state.data.candidates.find((x) => x.id === candidateId && x.programmeId === programmeId && x.academicYearId === academicYearId && x.cycleId === cycleId);
@@ -9120,12 +9114,6 @@ class Component extends DCLogic {
     base.pnZoomLink = group.zoomRoom.link || "";
     base.pnHasZoomLink = !!group.zoomRoom.link;
     base.pnNoZoomLink = !group.zoomRoom.link;
-    base.pnPanelExpanded = !s.pnPanelCollapsed;
-    base.pnPanelStyle = s.pnPanelCollapsed
-      ? "flex:none;width:44px;overflow:hidden"
-      : "flex:1;min-width:280px;max-width:400px;overflow-y:auto";
-    base.pnToggleIcon = s.pnPanelCollapsed ? "chevron-left" : "chevron-right";
-    base.onPnToggleCollapse = () => this.onPnToggleCollapse();
 
     // Free selection, not a forced one-at-a-time queue: the panelist picks any candidate from the
     // dropdown. Default to the first one so there's always something on screen after Join.
