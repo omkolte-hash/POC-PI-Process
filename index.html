@@ -1344,7 +1344,7 @@ a:hover{color:var(--color-accent);text-decoration:underline}
               <div class="dialog-title">View Document</div>
               <div class="dialog-body">
                 <div style="font-size:13px;opacity:0.7;margin-bottom:var(--space-3)">{{ cvModal.candidateId }} &middot; {{ cvModal.candidateName }}</div>
-                <table class="table" style="margin-bottom:var(--space-3)"><thead><tr><th>Document Type</th><th>View Document</th><th>Document Name</th></tr></thead><tbody>
+                <table class="table" style="margin-bottom:var(--space-3)"><thead><tr><th>Document Type</th><th>View Document</th><th>Document Name</th><th>Status</th></tr></thead><tbody>
                   <tr>
                     <td>{{ cvModal.docTypeLabel }}</td>
                     <td>
@@ -1352,6 +1352,10 @@ a:hover{color:var(--color-accent);text-decoration:underline}
                       <sc-if value="{{ cvModal.noDoc }}"><span style="opacity:0.5">No document uploaded</span></sc-if>
                     </td>
                     <td>{{ cvModal.fileName }}</td>
+                    <td>
+                      <sc-if value="{{ cvModal.hasDoc }}"><span class="{{ cvModal.statusBadgeCls }}">{{ cvModal.statusBadgeLabel }}</span></sc-if>
+                      <sc-if value="{{ cvModal.noDoc }}"><span style="opacity:0.5">&mdash;</span></sc-if>
+                    </td>
                   </tr>
                 </tbody></table>
                 <sc-if value="{{ cvModal.hasDoc }}"><div>
@@ -9137,10 +9141,14 @@ class Component extends DCLogic {
       const docType = this.state.cvModalDocType;
       const docCfg = docColumns.find((doc) => doc.key === docType);
       const doc = mc.verification.documents[docType] || {};
+      const docStatus = doc.status || "pending";
+      const statusBadgeCls = docStatus === "valid" ? "badge bg-success" : docStatus === "invalid" ? "badge bg-danger" : "badge bg-warning text-dark";
+      const statusBadgeLabel = docStatus === "valid" ? "Valid" : docStatus === "invalid" ? "Invalid" : "Draft";
       cvModal = {
         candidateId: mc.id, candidateName: mc.name,
         docTypeLabel: docCfg ? docCfg.label : "Document",
         hasDoc: !!doc.fileName, noDoc: !doc.fileName, fileName: doc.fileName, dataUrl: doc.dataUrl,
+        statusBadgeCls, statusBadgeLabel,
         checked: this.state.cvModalChecked, onCheckToggle: () => this.setState({ cvModalChecked: !this.state.cvModalChecked }),
         status: this.state.cvModalStatus, onStatusChange: (e) => this.setState({ cvModalStatus: e.target.value }),
         showSubmit: this.state.cvModalChecked, onSubmit: () => this.onCvSubmitStatus(),
