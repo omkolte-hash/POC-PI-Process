@@ -3786,7 +3786,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-SC-001_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-SC-001.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLVNDLTAwMSkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "invalid"
           }
         }
@@ -3903,7 +3903,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-SC-002_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-SC-002.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLVNDLTAwMikgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -4020,7 +4020,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-SC-003_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-SC-003.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLVNDLTAwMykgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -4119,7 +4119,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-SC-004_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-SC-004.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLVNDLTAwNCkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -4236,7 +4236,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-SC-005_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-SC-005.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLVNDLTAwNSkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -4335,7 +4335,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-SC-006_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-SC-006.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLVNDLTAwNikgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -4434,7 +4434,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-SC-007_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-SC-007.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLVNDLTAwNykgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -4551,7 +4551,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-SC-008_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-SC-008.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLVNDLTAwOCkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -4650,7 +4650,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-SC-009_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-SC-009.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLVNDLTAwOSkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -4749,7 +4749,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-SC-010_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-SC-010.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLVNDLTAxMCkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -4832,7 +4832,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-SC-011_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-SC-011.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLVNDLTAxMSkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -4884,7 +4884,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-SC-012_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-SC-012.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLVNDLTAxMikgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -4936,7 +4936,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-SC-013_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-SC-013.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLVNDLTAxMykgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -4988,7 +4988,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-SC-014_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-SC-014.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLVNDLTAxNCkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -5040,7 +5040,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-SC-015_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-SC-015.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLVNDLTAxNSkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -5092,7 +5092,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-SC-016_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-SC-016.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLVNDLTAxNikgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -5144,7 +5144,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-SC-017_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-SC-017.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLVNDLTAxNykgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -5196,7 +5196,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-SC-018_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-SC-018.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLVNDLTAxOCkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -5248,7 +5248,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-SC-019_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-SC-019.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLVNDLTAxOSkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -5300,7 +5300,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-SC-020_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-SC-020.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLVNDLTAyMCkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -5368,7 +5368,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-ST-001_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-ST-001.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLVNULTAwMSkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -5467,7 +5467,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-ST-002_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-ST-002.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLVNULTAwMikgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -5566,7 +5566,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-ST-003_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-ST-003.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLVNULTAwMykgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -5665,7 +5665,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-ST-004_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-ST-004.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLVNULTAwNCkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -5782,7 +5782,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-ST-005_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-ST-005.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLVNULTAwNSkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -5899,7 +5899,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-ST-006_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-ST-006.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLVNULTAwNikgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -5998,7 +5998,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-ST-007_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-ST-007.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLVNULTAwNykgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -6115,7 +6115,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-ST-008_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-ST-008.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLVNULTAwOCkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -6198,7 +6198,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-ST-009_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-ST-009.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLVNULTAwOSkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -6250,7 +6250,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-ST-010_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-ST-010.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLVNULTAxMCkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -6302,7 +6302,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-ST-011_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-ST-011.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLVNULTAxMSkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -6354,7 +6354,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-ST-012_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-ST-012.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLVNULTAxMikgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -6406,7 +6406,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-ST-013_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-ST-013.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLVNULTAxMykgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -6458,7 +6458,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-ST-014_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-ST-014.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLVNULTAxNCkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -6510,7 +6510,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-ST-015_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-ST-015.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLVNULTAxNSkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -6578,12 +6578,12 @@
         "documents": {
           "category": {
             "fileName": "SIM-DA-001_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-DA-001.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLURBLTAwMSkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           },
           "da": {
             "fileName": "SIM-DA-001_DA_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20DA%20Certificate%20document%20for%20SIM-DA-001.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2ND4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChEQSBFbGlnaWJpbGl0eSBDZXJ0aWZpY2F0ZSkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY3OCBUZCAoQ2FuZGlkYXRlOiBTSU0tREEtMDAxKSBUaiBFVApCVCAvRjEgMTEgVGYgNTAgNjU2IFRkIChQbGFjZWhvbGRlciBkb2N1bWVudCBmb3IgcHJvdG90eXBlIHB1cnBvc2VzLikgVGogRVQKQlQgL0YxIDExIFRmIDUwIDYzNCBUZCAoTm8gcmVhbCBmaWxlIHdhcyBzdWJtaXR0ZWQgZm9yIHRoaXMgY2FuZGlkYXRlLikgVGogRVQKZW5kc3RyZWFtCmVuZG9iagp4cmVmCjAgNgowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDAwMDkgMDAwMDAgbiAKMDAwMDAwMDA1NCAwMDAwMCBuIAowMDAwMDAwMTA1IDAwMDAwIG4gCjAwMDAwMDAyMTcgMDAwMDAgbiAKMDAwMDAwMDI4MCAwMDAwMCBuIAp0cmFpbGVyPDwvU2l6ZSA2L1Jvb3QgMSAwIFI+PgpzdGFydHhyZWYKNTkzCiUlRU9G",
             "status": "valid"
           }
         }
@@ -6682,12 +6682,12 @@
         "documents": {
           "category": {
             "fileName": "SIM-DA-002_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-DA-002.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLURBLTAwMikgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           },
           "da": {
             "fileName": "SIM-DA-002_DA_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20DA%20Certificate%20document%20for%20SIM-DA-002.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2ND4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChEQSBFbGlnaWJpbGl0eSBDZXJ0aWZpY2F0ZSkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY3OCBUZCAoQ2FuZGlkYXRlOiBTSU0tREEtMDAyKSBUaiBFVApCVCAvRjEgMTEgVGYgNTAgNjU2IFRkIChQbGFjZWhvbGRlciBkb2N1bWVudCBmb3IgcHJvdG90eXBlIHB1cnBvc2VzLikgVGogRVQKQlQgL0YxIDExIFRmIDUwIDYzNCBUZCAoTm8gcmVhbCBmaWxlIHdhcyBzdWJtaXR0ZWQgZm9yIHRoaXMgY2FuZGlkYXRlLikgVGogRVQKZW5kc3RyZWFtCmVuZG9iagp4cmVmCjAgNgowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDAwMDkgMDAwMDAgbiAKMDAwMDAwMDA1NCAwMDAwMCBuIAowMDAwMDAwMTA1IDAwMDAwIG4gCjAwMDAwMDAyMTcgMDAwMDAgbiAKMDAwMDAwMDI4MCAwMDAwMCBuIAp0cmFpbGVyPDwvU2l6ZSA2L1Jvb3QgMSAwIFI+PgpzdGFydHhyZWYKNTkzCiUlRU9G",
             "status": "valid"
           }
         }
@@ -6786,12 +6786,12 @@
         "documents": {
           "category": {
             "fileName": "SIM-DA-003_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-DA-003.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLURBLTAwMykgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           },
           "da": {
             "fileName": "SIM-DA-003_DA_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20DA%20Certificate%20document%20for%20SIM-DA-003.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2ND4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChEQSBFbGlnaWJpbGl0eSBDZXJ0aWZpY2F0ZSkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY3OCBUZCAoQ2FuZGlkYXRlOiBTSU0tREEtMDAzKSBUaiBFVApCVCAvRjEgMTEgVGYgNTAgNjU2IFRkIChQbGFjZWhvbGRlciBkb2N1bWVudCBmb3IgcHJvdG90eXBlIHB1cnBvc2VzLikgVGogRVQKQlQgL0YxIDExIFRmIDUwIDYzNCBUZCAoTm8gcmVhbCBmaWxlIHdhcyBzdWJtaXR0ZWQgZm9yIHRoaXMgY2FuZGlkYXRlLikgVGogRVQKZW5kc3RyZWFtCmVuZG9iagp4cmVmCjAgNgowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDAwMDkgMDAwMDAgbiAKMDAwMDAwMDA1NCAwMDAwMCBuIAowMDAwMDAwMTA1IDAwMDAwIG4gCjAwMDAwMDAyMTcgMDAwMDAgbiAKMDAwMDAwMDI4MCAwMDAwMCBuIAp0cmFpbGVyPDwvU2l6ZSA2L1Jvb3QgMSAwIFI+PgpzdGFydHhyZWYKNTkzCiUlRU9G",
             "status": "valid"
           }
         }
@@ -6890,12 +6890,12 @@
         "documents": {
           "category": {
             "fileName": "SIM-DA-004_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-DA-004.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLURBLTAwNCkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           },
           "da": {
             "fileName": "SIM-DA-004_DA_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20DA%20Certificate%20document%20for%20SIM-DA-004.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2ND4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChEQSBFbGlnaWJpbGl0eSBDZXJ0aWZpY2F0ZSkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY3OCBUZCAoQ2FuZGlkYXRlOiBTSU0tREEtMDA0KSBUaiBFVApCVCAvRjEgMTEgVGYgNTAgNjU2IFRkIChQbGFjZWhvbGRlciBkb2N1bWVudCBmb3IgcHJvdG90eXBlIHB1cnBvc2VzLikgVGogRVQKQlQgL0YxIDExIFRmIDUwIDYzNCBUZCAoTm8gcmVhbCBmaWxlIHdhcyBzdWJtaXR0ZWQgZm9yIHRoaXMgY2FuZGlkYXRlLikgVGogRVQKZW5kc3RyZWFtCmVuZG9iagp4cmVmCjAgNgowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDAwMDkgMDAwMDAgbiAKMDAwMDAwMDA1NCAwMDAwMCBuIAowMDAwMDAwMTA1IDAwMDAwIG4gCjAwMDAwMDAyMTcgMDAwMDAgbiAKMDAwMDAwMDI4MCAwMDAwMCBuIAp0cmFpbGVyPDwvU2l6ZSA2L1Jvb3QgMSAwIFI+PgpzdGFydHhyZWYKNTkzCiUlRU9G",
             "status": "valid"
           }
         }
@@ -7012,12 +7012,12 @@
         "documents": {
           "category": {
             "fileName": "SIM-DA-005_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-DA-005.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLURBLTAwNSkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           },
           "da": {
             "fileName": "SIM-DA-005_DA_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20DA%20Certificate%20document%20for%20SIM-DA-005.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2ND4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChEQSBFbGlnaWJpbGl0eSBDZXJ0aWZpY2F0ZSkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY3OCBUZCAoQ2FuZGlkYXRlOiBTSU0tREEtMDA1KSBUaiBFVApCVCAvRjEgMTEgVGYgNTAgNjU2IFRkIChQbGFjZWhvbGRlciBkb2N1bWVudCBmb3IgcHJvdG90eXBlIHB1cnBvc2VzLikgVGogRVQKQlQgL0YxIDExIFRmIDUwIDYzNCBUZCAoTm8gcmVhbCBmaWxlIHdhcyBzdWJtaXR0ZWQgZm9yIHRoaXMgY2FuZGlkYXRlLikgVGogRVQKZW5kc3RyZWFtCmVuZG9iagp4cmVmCjAgNgowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDAwMDkgMDAwMDAgbiAKMDAwMDAwMDA1NCAwMDAwMCBuIAowMDAwMDAwMTA1IDAwMDAwIG4gCjAwMDAwMDAyMTcgMDAwMDAgbiAKMDAwMDAwMDI4MCAwMDAwMCBuIAp0cmFpbGVyPDwvU2l6ZSA2L1Jvb3QgMSAwIFI+PgpzdGFydHhyZWYKNTkzCiUlRU9G",
             "status": "valid"
           }
         }
@@ -7118,12 +7118,12 @@
         "documents": {
           "category": {
             "fileName": "SIM-DA-006_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-DA-006.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLURBLTAwNikgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           },
           "da": {
             "fileName": "SIM-DA-006_DA_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20DA%20Certificate%20document%20for%20SIM-DA-006.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2ND4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChEQSBFbGlnaWJpbGl0eSBDZXJ0aWZpY2F0ZSkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY3OCBUZCAoQ2FuZGlkYXRlOiBTSU0tREEtMDA2KSBUaiBFVApCVCAvRjEgMTEgVGYgNTAgNjU2IFRkIChQbGFjZWhvbGRlciBkb2N1bWVudCBmb3IgcHJvdG90eXBlIHB1cnBvc2VzLikgVGogRVQKQlQgL0YxIDExIFRmIDUwIDYzNCBUZCAoTm8gcmVhbCBmaWxlIHdhcyBzdWJtaXR0ZWQgZm9yIHRoaXMgY2FuZGlkYXRlLikgVGogRVQKZW5kc3RyZWFtCmVuZG9iagp4cmVmCjAgNgowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDAwMDkgMDAwMDAgbiAKMDAwMDAwMDA1NCAwMDAwMCBuIAowMDAwMDAwMTA1IDAwMDAwIG4gCjAwMDAwMDAyMTcgMDAwMDAgbiAKMDAwMDAwMDI4MCAwMDAwMCBuIAp0cmFpbGVyPDwvU2l6ZSA2L1Jvb3QgMSAwIFI+PgpzdGFydHhyZWYKNTkzCiUlRU9G",
             "status": "valid"
           }
         }
@@ -7175,12 +7175,12 @@
         "documents": {
           "category": {
             "fileName": "SIM-DA-007_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-DA-007.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLURBLTAwNykgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           },
           "da": {
             "fileName": "SIM-DA-007_DA_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20DA%20Certificate%20document%20for%20SIM-DA-007.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2ND4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChEQSBFbGlnaWJpbGl0eSBDZXJ0aWZpY2F0ZSkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY3OCBUZCAoQ2FuZGlkYXRlOiBTSU0tREEtMDA3KSBUaiBFVApCVCAvRjEgMTEgVGYgNTAgNjU2IFRkIChQbGFjZWhvbGRlciBkb2N1bWVudCBmb3IgcHJvdG90eXBlIHB1cnBvc2VzLikgVGogRVQKQlQgL0YxIDExIFRmIDUwIDYzNCBUZCAoTm8gcmVhbCBmaWxlIHdhcyBzdWJtaXR0ZWQgZm9yIHRoaXMgY2FuZGlkYXRlLikgVGogRVQKZW5kc3RyZWFtCmVuZG9iagp4cmVmCjAgNgowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDAwMDkgMDAwMDAgbiAKMDAwMDAwMDA1NCAwMDAwMCBuIAowMDAwMDAwMTA1IDAwMDAwIG4gCjAwMDAwMDAyMTcgMDAwMDAgbiAKMDAwMDAwMDI4MCAwMDAwMCBuIAp0cmFpbGVyPDwvU2l6ZSA2L1Jvb3QgMSAwIFI+PgpzdGFydHhyZWYKNTkzCiUlRU9G",
             "status": "valid"
           }
         }
@@ -7232,12 +7232,12 @@
         "documents": {
           "category": {
             "fileName": "SIM-DA-008_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-DA-008.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLURBLTAwOCkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           },
           "da": {
             "fileName": "SIM-DA-008_DA_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20DA%20Certificate%20document%20for%20SIM-DA-008.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2ND4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChEQSBFbGlnaWJpbGl0eSBDZXJ0aWZpY2F0ZSkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY3OCBUZCAoQ2FuZGlkYXRlOiBTSU0tREEtMDA4KSBUaiBFVApCVCAvRjEgMTEgVGYgNTAgNjU2IFRkIChQbGFjZWhvbGRlciBkb2N1bWVudCBmb3IgcHJvdG90eXBlIHB1cnBvc2VzLikgVGogRVQKQlQgL0YxIDExIFRmIDUwIDYzNCBUZCAoTm8gcmVhbCBmaWxlIHdhcyBzdWJtaXR0ZWQgZm9yIHRoaXMgY2FuZGlkYXRlLikgVGogRVQKZW5kc3RyZWFtCmVuZG9iagp4cmVmCjAgNgowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDAwMDkgMDAwMDAgbiAKMDAwMDAwMDA1NCAwMDAwMCBuIAowMDAwMDAwMTA1IDAwMDAwIG4gCjAwMDAwMDAyMTcgMDAwMDAgbiAKMDAwMDAwMDI4MCAwMDAwMCBuIAp0cmFpbGVyPDwvU2l6ZSA2L1Jvb3QgMSAwIFI+PgpzdGFydHhyZWYKNTkzCiUlRU9G",
             "status": "valid"
           }
         }
@@ -7289,12 +7289,12 @@
         "documents": {
           "category": {
             "fileName": "SIM-DA-009_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-DA-009.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLURBLTAwOSkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           },
           "da": {
             "fileName": "SIM-DA-009_DA_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20DA%20Certificate%20document%20for%20SIM-DA-009.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2ND4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChEQSBFbGlnaWJpbGl0eSBDZXJ0aWZpY2F0ZSkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY3OCBUZCAoQ2FuZGlkYXRlOiBTSU0tREEtMDA5KSBUaiBFVApCVCAvRjEgMTEgVGYgNTAgNjU2IFRkIChQbGFjZWhvbGRlciBkb2N1bWVudCBmb3IgcHJvdG90eXBlIHB1cnBvc2VzLikgVGogRVQKQlQgL0YxIDExIFRmIDUwIDYzNCBUZCAoTm8gcmVhbCBmaWxlIHdhcyBzdWJtaXR0ZWQgZm9yIHRoaXMgY2FuZGlkYXRlLikgVGogRVQKZW5kc3RyZWFtCmVuZG9iagp4cmVmCjAgNgowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDAwMDkgMDAwMDAgbiAKMDAwMDAwMDA1NCAwMDAwMCBuIAowMDAwMDAwMTA1IDAwMDAwIG4gCjAwMDAwMDAyMTcgMDAwMDAgbiAKMDAwMDAwMDI4MCAwMDAwMCBuIAp0cmFpbGVyPDwvU2l6ZSA2L1Jvb3QgMSAwIFI+PgpzdGFydHhyZWYKNTkzCiUlRU9G",
             "status": "valid"
           }
         }
@@ -7346,12 +7346,12 @@
         "documents": {
           "category": {
             "fileName": "SIM-DA-010_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-DA-010.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLURBLTAxMCkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           },
           "da": {
             "fileName": "SIM-DA-010_DA_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20DA%20Certificate%20document%20for%20SIM-DA-010.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2ND4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChEQSBFbGlnaWJpbGl0eSBDZXJ0aWZpY2F0ZSkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY3OCBUZCAoQ2FuZGlkYXRlOiBTSU0tREEtMDEwKSBUaiBFVApCVCAvRjEgMTEgVGYgNTAgNjU2IFRkIChQbGFjZWhvbGRlciBkb2N1bWVudCBmb3IgcHJvdG90eXBlIHB1cnBvc2VzLikgVGogRVQKQlQgL0YxIDExIFRmIDUwIDYzNCBUZCAoTm8gcmVhbCBmaWxlIHdhcyBzdWJtaXR0ZWQgZm9yIHRoaXMgY2FuZGlkYXRlLikgVGogRVQKZW5kc3RyZWFtCmVuZG9iagp4cmVmCjAgNgowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDAwMDkgMDAwMDAgbiAKMDAwMDAwMDA1NCAwMDAwMCBuIAowMDAwMDAwMTA1IDAwMDAwIG4gCjAwMDAwMDAyMTcgMDAwMDAgbiAKMDAwMDAwMDI4MCAwMDAwMCBuIAp0cmFpbGVyPDwvU2l6ZSA2L1Jvb3QgMSAwIFI+PgpzdGFydHhyZWYKNTkzCiUlRU9G",
             "status": "valid"
           }
         }
@@ -7419,7 +7419,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-KM-001_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-KM-001.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLUtNLTAwMSkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -7518,7 +7518,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-KM-002_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-KM-002.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLUtNLTAwMikgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -7635,7 +7635,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-KM-003_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-KM-003.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLUtNLTAwMykgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -7734,7 +7734,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-KM-004_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-KM-004.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLUtNLTAwNCkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -7851,7 +7851,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-KM-005_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-KM-005.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLUtNLTAwNSkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -7950,7 +7950,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-KM-006_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-KM-006.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLUtNLTAwNikgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -8049,7 +8049,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-KM-007_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-KM-007.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLUtNLTAwNykgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -8150,7 +8150,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-KM-008_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-KM-008.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLUtNLTAwOCkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -8202,7 +8202,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-KM-009_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-KM-009.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLUtNLTAwOSkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -8254,7 +8254,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-KM-010_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-KM-010.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLUtNLTAxMCkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -8306,7 +8306,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-KM-011_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-KM-011.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLUtNLTAxMSkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -8358,7 +8358,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-KM-012_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-KM-012.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLUtNLTAxMikgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -8410,7 +8410,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-KM-013_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-KM-013.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLUtNLTAxMykgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -8462,7 +8462,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-KM-014_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-KM-014.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLUtNLTAxNCkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
@@ -8514,7 +8514,7 @@
         "documents": {
           "category": {
             "fileName": "SIM-KM-015_Category_Certificate.pdf",
-            "dataUrl": "data:text/plain;charset=utf-8,Placeholder%20Category%20Certificate%20document%20for%20SIM-KM-015.%20No%20real%20file%20was%20submitted%20%E2%80%94%20this%20stands%20in%20for%20whatever%20document%20would%20have%20been%20uploaded%20during%20the%20actual%20application%2C%20for%20prototype%20purposes.",
+            "dataUrl": "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSA0IDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDI2OD4+CnN0cmVhbQpCVCAvRjEgMTYgVGYgNTAgNzAwIFRkIChDYXRlZ29yeSAvIE1lZGljYWwgQ2VydGlmaWNhdGUpIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2NzggVGQgKENhbmRpZGF0ZTogU0lNLUtNLTAxNSkgVGogRVQKQlQgL0YxIDExIFRmIDUwIDY1NiBUZCAoUGxhY2Vob2xkZXIgZG9jdW1lbnQgZm9yIHByb3RvdHlwZSBwdXJwb3Nlcy4pIFRqIEVUCkJUIC9GMSAxMSBUZiA1MCA2MzQgVGQgKE5vIHJlYWwgZmlsZSB3YXMgc3VibWl0dGVkIGZvciB0aGlzIGNhbmRpZGF0ZS4pIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTQgMDAwMDAgbiAKMDAwMDAwMDEwNSAwMDAwMCBuIAowMDAwMDAwMjE3IDAwMDAwIG4gCjAwMDAwMDAyODAgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjU5NwolJUVPRg==",
             "status": "valid"
           }
         }
