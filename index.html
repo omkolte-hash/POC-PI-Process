@@ -8117,7 +8117,7 @@ class Component extends DCLogic {
       sdCreatedOn: this.engine.fmtDate(l.createdOn), sdCount: l.candidateIds.length,
       sdTagCls: meta.cls, sdStatusLabel: meta.label,
       sdApprovalLevels: chain.map((lvl, i) => ({
-        name: lvl.name,
+        name: `Level ${i + 1} Approval (${lvl.name})`,
         statusLabel: l.approvals[i] ? `${l.approvals[i].status} \u00b7 ${l.approvals[i].date}` : (i === l.currentLevelIndex && l.status === "pending" ? "Pending" : "\u2014")
       })),
       sdShowSend: btn.showSend && l.status !== "rejected", sdApprovalTagLabel: btn.tagLabel,
