@@ -8391,12 +8391,16 @@ class Component extends DCLogic {
       sfGroupCapacityStyle: `font-size:13px;margin:var(--space-3) 0 0;${groupCapacityExceeded ? "color:var(--color-accent-700)" : "opacity:0.65"}`,
       onSfBackToForm: () => this.onSfBackToForm(), onSfSaveGroups: () => this.onSfSaveGroups(),
       sessionRows: sessions.map((sess, i) => {
-        const allocated = sess.groups.reduce((a, g) => a + g.candidateIds.length, 0);
+        // sess.groups is always an array by the time it reaches here (createSession requires at
+        // least one, and legacy-data migration backfills []) - a defensive fallback costs nothing
+        // and avoids a hard crash if that invariant is ever violated.
+        const sessGroups = sess.groups || [];
+        const allocated = sessGroups.reduce((a, g) => a + g.candidateIds.length, 0);
         return {
           id: sess.id, label: `Session ${String(i + 1).padStart(2, "0")}`, date: this.engine.fmtDate(sess.date), time: `${sess.startTime} \u2013 ${sess.endTime}`,
-          capacity: sess.capacity, numGroups: sess.groups.length, allocated, available: sess.capacity - allocated,
+          capacity: sess.capacity, numGroups: sessGroups.length, allocated, available: sess.capacity - allocated,
           toggleLabel: "View Groups",
-          onToggle: () => this.setState({ groupsDrawerSessionId: sess.id, groupsDrawerActiveGroupId: sess.groups[0] ? sess.groups[0].id : null, gcgStep: null, gcgSelectedIds: [], gcgTargetGroupId: null, gcgTargetSessionId: null })
+          onToggle: () => this.setState({ groupsDrawerSessionId: sess.id, groupsDrawerActiveGroupId: sessGroups[0] ? sessGroups[0].id : null, gcgStep: null, gcgSelectedIds: [], gcgTargetGroupId: null, gcgTargetSessionId: null })
         };
       }),
       ...this.buildGroupsDrawer(d, sessions)
@@ -8407,14 +8411,15 @@ class Component extends DCLogic {
     const inactiveTabStyle = 'color:var(--color-text);border:none;background:none;padding:8px 16px;cursor:pointer';
     const session = sessions.find((sess) => sess.id === this.state.groupsDrawerSessionId);
     if (!session) return { groupsDrawerOpen: false, groupsDrawerTabs: [], groupsDrawerCandidates: [], groupsDrawerNoCandidates: true };
-    const activeGroupId = this.state.groupsDrawerActiveGroupId || (session.groups[0] && session.groups[0].id);
-    const activeGroup = session.groups.find((g) => g.id === activeGroupId);
+    const sessionGroups = session.groups || [];
+    const activeGroupId = this.state.groupsDrawerActiveGroupId || (sessionGroups[0] && sessionGroups[0].id);
+    const activeGroup = sessionGroups.find((g) => g.id === activeGroupId);
     const cands = activeGroup ? d.candidates.filter((c) => c.allocation && c.allocation.sessionId === session.id && c.allocation.groupId === activeGroup.id) : [];
     return {
       groupsDrawerOpen: true,
       groupsDrawerTitle: `Groups \u2013 Session ${this.engine.fmtDate(session.date)}`,
       onGroupsDrawerClose: () => this.setState({ groupsDrawerSessionId: null, groupsDrawerActiveGroupId: null, gcgStep: null, gcgSelectedIds: [], gcgTargetGroupId: null, gcgTargetSessionId: null }),
-      groupsDrawerTabs: session.groups.map((g) => ({
+      groupsDrawerTabs: sessionGroups.map((g) => ({
         id: g.id, label: g.name, style: g.id === activeGroupId ? activeTabStyle : inactiveTabStyle,
         onClick: () => this.setState({ groupsDrawerActiveGroupId: g.id, gcgStep: null, gcgSelectedIds: [], gcgTargetGroupId: null, gcgTargetSessionId: null })
       })),
@@ -8432,9 +8437,10 @@ class Component extends DCLogic {
     const orderedSessions = [session, ...sessions.filter((s) => s.id !== session.id)];
     const gcgTargetGroups = [];
     orderedSessions.forEach((sess) => {
+      const sessGroups = sess.groups || [];
       const eligibleGroups = sess.id === session.id
-        ? (activeGroup ? sess.groups.filter((g) => g.id !== activeGroup.id) : sess.groups)
-        : sess.groups;
+        ? (activeGroup ? sessGroups.filter((g) => g.id !== activeGroup.id) : sessGroups)
+        : sessGroups;
       if (!eligibleGroups.length) return;
       const si = sessions.findIndex((s) => s.id === sess.id);
       gcgTargetGroups.push({
