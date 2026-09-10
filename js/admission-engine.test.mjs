@@ -7,7 +7,8 @@ import {
   moveCandidatesAllocation, confirmShortlist, createApprovalRequest, sendApprovalMail,
   generateMailOtp, verifyMailOtp, createAdmissionCycle, activeCycleId, cyclesForScope,
   setActiveCycle, deleteAdmissionCycle, buildCandidateDocuments, approveShortlistList, revertShortlist,
-  runMeritProcessing, approveMeritBatch, savePanelist, approvePanelist, fmtDateTime
+  runMeritProcessing, approveMeritBatch, savePanelist, approvePanelist, fmtDateTime,
+  unassignPanelist
 } from "./admission-engine.js";
 
 function makeReadyCandidate(ds, programmeId, academicYearId, overrides) {
@@ -324,4 +325,44 @@ test("fmtDateTime formats an ISO timestamp and returns empty string for no value
   assert.equal(fmtDateTime(null), "");
   assert.equal(fmtDateTime(""), "");
   assert.ok(fmtDateTime("2026-09-10T10:15:00.000Z").length > 0);
+});
+
+// Feedback: Panelist Allocation needs a way to undo assignPanelist.
+function makeSessionWithGroup(ds, overrides) {
+  const session = {
+    id: "S1", programmeId: "P1", academicYearId: "AY1", date: "2026-01-01",
+    startTime: "10:00 AM", endTime: "11:00 AM",
+    groups: [{ id: "G1", name: "Group 1", capacity: 5, candidateIds: [], zoomRoom: { id: "ZR1", link: "", panelistIds: [] }, ...overrides }]
+  };
+  ds.sessions.push(session);
+  return session.groups[0];
+}
+
+test("unassignPanelist removes an unscored panelist from the group", () => {
+  const ds = generateDataset();
+  makeSessionWithGroup(ds, { zoomRoom: { id: "ZR1", link: "", panelistIds: ["PAN1"] } });
+
+  const res = unassignPanelist(ds, "S1", "G1", "PAN1");
+  assert.ok(res.ok);
+  const group = ds.sessions[0].groups[0];
+  assert.ok(!group.zoomRoom.panelistIds.includes("PAN1"));
+});
+
+test("unassignPanelist refuses once the panelist has scored a candidate in the group", () => {
+  const ds = generateDataset();
+  makeSessionWithGroup(ds, { candidateIds: ["C1"], zoomRoom: { id: "ZR1", link: "", panelistIds: ["PAN1"] } });
+  const c = makeReadyCandidate(ds, "P1", "AY1", { id: "C1", piTotal: null });
+  c.piScores = { PAN1: { technical: 10 } };
+
+  const res = unassignPanelist(ds, "S1", "G1", "PAN1");
+  assert.ok(res.error);
+  assert.ok(ds.sessions[0].groups[0].zoomRoom.panelistIds.includes("PAN1"), "refused unassign must not touch panelistIds");
+});
+
+test("unassignPanelist errors when the panelist isn't assigned to the group", () => {
+  const ds = generateDataset();
+  makeSessionWithGroup(ds, { zoomRoom: { id: "ZR1", link: "", panelistIds: ["PAN2"] } });
+
+  const res = unassignPanelist(ds, "S1", "G1", "PAN1");
+  assert.ok(res.error);
 });

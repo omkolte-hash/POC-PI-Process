@@ -1210,7 +1210,9 @@ a:hover{color:var(--color-accent);text-decoration:underline}
                 </div>
               </div>
               <div style="display:flex;gap:6px;flex-wrap:wrap">
-                <sc-for list="{{ g.panelistChips }}" as="pc" hint-placeholder-count="2"><span class="tag tag-outline">{{ pc }}</span></sc-for>
+                <sc-for list="{{ g.panelistChips }}" as="pc" hint-placeholder-count="2">
+                  <span class="tag tag-outline" style="display:inline-flex;align-items:center;gap:4px">{{ pc.label }}<button type="button" class="btn btn-icon btn-ghost btn-sm" onClick="{{ pc.onUnassign }}" title="Unassign panelist"><i data-lucide="x" style="width:12px;height:12px"></i></button></span>
+                </sc-for>
               </div>
             </div>
           </sc-for>
@@ -8667,6 +8669,9 @@ class Component extends DCLogic {
     this.mutate((ds) => this.engine.assignPanelist(ds, sessionId, groupId, panelistId), (r) => (r && r.error) ? r.error : "Panelist assigned to group.");
     this.setPick(groupId, "");
   }
+  onUnassignPanelist(sessionId, groupId, panelistId) {
+    this.mutate((ds) => this.engine.unassignPanelist(ds, sessionId, groupId, panelistId), (r) => (r && r.error) ? r.error : "Panelist unassigned from group.");
+  }
   onSaveZoomLink(sessionId, groupId) {
     const link = (this.state.zrLinkDrafts && this.state.zrLinkDrafts[groupId]) || "";
     this.mutate((ds) => this.engine.setZoomRoomLink(ds, sessionId, groupId, link), (r) => r.error ? r.error : "Zoom Room link saved.");
@@ -8859,7 +8864,10 @@ class Component extends DCLogic {
         const assignedIds = g.zoomRoom.panelistIds;
         return {
           id: g.id, name: g.name, link: g.zoomRoom.link,
-          panelistChips: assignedIds.map((pid2) => (d.panelists.find((p) => p.id === pid2) || {}).name).filter(Boolean),
+          panelistChips: assignedIds.map((pid2) => {
+            const p = d.panelists.find((x) => x.id === pid2);
+            return p && { label: p.name, onUnassign: () => this.onUnassignPanelist(session.id, g.id, pid2) };
+          }).filter(Boolean),
           pickPanelist: this.state.pickMap[g.id] || "", onPickChange: (e) => this.setPick(g.id, e.target.value),
           availablePanelists: approved.filter((p) => !assignedIds.includes(p.id)).map((p) => ({ id: p.id, name: p.name, type: p.type })),
           onAssign: () => this.onAssignPanelist(session.id, g.id)
