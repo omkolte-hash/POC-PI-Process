@@ -943,12 +943,14 @@ a:hover{color:var(--color-accent);text-decoration:underline}
                   <sc-if value="{{ gcgStepIsTarget }}"><div>
                     <p style="font-size:12px;opacity:0.7;margin-top:0">Move {{ gcgSelectedCount }} candidate(s) to:</p>
                     <sc-for list="{{ gcgTargetGroups }}" as="tg" hint-placeholder-count="3">
-                      <div style="{{ tg.style }}" onClick="{{ tg.onClick }}">
+                      <sc-if value="{{ tg.isHeader }}"><div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--color-text-muted);margin:12px 0 8px">{{ tg.label }}</div></sc-if>
+                      <sc-if value="{{ tg.isGroup }}"><div style="{{ tg.style }}" onClick="{{ tg.onClick }}">
                         <div style="font-weight:600">{{ tg.name }}</div>
                         <div style="font-size:12px;opacity:0.7">Capacity {{ tg.capacity }} &middot; Allocated {{ tg.allocated }} &middot; Available {{ tg.available }}</div>
-                      </div>
+                      </div></sc-if>
                     </sc-for>
-                    <sc-if value="{{ gcgNoTargetGroups }}"><div style="font-size:12px;opacity:0.5">No other groups in this session to move to.</div></sc-if>
+                    <sc-if value="{{ gcgNoTargetGroups }}"><div style="font-size:12px;opacity:0.5">No other groups to move to.</div></sc-if>
+                    <sc-if value="{{ gcgShowCrossSessionWarning }}"><div style="font-size:12px;border:1px solid var(--color-accent-700);border-radius:var(--radius-sm);background:color-mix(in srgb, var(--color-accent) 8%, transparent);padding:8px 10px;margin-top:var(--space-3)">Moving to a different session changes these candidates' interview date and time, and resets their PI attendance and any PI scores recorded so far.</div></sc-if>
                     <div style="display:flex;gap:var(--space-2);margin-top:var(--space-4)">
                       <button type="button" class="btn btn-primary" onClick="{{ onGcgMoveStudents }}" disabled="{{ gcgMoveDisabled }}">Move Students</button>
                       <button type="button" class="btn btn-ghost" onClick="{{ onGcgBack }}">Back</button>
@@ -4577,7 +4579,7 @@ class Component extends DCLogic {
     sfToDate: "", sfToTime: "", sfToPickerOpen: false, sfToViewMonth: "",
     sfReportingMinutes: "", sfCapacity: "", sfGroups: "", sfGroupDrafts: [], sfAutoGroupNames: false,
     groupsDrawerSessionId: null, groupsDrawerActiveGroupId: null,
-    gcgStep: null, gcgSelectedIds: [], gcgTargetGroupId: null,
+    gcgStep: null, gcgSelectedIds: [], gcgTargetGroupId: null, gcgTargetSessionId: null,
     caSessionId: "", caGroupId: "",
     caFilterCategory: "ALL", caSelectedIds: [], caGroupSelectedIds: [],
     aaMode: false, aaPreview: null, dragCandidateIds: [],
@@ -8394,7 +8396,7 @@ class Component extends DCLogic {
           id: sess.id, label: `Session ${String(i + 1).padStart(2, "0")}`, date: this.engine.fmtDate(sess.date), time: `${sess.startTime} \u2013 ${sess.endTime}`,
           capacity: sess.capacity, numGroups: sess.groups.length, allocated, available: sess.capacity - allocated,
           toggleLabel: "View Groups",
-          onToggle: () => this.setState({ groupsDrawerSessionId: sess.id, groupsDrawerActiveGroupId: sess.groups[0] ? sess.groups[0].id : null, gcgStep: null, gcgSelectedIds: [], gcgTargetGroupId: null })
+          onToggle: () => this.setState({ groupsDrawerSessionId: sess.id, groupsDrawerActiveGroupId: sess.groups[0] ? sess.groups[0].id : null, gcgStep: null, gcgSelectedIds: [], gcgTargetGroupId: null, gcgTargetSessionId: null })
         };
       }),
       ...this.buildGroupsDrawer(d, sessions)
@@ -8411,36 +8413,49 @@ class Component extends DCLogic {
     return {
       groupsDrawerOpen: true,
       groupsDrawerTitle: `Groups \u2013 Session ${this.engine.fmtDate(session.date)}`,
-      onGroupsDrawerClose: () => this.setState({ groupsDrawerSessionId: null, groupsDrawerActiveGroupId: null, gcgStep: null, gcgSelectedIds: [], gcgTargetGroupId: null }),
+      onGroupsDrawerClose: () => this.setState({ groupsDrawerSessionId: null, groupsDrawerActiveGroupId: null, gcgStep: null, gcgSelectedIds: [], gcgTargetGroupId: null, gcgTargetSessionId: null }),
       groupsDrawerTabs: session.groups.map((g) => ({
         id: g.id, label: g.name, style: g.id === activeGroupId ? activeTabStyle : inactiveTabStyle,
-        onClick: () => this.setState({ groupsDrawerActiveGroupId: g.id, gcgStep: null, gcgSelectedIds: [], gcgTargetGroupId: null })
+        onClick: () => this.setState({ groupsDrawerActiveGroupId: g.id, gcgStep: null, gcgSelectedIds: [], gcgTargetGroupId: null, gcgTargetSessionId: null })
       })),
       groupsDrawerActiveGroupMeta: activeGroup ? `Capacity ${activeGroup.capacity} \u00b7 Allocated ${activeGroup.candidateIds.length} \u00b7 Available ${activeGroup.capacity - activeGroup.candidateIds.length}` : "",
-      ...this.buildGroupsChangeGroup(session, activeGroup, cands)
+      ...this.buildGroupsChangeGroup(session, activeGroup, cands, sessions)
     };
   }
-  // Change Group flow, scoped to the drawer's currently selected group tab. Target groups are limited to
-  // other groups within this same session (not other sessions) - the drawer is already session-scoped, and
-  // a cross-session move would also imply a different date/time for the moved candidates, which is a bigger
-  // decision than this quick reallocation control should make on the user's behalf.
-  buildGroupsChangeGroup(session, activeGroup, cands) {
+  // Change Group flow, scoped to the drawer's currently selected group tab. Target groups span every
+  // session in the same programme/academic year/cycle (the current session's other groups first, then
+  // each other session's groups under its own heading) since candidates can be reallocated across sessions.
+  buildGroupsChangeGroup(session, activeGroup, cands, sessions) {
     const step = this.state.gcgStep;
     const selectedIds = this.state.gcgSelectedIds;
     const candIds = cands.map((c) => c.id);
-    const otherGroups = activeGroup ? session.groups.filter((g) => g.id !== activeGroup.id) : [];
-    const gcgTargetGroups = otherGroups.map((g) => {
-      const available = g.capacity - g.candidateIds.length;
-      const disabled = available < selectedIds.length;
-      const selected = this.state.gcgTargetGroupId === g.id;
-      let style = "padding:10px 12px;border:1px solid var(--color-divider);border-radius:var(--radius-sm);margin-bottom:8px;";
-      style += disabled ? "opacity:0.45;cursor:not-allowed;" : "cursor:pointer;";
-      if (selected) style += "border-color:var(--color-accent-700);background:color-mix(in srgb, var(--color-accent) 8%, transparent);";
-      return {
-        id: g.id, name: g.name, capacity: g.capacity, allocated: g.candidateIds.length, available, style,
-        onClick: disabled ? null : () => this.onGcgSelectTarget(g.id)
-      };
+    const orderedSessions = [session, ...sessions.filter((s) => s.id !== session.id)];
+    const gcgTargetGroups = [];
+    orderedSessions.forEach((sess) => {
+      const eligibleGroups = sess.id === session.id
+        ? (activeGroup ? sess.groups.filter((g) => g.id !== activeGroup.id) : sess.groups)
+        : sess.groups;
+      if (!eligibleGroups.length) return;
+      const si = sessions.findIndex((s) => s.id === sess.id);
+      gcgTargetGroups.push({
+        isHeader: true, isGroup: false,
+        label: `Session ${String(si + 1).padStart(2, "0")} \u2014 ${this.engine.fmtDate(sess.date)}, ${sess.startTime}`
+      });
+      eligibleGroups.forEach((g) => {
+        const available = g.capacity - g.candidateIds.length;
+        const disabled = available < selectedIds.length;
+        const selected = this.state.gcgTargetGroupId === g.id && this.state.gcgTargetSessionId === sess.id;
+        let style = "padding:10px 12px;border:1px solid var(--color-divider);border-radius:var(--radius-sm);margin-bottom:8px;";
+        style += disabled ? "opacity:0.45;cursor:not-allowed;" : "cursor:pointer;";
+        if (selected) style += "border-color:var(--color-accent-700);background:color-mix(in srgb, var(--color-accent) 8%, transparent);";
+        gcgTargetGroups.push({
+          isHeader: false, isGroup: true,
+          id: g.id, name: g.name, capacity: g.capacity, allocated: g.candidateIds.length, available, style,
+          onClick: disabled ? null : () => this.onGcgSelectTarget(sess.id, g.id)
+        });
+      });
     });
+    const gcgShowCrossSessionWarning = !!this.state.gcgTargetSessionId && this.state.gcgTargetSessionId !== session.id;
     return {
       gcgSelectModeActive: step === "select",
       gcgStepIsTarget: step === "target",
@@ -8459,12 +8474,13 @@ class Component extends DCLogic {
       onGcgNext: () => this.onGcgNext(), onGcgCancel: () => this.onGcgCancel(), onGcgBack: () => this.onGcgBack(),
       gcgSelectedCount: selectedIds.length,
       gcgTargetGroups, gcgNoTargetGroups: gcgTargetGroups.length === 0,
+      gcgShowCrossSessionWarning,
       gcgMoveDisabled: !this.state.gcgTargetGroupId,
       onGcgMoveStudents: () => this.onGcgMoveStudents()
     };
   }
   onGcgStart() { this.setState({ gcgStep: "select", gcgSelectedIds: [] }); }
-  onGcgCancel() { this.setState({ gcgStep: null, gcgSelectedIds: [], gcgTargetGroupId: null }); }
+  onGcgCancel() { this.setState({ gcgStep: null, gcgSelectedIds: [], gcgTargetGroupId: null, gcgTargetSessionId: null }); }
   onGcgToggleSelect(id) {
     const ids = this.state.gcgSelectedIds;
     this.setState({ gcgSelectedIds: ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id] });
@@ -8476,16 +8492,16 @@ class Component extends DCLogic {
   }
   onGcgNext() {
     if (!this.state.gcgSelectedIds.length) return;
-    this.setState({ gcgStep: "target", gcgTargetGroupId: null });
+    this.setState({ gcgStep: "target", gcgTargetGroupId: null, gcgTargetSessionId: null });
   }
-  onGcgBack() { this.setState({ gcgStep: "select", gcgTargetGroupId: null }); }
-  onGcgSelectTarget(id) { this.setState({ gcgTargetGroupId: id }); }
+  onGcgBack() { this.setState({ gcgStep: "select", gcgTargetGroupId: null, gcgTargetSessionId: null }); }
+  onGcgSelectTarget(sessionId, id) { this.setState({ gcgTargetGroupId: id, gcgTargetSessionId: sessionId }); }
   onGcgMoveStudents() {
-    const { gcgSelectedIds, gcgTargetGroupId, groupsDrawerSessionId } = this.state;
+    const { gcgSelectedIds, gcgTargetGroupId, gcgTargetSessionId } = this.state;
     if (!gcgSelectedIds.length || !gcgTargetGroupId) return;
-    const res = this.mutate((ds) => this.engine.moveCandidatesAllocation(ds, gcgSelectedIds, groupsDrawerSessionId, gcgTargetGroupId),
+    const res = this.mutate((ds) => this.engine.moveCandidatesAllocation(ds, gcgSelectedIds, gcgTargetSessionId, gcgTargetGroupId),
       (r) => r.error ? r.error : `Moved ${r.moved} candidate(s).`);
-    if (res && res.ok) this.setState({ gcgStep: null, gcgSelectedIds: [], gcgTargetGroupId: null });
+    if (res && res.ok) this.setState({ gcgStep: null, gcgSelectedIds: [], gcgTargetGroupId: null, gcgTargetSessionId: null });
   }
 
   onCaFilterCategory(e) { this.setState({ caFilterCategory: e.target.value, caSelectedIds: [] }); }

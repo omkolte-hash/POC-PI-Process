@@ -139,6 +139,62 @@ test("moveCandidatesAllocation rejects a move that would exceed the target group
   assert.deepEqual(g2.candidateIds, ["C13", "C14"]);
 });
 
+// Follow-up: "Change Group" can now move candidates into a different session's group, not just
+// another group in the same session — the engine already supported this (matching is by
+// programme/academicYear/cycle, not by session), this just locks in the behavior with a test.
+test("moveCandidatesAllocation moves a candidate into another session's group and resets attendance/scores", () => {
+  const ds = generateDataset();
+  const inst = createInstitute(ds, { name: "Test Institute", code: "TI" });
+  const prog = createProgramme(ds, { instituteId: inst.id, name: "Test Programme", code: "TP" });
+  const ay = ds.activeAcademicYearByProgramme[prog.id];
+
+  ds.sessions.push(
+    { id: "S1", programmeId: prog.id, academicYearId: ay, date: "2026-01-01", startTime: "10:00 AM", endTime: "11:00 AM", groups: [{ id: "G1", name: "Group 1", capacity: 5, candidateIds: ["C30"], zoomRoom: { id: "ZR1", link: "", panelistIds: [] } }] },
+    { id: "S2", programmeId: prog.id, academicYearId: ay, date: "2026-01-05", startTime: "2:00 PM", endTime: "3:00 PM", groups: [{ id: "G2", name: "Group 2", capacity: 5, candidateIds: [], zoomRoom: { id: "ZR2", link: "", panelistIds: [] } }] }
+  );
+  const c30 = makeReadyCandidate(ds, prog.id, ay, { id: "C30", piTotal: 30, slatScore: 70 });
+  c30.allocation = { sessionId: "S1", groupId: "G1" };
+  c30.piScores = { panelist1: 15 }; c30.piScoreLocked = { panelist1: true }; c30.piNotes = { panelist1: "good" };
+  markAttendance(ds, "C30", "pi", "present", prog.id, ay, undefined, true);
+  assert.equal(c30.piAttendanceLocked, true);
+
+  const res = moveCandidatesAllocation(ds, ["C30"], "S2", "G2");
+  assert.ok(res.ok);
+  assert.equal(res.moved, 1);
+  assert.deepEqual(c30.allocation, { sessionId: "S2", groupId: "G2" }, "allocation must point at the new session and group");
+  const [s1, s2] = ds.sessions;
+  assert.deepEqual(s1.groups[0].candidateIds, [], "candidate must leave the source group");
+  assert.deepEqual(s2.groups[0].candidateIds, ["C30"], "candidate must join the target group in the other session");
+  assert.equal(c30.piAttendance, "pending", "attendance must reset for the new session's panel");
+  assert.equal(c30.piAttendanceLocked, false, "attendance lock must not survive a cross-session move");
+  assert.deepEqual(c30.piScores, {}, "PI scores belong to the old panel and must be cleared");
+  assert.deepEqual(c30.piScoreLocked, {});
+  assert.deepEqual(c30.piNotes, {});
+  assert.equal(c30.piTotal, null);
+});
+
+test("moveCandidatesAllocation enforces capacity on a different session's target group", () => {
+  const ds = generateDataset();
+  const inst = createInstitute(ds, { name: "Test Institute", code: "TI" });
+  const prog = createProgramme(ds, { instituteId: inst.id, name: "Test Programme", code: "TP" });
+  const ay = ds.activeAcademicYearByProgramme[prog.id];
+
+  ds.sessions.push(
+    { id: "S1", programmeId: prog.id, academicYearId: ay, date: "2026-01-01", startTime: "10:00 AM", endTime: "11:00 AM", groups: [{ id: "G1", name: "Group 1", capacity: 5, candidateIds: ["C31"], zoomRoom: { id: "ZR1", link: "", panelistIds: [] } }] },
+    { id: "S2", programmeId: prog.id, academicYearId: ay, date: "2026-01-05", startTime: "2:00 PM", endTime: "3:00 PM", groups: [{ id: "G2", name: "Group 2", capacity: 1, candidateIds: ["C32"], zoomRoom: { id: "ZR2", link: "", panelistIds: [] } }] }
+  );
+  const c31 = makeReadyCandidate(ds, prog.id, ay, { id: "C31", piTotal: 30, slatScore: 70 });
+  c31.allocation = { sessionId: "S1", groupId: "G1" };
+  makeReadyCandidate(ds, prog.id, ay, { id: "C32", piTotal: 20, slatScore: 60 }).allocation = { sessionId: "S2", groupId: "G2" };
+
+  const res = moveCandidatesAllocation(ds, ["C31"], "S2", "G2");
+  assert.ok(res.error, "a full target group in another session must refuse the move");
+  assert.deepEqual(c31.allocation, { sessionId: "S1", groupId: "G1" }, "candidate must stay put when the move is rejected");
+  const [s1, s2] = ds.sessions;
+  assert.deepEqual(s1.groups[0].candidateIds, ["C31"]);
+  assert.deepEqual(s2.groups[0].candidateIds, ["C32"]);
+});
+
 // PI Attendance page's confirm-and-mark flow (see index.html buildAttendance) passes lock=true —
 // once locked, markAttendance must refuse further changes until a re-allocation clears the lock.
 test("markAttendance locks the candidate when marked with lock=true, and a locked candidate can't be changed again", () => {
