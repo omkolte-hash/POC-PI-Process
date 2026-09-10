@@ -1058,7 +1058,6 @@ a:hover{color:var(--color-accent);text-decoration:underline}
                     <td>{{ g.panelistNames }}</td>
                     <td style="white-space:nowrap">
                       <button type="button" class="btn btn-outline-secondary btn-sm me-1" onClick="{{ g.onSaveLink }}">Save Link</button>
-                      <button type="button" class="btn btn-primary btn-sm" onClick="{{ g.onAssign }}" disabled="{{ g.assignDisabled }}">Auto-Assign</button>
                     </td>
                   </tr>
                 </sc-for>
@@ -8666,9 +8665,6 @@ class Component extends DCLogic {
     this.mutate((ds) => this.engine.assignPanelist(ds, sessionId, groupId, panelistId), (r) => (r && r.error) ? r.error : "Panelist assigned to group.");
     this.setPick(groupId, "");
   }
-  onAssignZoomRoom(sessionId, groupId) {
-    this.mutate((ds) => this.engine.assignZoomRoomLink(ds, sessionId, groupId), (r) => r.error ? r.error : "Zoom Room assigned.");
-  }
   onSaveZoomLink(sessionId, groupId) {
     const link = (this.state.zrLinkDrafts && this.state.zrLinkDrafts[groupId]) || "";
     this.mutate((ds) => this.engine.setZoomRoomLink(ds, sessionId, groupId, link), (r) => r.error ? r.error : "Zoom Room link saved.");
@@ -8689,9 +8685,7 @@ class Component extends DCLogic {
             linkDraft: drafts[g.id] != null ? drafts[g.id] : (g.zoomRoom.link || ""),
             onLinkDraftChange: (e) => this.setState({ zrLinkDrafts: { ...drafts, [g.id]: e.target.value } }),
             onSaveLink: () => this.onSaveZoomLink(s.id, g.id),
-            panelistNames: assignedIds.map((pid2) => (d.panelists.find((p) => p.id === pid2) || {}).name).join(", ") || "No panelists assigned yet",
-            assignDisabled: !!g.zoomRoom.link || assignedIds.length === 0,
-            onAssign: () => this.onAssignZoomRoom(s.id, g.id)
+            panelistNames: assignedIds.map((pid2) => (d.panelists.find((p) => p.id === pid2) || {}).name).join(", ") || "No panelists assigned yet"
           };
         })
       }))
