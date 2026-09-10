@@ -4930,7 +4930,10 @@ class Component extends DCLogic {
     if (req.status === "rejected") return { showSend: true, tagLabel: "Rejected", tagCls: "tag tag-neutral" };
     if (req.status === "approved") return { showSend: false, tagLabel: "Approved", tagCls: "tag tag-accent" };
     const levelName = (chain && chain[req.levelIndex] && chain[req.levelIndex].name) || `Level ${req.levelIndex + 1}`;
-    if (req.mailIds[req.levelIndex]) {
+    // mailIds is backfilled on load (see normalizeDataset) and always set on creation, but this is
+    // the one chokepoint every approval display (shortlist/merit/assessment-params) routes through,
+    // so guard here too rather than trust every past and future writer got the shape right.
+    if ((req.mailIds || [])[req.levelIndex]) {
       return { showSend: false, tagLabel: `Pending ${levelName}`, tagCls: req.levelIndex === 0 ? "tag tag-neutral" : "tag tag-outline" };
     }
     if (req.levelIndex === 0) return { showSend: true, tagLabel: "", tagCls: "" };

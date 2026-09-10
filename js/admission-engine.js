@@ -401,11 +401,15 @@ export function normalizeDataset(d) {
   // levelIndex + a snapshotted levelLabel (the popup approval tab has no dataset access to resolve a
   // chain lookup itself, and a historical mail shouldn't retroactively relabel if a level is renamed).
   const approvalRequests = (d.approvalRequests || []).map((r) => {
-    if (r.levelIndex !== undefined && r.chainLength !== undefined) return r;
+    // mailIds has been part of this shape since it was introduced, but a request saved by some
+    // in-between version can still be missing it even though levelIndex/chainLength are already
+    // present (approvalButtonState indexes into it unconditionally) - backfill it regardless of
+    // which branch below a record otherwise falls into.
+    if (r.levelIndex !== undefined && r.chainLength !== undefined) return r.mailIds ? r : { ...r, mailIds: [] };
     // Backfill chainLength for requests saved before it existed — best-effort against the
     // programme's chain as it stands right now, same live lookup verifyMailOtp used to do inline.
     const chainLength = effectiveApprovalChain(programmes.find((p) => p.id === r.programmeId)).length;
-    if (r.levelIndex !== undefined) return { ...r, chainLength };
+    if (r.levelIndex !== undefined) return { ...r, chainLength, mailIds: r.mailIds || [] };
     const levelIndex = r.level === "siu" ? 1 : 0;
     const status = r.status === "approved" ? "approved" : r.status === "rejected" ? "rejected" : "pending";
     return { ...r, levelIndex, status, mailIds: [r.directorMailId || null, r.siuMailId || null], chainLength };
@@ -877,6 +881,7 @@ export function sendApprovalMail(ds, requestId, { to, subject, body }) {
     to: to.trim(), subject, body, sentOn: nowISO().slice(0, 10), token: randomToken(), otp: null, status: "pending"
   };
   ds.sentMails.push(mail);
+  if (!req.mailIds) req.mailIds = [];
   req.mailIds[req.levelIndex] = mail.id;
   return { ok: true, mail };
 }

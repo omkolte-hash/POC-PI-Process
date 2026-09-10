@@ -9,7 +9,8 @@ import {
   setActiveCycle, deleteAdmissionCycle, buildCandidateDocuments, approveShortlistList, revertShortlist,
   runMeritProcessing, approveMeritBatch, savePanelist, approvePanelist, fmtDateTime,
   unassignPanelist, panelistInstituteId, panelistServesProgramme,
-  sendGroupMeetingNotification, placeholderCandidateEmail, markAttendance, editLockedAttendance
+  sendGroupMeetingNotification, placeholderCandidateEmail, markAttendance, editLockedAttendance,
+  normalizeDataset
 } from "./admission-engine.js";
 
 function makeReadyCandidate(ds, programmeId, academicYearId, overrides) {
@@ -607,4 +608,39 @@ test("sendGroupMeetingNotification refuses when the group has no candidates", ()
 
   assert.ok(res.error);
   assert.equal(ds.sentMails.length, before, "refusal must not send any mail");
+});
+
+test("normalizeDataset backfills a missing mailIds array on an already-shaped approvalRequest", () => {
+  // Regression for a real crash: "Cannot read properties of undefined (reading '0')" in
+  // approvalButtonState, from an approvalRequest record that had levelIndex/chainLength (so it
+  // skipped every other migration branch) but no mailIds array.
+  const ds = normalizeDataset({
+    approvalRequests: [{
+      id: "AR-1", subjectType: "shortlist", subjectId: "SL-1",
+      programmeId: "P1", academicYearId: "AY1", cycleId: "C1",
+      levelIndex: 0, chainLength: 2, status: "pending"
+    }]
+  });
+
+  const req = ds.approvalRequests.find((r) => r.id === "AR-1");
+  assert.ok(Array.isArray(req.mailIds), "mailIds must be backfilled to an array");
+  assert.equal(req.mailIds.length, 0);
+});
+
+test("sendApprovalMail still works if req.mailIds was somehow missing at write time", () => {
+  const ds = generateDataset();
+  const inst = createInstitute(ds, { name: "Test Institute", code: "TI" });
+  const prog = createProgramme(ds, { instituteId: inst.id, name: "Test Programme", code: "TP" });
+  ds.approvalRequests.push({
+    id: "AR-X", subjectType: "shortlist", subjectId: "SL-X",
+    programmeId: prog.id, academicYearId: "AY1", cycleId: null,
+    levelIndex: 0, chainLength: 1, status: "pending", summary: "test", createdOn: "2026-01-01"
+    // mailIds intentionally omitted
+  });
+
+  const res = sendApprovalMail(ds, "AR-X", { to: "a@b.com", subject: "s", body: "b" });
+
+  assert.ok(res.ok);
+  const req = ds.approvalRequests.find((r) => r.id === "AR-X");
+  assert.equal(req.mailIds[0], res.mail.id);
 });
