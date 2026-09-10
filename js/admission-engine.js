@@ -1067,6 +1067,27 @@ export function assignPanelist(ds, sessionId, groupId, panelistId) {
   return { ok: true };
 }
 
+// Undo of assignPanelist. Refuses once the panelist has put in (or had locked) a score for any
+// candidate in this group — piTotal/allPanelistsScored (see submitPanelistScore) trust panelistIds
+// to line up with who actually scored, so silently dropping a scored panelist would let the
+// remaining panelists' partial totals pass as "everyone scored." We don't recompute piTotal here
+// either way: an unscored panelist leaving never changes an already-computed total, and leaving the
+// recompute to the next submitPanelistScore call (rather than doing it here) avoids finalizing a
+// candidate's score as a side effect of an unassign click.
+export function unassignPanelist(ds, sessionId, groupId, panelistId) {
+  const session = ds.sessions.find((s) => s.id === sessionId);
+  const group = session && session.groups.find((g) => g.id === groupId);
+  if (!group) return { error: "Group not found." };
+  if (!group.zoomRoom.panelistIds.includes(panelistId)) return { error: "Panelist is not assigned to this group." };
+  const hasScored = group.candidateIds.some((cid) => {
+    const c = ds.candidates.find((x) => x.id === cid && x.programmeId === session.programmeId && x.academicYearId === session.academicYearId && x.cycleId === session.cycleId);
+    return c && ((c.piScores && c.piScores[panelistId] != null) || (c.piScoreLocked && c.piScoreLocked[panelistId]));
+  });
+  if (hasScored) return { error: "Can't unassign: this panelist has already scored candidates in this group." };
+  group.zoomRoom.panelistIds = group.zoomRoom.panelistIds.filter((id) => id !== panelistId);
+  return { ok: true };
+}
+
 export function assignZoomRoomLink(ds, sessionId, groupId) {
   const session = ds.sessions.find((s) => s.id === sessionId);
   const group = session && session.groups.find((g) => g.id === groupId);
