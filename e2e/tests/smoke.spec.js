@@ -45,7 +45,7 @@ test.describe('Role sidebar smoke tests', () => {
     const groups = [
       { group: 'Programmes', links: ['Programmes'] },
       { group: 'Candidates', links: ['Candidates', 'Create Shortlist', 'Shortlist Approval'] },
-      { group: 'PI Management', links: ['Sessions', 'Groups', 'Candidate Allocation', 'Zoom Rooms', 'Panelists', 'Panelist Allocation', 'Barcode Labels'] },
+      { group: 'PI Management', links: ['Sessions', 'Groups', 'Candidate Allocation', 'Zoom Rooms', 'Panelists', 'Barcode Labels', 'Panelist Allocation'] },
       { group: 'Interview Day', links: ['PI Attendance', 'PI Scoring'] },
       { group: 'Verification', links: ['Category Verification'] },
       { group: 'Merit', links: ['Final Scores', 'Merit Processing', 'Merit Approval', 'Merit Releases', 'Waiting List', 'Provisional Letters'] },
