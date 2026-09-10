@@ -71,7 +71,6 @@ test('Staff member only sees their role\'s pages after login; Settings is never 
   // Pages this role wasn't granted (e.g. Formula Builder, from the Merit group) are absent too —
   // proves this is real per-role filtering, not just Settings being special-cased.
   await expect(page.locator('.apsSideLink', { hasText: 'Formula Builder' })).toHaveCount(0);
-  await expect(page.locator('.apsSideLink', { hasText: 'Seat Allocation' })).toHaveCount(0);
 });
 
 // "Coordinator will mark student present, not the panelist" — the main-shell PI Attendance page

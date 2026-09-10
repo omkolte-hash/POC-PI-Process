@@ -37,7 +37,6 @@ const STEPS = [
   { t: 'Merit Processing',          g: 'Merit',         l: 'Merit Processing',              n: 'EPIC-301 · Rank within partitions; assign bands.' },
   { t: 'Merit Approval',            g: 'Merit',         l: 'Merit Approval',                n: 'EPIC-301/105 · Merit batch to approval.' },
   { t: 'Merit Releases',            g: 'Merit',         l: 'Merit Releases',                n: 'EPIC-301 · Release approved batch as a whole.' },
-  { t: 'Seat Allocation [NEW]',     g: 'Merit',         l: 'Seat Allocation',               n: 'STORY-302 · Seat matrix + audited conversion + vacancy.' },
   { t: 'Offer Management [NEW]',    g: 'Merit',         l: 'Offer Management',              n: 'STORY-303-01 · Offer templates, generation, lifecycle.' },
   { t: 'Waiting List',              g: 'Merit',         l: 'Waiting List',                  n: 'EPIC-301 · Waiting-band promotion in sequence.' },
   { t: 'Email Templates [NEW]',     g: 'Communications',l: 'Email Templates',               n: 'STORY-304 · Merge templates, recipient groups, history.' },
