@@ -182,6 +182,7 @@ test('full admission lifecycle: programme creation through provisional letters',
     for (let i = 1; i <= 2; i++) {
       const name = `E2E Panelist ${i}`;
       await gotoNav(page, 'PI Management', 'Panelists');
+      await page.locator('button:has-text("Create Panelist")').click();
       await fieldByLabel(page, 'Salutation').locator('select').selectOption('Dr.');
       await fieldByLabel(page, 'Name').locator('input').fill(name);
       await fieldByLabel(page, 'Email ID').locator('input').fill(`e2e.panelist${i}@test.local`);

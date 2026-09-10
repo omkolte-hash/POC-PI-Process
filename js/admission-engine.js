@@ -1122,17 +1122,41 @@ export function savePanelist(ds, form, existingId) {
     industryYears: Number(form.industryYears) || 0, academicYears: Number(form.academicYears) || 0,
     imageDataUrl: form.imageDataUrl || null, remarks: form.remarks || "N/A"
   };
+  // programmeIds is optional: a panelist with none selected is institute-global (see
+  // panelistServesProgramme) rather than tied to specific programmes.
+  const programmeIds = form.programmeIds || [];
   if (existingId) {
     const p = ds.panelists.find((x) => x.id === existingId);
     if (!p) return { error: "Panelist not found." };
     Object.assign(p, fields, { imageDataUrl: fields.imageDataUrl || p.imageDataUrl || null });
-    p.programmeIds = Array.from(new Set([...(p.programmeIds || []), ...form.programmeIds]));
+    p.programmeIds = programmeIds; // edit replaces the selection outright, not a union
     if (p.credentials) p.credentials.loginId = p.email; // keep the portal login in sync with the current email
     return { ok: true, id: p.id };
   }
   const id = `P${ds.panelists.length + 1}`;
-  ds.panelists.push({ id, ...fields, programmeIds: form.programmeIds, approval: effectivePanelistApprovalChain(ds).map(() => "pending") });
+  ds.panelists.push({
+    id, ...fields, instituteId: form.instituteId, programmeIds,
+    approval: effectivePanelistApprovalChain(ds).map(() => "pending")
+  });
   return { ok: true, id };
+}
+
+// A panelist's institute affiliation: the instituteId recorded at creation, or — for older/imported
+// records that predate that field (e.g. sample-data panelists, which only ever had programmeIds) —
+// derived from a linked programme's institute. No data migration needed for those records.
+export function panelistInstituteId(ds, p) {
+  if (p.instituteId) return p.instituteId;
+  const progId = (p.programmeIds || [])[0];
+  const prog = progId && ds.programmes.find((x) => x.id === progId);
+  return prog ? prog.instituteId : null;
+}
+
+// Panelists are institute-global by default: one with no programmeIds selected is available to
+// every programme in their institute, not just an explicit list.
+export function panelistServesProgramme(ds, p, programmeId) {
+  if ((p.programmeIds || []).length) return p.programmeIds.includes(programmeId);
+  const prog = ds.programmes.find((x) => x.id === programmeId);
+  return !!prog && panelistInstituteId(ds, p) === prog.instituteId;
 }
 
 export function approvePanelist(ds, panelistId, levelIndex, decision) {
