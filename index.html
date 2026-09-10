@@ -1280,7 +1280,7 @@ a:hover{color:var(--color-accent);text-decoration:underline}
           <sc-if value="{{ scNoResults }}"><p style="font-size:13px;opacity:0.6">No candidates match the current filters.</p></sc-if>
 
           <sc-if value="{{ scCandidate }}"><div class="dialog-backdrop">
-            <div class="dialog" id="pi-scoring-detail" style="width:min(900px,100%)">
+            <div class="dialog" id="pi-scoring-detail" style="width:min(1200px,100%);max-height:90vh;overflow-y:auto">
               <div style="display:flex;justify-content:space-between;align-items:flex-start">
                 <div style="font-size:13px"><strong>{{ scCandidate.id }}</strong> &middot; {{ scCandidate.name }} &middot; {{ scCandidate.programme }} &middot; {{ scCandidate.category }} &middot; {{ scCandidate.session }} &middot; {{ scCandidate.group }} &middot; Zoom Room: {{ scCandidate.zoomRoom }}</div>
                 <button type="button" class="btn btn-ghost" onClick="{{ onScCloseDetail }}">Close</button>
