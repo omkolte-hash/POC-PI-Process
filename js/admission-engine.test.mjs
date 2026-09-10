@@ -82,6 +82,60 @@ test("moveCandidatesAllocation does not orphan an already merit-processed candid
   assert.equal(c.meritCategory, "merit", "meritCategory must stay intact, not orphaned");
 });
 
+// Groups drawer "Change Group": move one or more candidates from their current group into another
+// group in the same session, and refuse the move if the target group doesn't have enough free seats.
+test("moveCandidatesAllocation moves multiple candidates into a group with enough capacity", () => {
+  const ds = generateDataset();
+  const inst = createInstitute(ds, { name: "Test Institute", code: "TI" });
+  const prog = createProgramme(ds, { instituteId: inst.id, name: "Test Programme", code: "TP" });
+  const ay = ds.activeAcademicYearByProgramme[prog.id];
+
+  ds.sessions.push({
+    id: "S1", programmeId: prog.id, academicYearId: ay, date: "2026-01-01", startTime: "10:00 AM", endTime: "11:00 AM",
+    groups: [
+      { id: "G1", name: "Group 1", capacity: 5, candidateIds: ["C10", "C11"], zoomRoom: { id: "ZR1", link: "", panelistIds: [] } },
+      { id: "G2", name: "Group 2", capacity: 5, candidateIds: [], zoomRoom: { id: "ZR2", link: "", panelistIds: [] } }
+    ]
+  });
+  const c10 = makeReadyCandidate(ds, prog.id, ay, { id: "C10", piTotal: 30, slatScore: 70 });
+  c10.allocation = { sessionId: "S1", groupId: "G1" };
+  const c11 = makeReadyCandidate(ds, prog.id, ay, { id: "C11", piTotal: 32, slatScore: 60 });
+  c11.allocation = { sessionId: "S1", groupId: "G1" };
+
+  const res = moveCandidatesAllocation(ds, ["C10", "C11"], "S1", "G2");
+  assert.ok(res.ok);
+  assert.equal(res.moved, 2);
+  assert.equal(c10.allocation.groupId, "G2");
+  assert.equal(c11.allocation.groupId, "G2");
+  const [g1, g2] = ds.sessions[0].groups;
+  assert.deepEqual(g1.candidateIds, [], "candidates must be removed from the source group");
+  assert.deepEqual(g2.candidateIds.sort(), ["C10", "C11"], "candidates must be added to the target group");
+});
+
+test("moveCandidatesAllocation rejects a move that would exceed the target group's capacity", () => {
+  const ds = generateDataset();
+  const inst = createInstitute(ds, { name: "Test Institute", code: "TI" });
+  const prog = createProgramme(ds, { instituteId: inst.id, name: "Test Programme", code: "TP" });
+  const ay = ds.activeAcademicYearByProgramme[prog.id];
+
+  ds.sessions.push({
+    id: "S1", programmeId: prog.id, academicYearId: ay, date: "2026-01-01", startTime: "10:00 AM", endTime: "11:00 AM",
+    groups: [
+      { id: "G1", name: "Group 1", capacity: 5, candidateIds: ["C12"], zoomRoom: { id: "ZR1", link: "", panelistIds: [] } },
+      { id: "G2", name: "Group 2", capacity: 2, candidateIds: ["C13", "C14"], zoomRoom: { id: "ZR2", link: "", panelistIds: [] } }
+    ]
+  });
+  const c12 = makeReadyCandidate(ds, prog.id, ay, { id: "C12", piTotal: 30, slatScore: 70 });
+  c12.allocation = { sessionId: "S1", groupId: "G1" };
+
+  const res = moveCandidatesAllocation(ds, ["C12"], "S1", "G2");
+  assert.ok(res.error, "a full target group must refuse the move");
+  assert.equal(c12.allocation.groupId, "G1", "candidate must stay put when the move is rejected");
+  const [g1, g2] = ds.sessions[0].groups;
+  assert.deepEqual(g1.candidateIds, ["C12"]);
+  assert.deepEqual(g2.candidateIds, ["C13", "C14"]);
+});
+
 // BUG-APPROVAL-01: an admin shortening a programme's approval chain mid-flight used to desync the
 // approval-request's live-chain "is this the last level?" check from the shortlist's own approvals
 // array, frozen at its own creation time. createApprovalRequest now freezes chainLength the same way.
