@@ -192,6 +192,13 @@ export function fmtDate(d) {
   const dt = new Date(d);
   return dt.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
 }
+// Same as fmtDate but with the decision time, for approval displays — pass an ISO timestamp
+// (e.g. approvals[i].decidedAt); returns "" for a falsy input rather than "Invalid Date".
+export function fmtDateTime(d) {
+  if (!d) return "";
+  const dt = new Date(d);
+  return dt.toLocaleString("en-IN", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+}
 export function nowISO() { return new Date().toISOString(); }
 
 // ---------- Candidate CSV import ----------
@@ -567,11 +574,12 @@ export function approveShortlistList(ds, listId, levelIndex, decision, comments)
   const list = ds.shortlists.find((l) => l.id === listId);
   if (!list) return;
   if (list.status !== "pending" || list.currentLevelIndex !== levelIndex) return;
-  const date = nowISO().slice(0, 10);
+  const decidedAt = nowISO();
+  const date = decidedAt.slice(0, 10);
   const candidates = list.candidateIds
     .map((id) => ds.candidates.find((c) => c.id === id && c.programmeId === list.programmeId && c.academicYearId === list.academicYearId && c.cycleId === list.cycleId))
     .filter(Boolean);
-  list.approvals[levelIndex] = { status: decision, date, comments };
+  list.approvals[levelIndex] = { status: decision, date, decidedAt, comments };
   if (decision === "approved") {
     const isLast = levelIndex === list.approvals.length - 1;
     if (isLast) {
@@ -1116,6 +1124,10 @@ export function approvePanelist(ds, panelistId, levelIndex, decision) {
   if (p.approval.length < chain.length) p.approval = [...p.approval, ...new Array(chain.length - p.approval.length).fill("pending")];
   if (levelIndex > 0 && p.approval[levelIndex - 1] !== "approved") return;
   p.approval[levelIndex] = decision;
+  // Parallel to p.approval (kept a plain string array so every existing `=== "approved"` check
+  // stays valid) — decision timestamps live here instead, indexed the same way.
+  if (!p.approvalDecidedAt) p.approvalDecidedAt = [];
+  p.approvalDecidedAt[levelIndex] = nowISO();
   if (p.approval.length === chain.length && p.approval.every((a) => a === "approved") && !p.credentials) {
     p.credentials = { loginId: p.email, password: genPassword(), issuedOn: nowISO().slice(0, 10) };
     ds.sentMails.push({
@@ -1343,11 +1355,12 @@ export function approveMeritBatch(ds, batchId, levelIndex, decision, comments) {
   const batch = ds.meritBatches.find((b) => b.id === batchId);
   if (!batch) return;
   if (batch.status !== "pending" || batch.currentLevelIndex !== levelIndex) return;
-  const date = nowISO().slice(0, 10);
+  const decidedAt = nowISO();
+  const date = decidedAt.slice(0, 10);
   const candidates = batch.candidateIds
     .map((id) => ds.candidates.find((c) => c.id === id && c.programmeId === batch.programmeId && c.academicYearId === batch.academicYearId && c.cycleId === batch.cycleId))
     .filter(Boolean);
-  batch.approvals[levelIndex] = { status: decision, date, comments };
+  batch.approvals[levelIndex] = { status: decision, date, decidedAt, comments };
   if (decision === "approved") {
     candidates.forEach((c) => { if (!c.meritApproval) c.meritApproval = []; c.meritApproval[levelIndex] = { status: "approved", date }; });
     const isLast = levelIndex === batch.approvals.length - 1;

@@ -6,7 +6,8 @@ import {
   generateDataset, createInstitute, createProgramme, setApvScore, setScoringFormula,
   moveCandidatesAllocation, confirmShortlist, createApprovalRequest, sendApprovalMail,
   generateMailOtp, verifyMailOtp, createAdmissionCycle, activeCycleId, cyclesForScope,
-  setActiveCycle, deleteAdmissionCycle, buildCandidateDocuments, approveShortlistList, revertShortlist
+  setActiveCycle, deleteAdmissionCycle, buildCandidateDocuments, approveShortlistList, revertShortlist,
+  runMeritProcessing, approveMeritBatch, savePanelist, approvePanelist, fmtDateTime
 } from "./admission-engine.js";
 
 function makeReadyCandidate(ds, programmeId, academicYearId, overrides) {
@@ -262,4 +263,65 @@ test("revertShortlist resets a rejected shortlist's candidates to yet-to-shortli
   assert.equal(c.shortlistStatus, "yet-to-shortlist", "reverted candidate lands in the Draft/yet-to-shortlist bucket");
   assert.equal(c.shortlistId, null);
   assert.ok(list.reverted, "list is flagged reverted so the button doesn't offer itself again");
+});
+
+// Feedback: approval displays ("approved by: Director") must also show when the decision was made.
+// approveShortlistList/approveMeritBatch/approvePanelist now stamp a decision timestamp alongside
+// their existing status value, without changing the shape/value other code already compares against.
+test("approveShortlistList records a decision timestamp alongside the existing date field", () => {
+  const ds = generateDataset();
+  const inst = createInstitute(ds, { name: "Test Institute", code: "TI" });
+  const prog = createProgramme(ds, { instituteId: inst.id, name: "Test Programme", code: "TP" });
+  const ay = ds.activeAcademicYearByProgramme[prog.id];
+  const c = makeReadyCandidate(ds, prog.id, ay, { id: "C6", piTotal: 30, slatScore: 50 });
+  c.shortlistStatus = "yet-to-shortlist";
+
+  const { list } = confirmShortlist(ds, { programmeId: prog.id, academicYearId: ay, filter: { groups: [] }, rankField: null, mode: "all", value: null });
+  approveShortlistList(ds, list.id, 0, "approved", "");
+
+  assert.equal(list.approvals[0].status, "approved", "decision value is unchanged");
+  assert.ok(list.approvals[0].decidedAt, "decision timestamp recorded");
+  assert.equal(list.approvals[0].date, list.approvals[0].decidedAt.slice(0, 10), "existing date field stays in sync with decidedAt");
+});
+
+test("approveMeritBatch records a decision timestamp alongside the existing date field", () => {
+  const ds = generateDataset();
+  const inst = createInstitute(ds, { name: "Test Institute", code: "TI" });
+  const prog = createProgramme(ds, { instituteId: inst.id, name: "Test Programme", code: "TP" });
+  const ay = ds.activeAcademicYearByProgramme[prog.id];
+  const c = makeReadyCandidate(ds, prog.id, ay, { id: "C7", piTotal: 34, slatScore: 80 });
+  setApvScore(ds, "C7", 8, prog.id, ay);
+
+  const { batch } = runMeritProcessing(ds, { programmeId: prog.id, academicYearId: ay, cycleId: undefined, category: "OPEN", criteria: "count", value: 5, waitingSize: 0 });
+  assert.ok(batch, "a merit batch must be created for a non-empty pool");
+
+  approveMeritBatch(ds, batch.id, 0, "approved", "");
+  assert.equal(batch.approvals[0].status, "approved", "decision value is unchanged");
+  assert.ok(batch.approvals[0].decidedAt, "decision timestamp recorded");
+  assert.equal(batch.approvals[0].date, batch.approvals[0].decidedAt.slice(0, 10), "existing date field stays in sync with decidedAt");
+});
+
+test("approvePanelist records a decision timestamp per level without changing the approval string values", () => {
+  const ds = generateDataset();
+  const inst = createInstitute(ds, { name: "Test Institute", code: "TI" });
+  const prog = createProgramme(ds, { instituteId: inst.id, name: "Test Programme", code: "TP" });
+
+  const saved = savePanelist(ds, { name: "Dr. Test", email: "t@x.com", programmeIds: [prog.id] });
+  const p = ds.panelists.find((x) => x.id === saved.id);
+  assert.deepEqual(p.approval, ["pending", "pending"], "default panelist approval chain has 2 levels");
+
+  approvePanelist(ds, p.id, 0, "approved");
+  assert.equal(p.approval[0], "approved", "approval value itself must stay the plain string other code compares against");
+  assert.ok(p.approvalDecidedAt && p.approvalDecidedAt[0], "level 0 decision time recorded");
+  assert.equal(p.approvalDecidedAt[1], undefined, "level 1 still pending, no time recorded yet");
+
+  approvePanelist(ds, p.id, 1, "approved");
+  assert.equal(p.approval[1], "approved");
+  assert.ok(p.approvalDecidedAt[1], "level 1 decision time recorded");
+});
+
+test("fmtDateTime formats an ISO timestamp and returns empty string for no value", () => {
+  assert.equal(fmtDateTime(null), "");
+  assert.equal(fmtDateTime(""), "");
+  assert.ok(fmtDateTime("2026-09-10T10:15:00.000Z").length > 0);
 });
