@@ -24,10 +24,10 @@ test.beforeEach(async ({ page }) => {
 
   await gotoNav(page, 'Programmes', 'Programmes');
   const progName = 'QA-CyclesTest-' + Date.now().toString().slice(-6);
-  await fieldByLabel(page, 'Programme Name').locator('input').fill(progName);
-  await fieldByLabel(page, 'Programme Code').locator('input').fill(progName.replace(/-/g, ''));
-  await fieldByLabel(page, 'Description').locator('input').fill('QA fixture programme for cycle tests.');
   await page.locator('button:has-text("Create Programme")').click();
+  await fieldByLabel(page, 'Programme Name').locator('textarea').fill(progName);
+  await fieldByLabel(page, 'Description').locator('textarea').fill('QA fixture programme for cycle tests.');
+  await page.locator('.dialog button:has-text("Save")').click();
   await page.waitForTimeout(300);
   await page.locator('header select').nth(1).selectOption({ label: progName });
   await page.waitForTimeout(300);

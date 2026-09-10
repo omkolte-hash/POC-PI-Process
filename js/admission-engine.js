@@ -33,9 +33,12 @@ export const DEFAULT_REQUIRED_DOCUMENTS = [
 // two-level chain as the starting config for every new programme. No stable "key" field like
 // requiredDocuments rows: nothing references a level by persistent key, every reference is positional
 // (levelIndex into the chain sorted by seq).
+// `name` here is a lookup template only, used to resolve a real institute role id when a chain is
+// created/migrated (see createProgramme/normalizeDataset) — persisted chain levels store
+// {id, seq, roleId}, not name, since the approver is a real role now.
 export const DEFAULT_APPROVAL_CHAIN = [
-  { id: "AC-default-director", seq: 1, name: "Director", approverEmail: "" },
-  { id: "AC-default-siu", seq: 2, name: "SIU", approverEmail: "" }
+  { id: "AC-default-director", seq: 1, name: "Director" },
+  { id: "AC-default-siu", seq: 2, name: "SIU" }
 ];
 export function effectiveApprovalChain(programme) {
   return ((programme && programme.approvalChain) || DEFAULT_APPROVAL_CHAIN).slice().sort((a, b) => a.seq - b.seq);
@@ -73,7 +76,7 @@ export const DEFAULT_INSTITUTE_ROLES = [
   // Observer needs to see and drop into any scheduled Zoom Room for quality monitoring.
   { name: "Observer", pages: ["reports-dashboard", "reports-candidates", "reports-sessions", "candidate-list", "zoom-rooms", "final-scores", "merit-releases", "waiting-list"] },
   { name: "Document Verification Team", pages: ["candidate-list", "verification", "document-collection"] },
-  { name: "SIU", pages: ["reports-dashboard", "reports-candidates", "reports-sessions", "candidate-list", "verification", "final-scores", "merit-releases", "waiting-list"] }
+  { name: "SIU", pages: ["reports-dashboard", "reports-candidates", "reports-sessions", "candidate-list", "verification", "final-scores", "merit-releases", "waiting-list", "pending-approvals"] }
 ];
 export function seedDefaultRoles(ds, instituteId) {
   DEFAULT_INSTITUTE_ROLES.forEach((r, i) => {
@@ -114,15 +117,19 @@ export function saveStaffMember(ds, instituteId, id, form) {
     return { error: "A staff member with this email already exists." };
   }
   const fields = { name: form.name.trim(), email, mobile: form.mobile || "", roleId: form.roleId, status: form.status || "Active" };
+  const password = (form.password || "").trim();
   if (id) {
     const idx = ds.staff.findIndex((s) => s.id === id && s.instituteId === instituteId);
     if (idx === -1) return { error: "Staff member not found." };
     ds.staff[idx] = { ...ds.staff[idx], ...fields };
-    if (ds.staff[idx].credentials) ds.staff[idx].credentials.loginId = email;
-    return { ok: true, id, credentials: null };
+    if (ds.staff[idx].credentials) {
+      ds.staff[idx].credentials.loginId = email;
+      if (password) ds.staff[idx].credentials.password = password;
+    }
+    return { ok: true, id, credentials: password ? ds.staff[idx].credentials : null };
   }
   const newId = `STAFF-${instituteId}-${Date.now()}`;
-  const credentials = { loginId: email, password: genPassword(), issuedOn: nowISO().slice(0, 10) };
+  const credentials = { loginId: email, password: password || genPassword(), issuedOn: nowISO().slice(0, 10) };
   ds.staff.push({ id: newId, instituteId, ...fields, credentials });
   ds.sentMails.push({
     id: `MAIL-${ds.sentMails.length + 1}`, approvalRequestId: null, levelIndex: null, levelLabel: "Info",
@@ -343,6 +350,21 @@ export function normalizeDataset(d) {
     } else if (!cand.verification) {
       cand = { ...cand, verification: { documents: {} } };
     }
+    // shortlistStatus's value set changed from yet-to-shortlist/pending-approval/approved to the real
+    // Draft -> Doc Verified -> Shortlisted Pending -> Shortlist Approved lifecycle — Doc Verified is a
+    // genuine new gate (see confirmShortlist): a candidate needs every applicable document Valid before
+    // they're shortlist-eligible. A file saved under the old value set is remapped here (after the
+    // verification-shape migration above, so verification.documents is already in the new shape),
+    // computing Doc Verified from real progress rather than leaving everyone stuck at Draft.
+    if (cand.shortlistStatus === "yet-to-shortlist") {
+      const programme = (d.programmes || []).find((p) => p.id === cand.programmeId);
+      const requiredDocuments = (programme && programme.requiredDocuments) || [];
+      cand = { ...cand, shortlistStatus: verificationComplete(cand, requiredDocuments) ? "doc-verified" : "draft" };
+    } else if (cand.shortlistStatus === "pending-approval") {
+      cand = { ...cand, shortlistStatus: "shortlisted-pending" };
+    } else if (cand.shortlistStatus === "approved") {
+      cand = { ...cand, shortlistStatus: "shortlist-approved" };
+    }
     return cand;
   });
   const panelists = (d.panelists || []).map((p) => {
@@ -390,29 +412,38 @@ export function normalizeDataset(d) {
   // assignment, push), so two programmes sharing one array by reference would silently corrupt each
   // other the moment either one is edited (safe in the running app, which always clones the whole
   // dataset before any mutation — but not safe for anything that touches the engine directly).
-  const programmes = (d.programmes || []).map((p) => ({
-    ...p,
-    requiredDocuments: p.requiredDocuments || DEFAULT_REQUIRED_DOCUMENTS.map((doc) => ({ ...doc })),
-    shortlistRankField: p.shortlistRankField || "slatScore",
-    approvalChain: p.approvalChain || DEFAULT_APPROVAL_CHAIN.map((lvl) => ({ ...lvl }))
-  }));
-  // approvalRequests: old {level:"director"|"siu", status, directorMailId, siuMailId} -> chain-length-
-  // agnostic {levelIndex, status, mailIds}. sentMails: old {level:"director"|"siu"|"info"} -> adds
-  // levelIndex + a snapshotted levelLabel (the popup approval tab has no dataset access to resolve a
-  // chain lookup itself, and a historical mail shouldn't retroactively relabel if a level is renamed).
+  const programmes = (d.programmes || []).map((p) => {
+    let approvalChain = p.approvalChain;
+    // Old chain shape was {id, seq, name, approverEmail} (free-text approver) or missing entirely;
+    // the new shape is {id, seq, roleId}, resolved by matching the old level name (or the default
+    // Director/SIU template) against this institute's real seeded roles.
+    if (!approvalChain || approvalChain.some((lvl) => lvl.roleId === undefined)) {
+      const instRoles = roles.filter((r) => r.instituteId === p.instituteId);
+      const template = approvalChain && approvalChain.length ? approvalChain : DEFAULT_APPROVAL_CHAIN;
+      approvalChain = template.map((lvl) => {
+        if (lvl.roleId !== undefined) return lvl;
+        const match = instRoles.find((r) => r.name === lvl.name);
+        return { id: lvl.id, seq: lvl.seq, roleId: match ? match.id : null };
+      });
+    }
+    return {
+      ...p,
+      requiredDocuments: p.requiredDocuments || DEFAULT_REQUIRED_DOCUMENTS.map((doc) => ({ ...doc })),
+      shortlistRankField: p.shortlistRankField || "slatScore",
+      approvalChain
+    };
+  });
+  // approvalRequests: replaces the old mail/OTP-driven {level, mailIds, directorMailId, siuMailId}
+  // fields with a direct-approve model — the level's approver is now a specific staff member,
+  // tracked as currentApproverStaffId. A request mid-flight under the old mail flow has no staff
+  // to carry forward, so it resets to "not yet sent for this level" (currentApproverStaffId: null)
+  // and the sender re-sends by picking a person, same as any other not-yet-sent level.
   const approvalRequests = (d.approvalRequests || []).map((r) => {
-    // mailIds has been part of this shape since it was introduced, but a request saved by some
-    // in-between version can still be missing it even though levelIndex/chainLength are already
-    // present (approvalButtonState indexes into it unconditionally) - backfill it regardless of
-    // which branch below a record otherwise falls into.
-    if (r.levelIndex !== undefined && r.chainLength !== undefined) return r.mailIds ? r : { ...r, mailIds: [] };
-    // Backfill chainLength for requests saved before it existed — best-effort against the
-    // programme's chain as it stands right now, same live lookup verifyMailOtp used to do inline.
-    const chainLength = effectiveApprovalChain(programmes.find((p) => p.id === r.programmeId)).length;
-    if (r.levelIndex !== undefined) return { ...r, chainLength, mailIds: r.mailIds || [] };
-    const levelIndex = r.level === "siu" ? 1 : 0;
+    const chainLength = r.chainLength !== undefined ? r.chainLength : effectiveApprovalChain(programmes.find((p) => p.id === r.programmeId)).length;
+    const levelIndex = r.levelIndex !== undefined ? r.levelIndex : (r.level === "siu" ? 1 : 0);
     const status = r.status === "approved" ? "approved" : r.status === "rejected" ? "rejected" : "pending";
-    return { ...r, levelIndex, status, mailIds: [r.directorMailId || null, r.siuMailId || null], chainLength };
+    const { mailIds, level, directorMailId, siuMailId, ...rest } = r;
+    return { ...rest, levelIndex, status, chainLength, currentApproverStaffId: r.currentApproverStaffId || null };
   });
   const sentMails = (d.sentMails || []).map((m) => {
     if (m.levelLabel !== undefined) return m;
@@ -500,8 +531,13 @@ export function generateDataset() {
 
 // ---------- Status metadata (label + tag class + icon) ----------
 export const STATUS_META = {
-  "yet-to-shortlist": { label: "Yet to be Shortlisted", cls: "tag-neutral" },
-  "pending-approval": { label: "Pending Approval", cls: "tag-outline" },
+  // Candidate overall Status lifecycle (see confirmShortlist/recomputeOutcome): Draft -> Doc Verified
+  // (every applicable document Valid) -> Shortlisted Pending (in a shortlist awaiting approval) ->
+  // Shortlist Approved.
+  draft: { label: "Draft", cls: "tag-neutral" },
+  "doc-verified": { label: "Doc Verified", cls: "tag-outline" },
+  "shortlisted-pending": { label: "Shortlisted Pending", cls: "tag-outline" },
+  "shortlist-approved": { label: "Shortlist Approved", cls: "tag-accent" },
   pending: { label: "Pending", cls: "tag-neutral" },
   present: { label: "Present", cls: "tag-accent" },
   absent: { label: "Absent", cls: "tag-neutral" },
@@ -546,7 +582,7 @@ export function confirmShortlist(ds, { programmeId, academicYearId, cycleId, fil
   if (mode !== "all" && (!rankField || !Number.isFinite(value) || value <= 0)) return { count: 0, list: null };
   const programme = ds.programmes.find((p) => p.id === programmeId);
   const typeOf = (field) => candidateFieldType(ds, programmeId, academicYearId, field);
-  let pool = ds.candidates.filter((c) => c.programmeId === programmeId && c.academicYearId === academicYearId && c.cycleId === cycleId && c.shortlistStatus === "yet-to-shortlist" && evaluateFilter(c, filter, typeOf));
+  let pool = ds.candidates.filter((c) => c.programmeId === programmeId && c.academicYearId === academicYearId && c.cycleId === cycleId && c.shortlistStatus === "doc-verified" && evaluateFilter(c, filter, typeOf));
   if (rankField) {
     const rank = (c) => (c[rankField] == null ? -Infinity : c[rankField]);
     pool.sort((a, b) => rank(b) - rank(a));
@@ -567,7 +603,7 @@ export function confirmShortlist(ds, { programmeId, academicYearId, cycleId, fil
   };
   ds.shortlists.push(list);
   selected.forEach((c) => {
-    c.shortlistStatus = "pending-approval";
+    c.shortlistStatus = "shortlisted-pending";
     c.shortlistId = list.id;
     c.timeline.push({ label: `Shortlisted (${list.id})`, date });
   });
@@ -588,19 +624,22 @@ export function approveShortlistList(ds, listId, levelIndex, decision, comments)
     const isLast = levelIndex === list.approvals.length - 1;
     if (isLast) {
       list.status = "approved";
-      candidates.forEach((c) => { c.shortlistStatus = "approved"; c.timeline.push({ label: `Shortlist Approved (${listId})`, date }); });
+      candidates.forEach((c) => { c.shortlistStatus = "shortlist-approved"; c.timeline.push({ label: `Shortlist Approved (${listId})`, date }); });
     } else {
       list.currentLevelIndex = levelIndex + 1;
       candidates.forEach((c) => c.timeline.push({ label: `Level ${levelIndex + 1} Approved (${listId})`, date }));
     }
   } else {
     list.status = "rejected";
-    candidates.forEach((c) => { c.shortlistStatus = "yet-to-shortlist"; c.shortlistId = null; c.timeline.push({ label: `Level ${levelIndex + 1} Rejected (${listId}) — returned to pool`, date }); });
+    // Back to Doc Verified, not all the way to Draft — rejection is about this shortlist's own
+    // criteria/approval, not a verdict on the candidate's (still-Valid) documents. They're immediately
+    // eligible for the next shortlist run again.
+    candidates.forEach((c) => { c.shortlistStatus = "doc-verified"; c.shortlistId = null; c.timeline.push({ label: `Level ${levelIndex + 1} Rejected (${listId}) — returned to pool`, date }); });
   }
 }
 
 // Explicit Director/SIU action once a shortlist has been rejected at any level — puts every candidate
-// on it back into the "yet-to-shortlist" pool (the same bucket confirmShortlist draws from), i.e. Draft.
+// on it back into the "doc-verified" pool (the same bucket confirmShortlist draws from).
 export function revertShortlist(ds, listId) {
   const list = ds.shortlists.find((l) => l.id === listId);
   if (!list) return { error: "Shortlist not found." };
@@ -609,7 +648,7 @@ export function revertShortlist(ds, listId) {
   const candidates = list.candidateIds
     .map((id) => ds.candidates.find((c) => c.id === id && c.programmeId === list.programmeId && c.academicYearId === list.academicYearId && c.cycleId === list.cycleId))
     .filter(Boolean);
-  candidates.forEach((c) => { c.shortlistStatus = "yet-to-shortlist"; c.shortlistId = null; c.timeline.push({ label: `Shortlist Reverted (${listId}) — status set to Draft`, date }); });
+  candidates.forEach((c) => { c.shortlistStatus = "doc-verified"; c.shortlistId = null; c.timeline.push({ label: `Shortlist Reverted (${listId}) — status set to Doc Verified`, date }); });
   list.reverted = true;
   return { ok: true, count: candidates.length };
 }
@@ -671,10 +710,14 @@ export function setInstituteStatus(ds, instituteId, status) {
 
 export function createProgramme(ds, form) {
   const id = form.code ? form.code.toUpperCase().replace(/[^A-Z0-9]/g, "") : `PROG${ds.programmes.length + 1}`;
+  const instRoles = ds.roles.filter((r) => r.instituteId === form.instituteId);
   const programme = {
     id, instituteId: form.instituteId, name: form.name, code: form.code, description: form.description || "", status: "Active", city: "\u2014", centre: "\u2014",
     requiredDocuments: DEFAULT_REQUIRED_DOCUMENTS.map((doc) => ({ ...doc })), shortlistRankField: "slatScore",
-    approvalChain: DEFAULT_APPROVAL_CHAIN.map((lvl) => ({ ...lvl }))
+    approvalChain: DEFAULT_APPROVAL_CHAIN.map((lvl) => {
+      const match = instRoles.find((r) => r.name === lvl.name);
+      return { id: lvl.id, seq: lvl.seq, roleId: match ? match.id : null };
+    })
   };
   ds.programmes.push(programme);
   const years = [{ id: `AY2026-${id}`, programmeId: id, label: "2026\u201327", status: "Active" }];
@@ -848,10 +891,7 @@ export function deleteAssessmentParam(ds, programmeId, type, id) {
   ds.assessmentParamsDraft[programmeId][type] = ds.assessmentParamsDraft[programmeId][type].filter((p) => p.id !== id);
 }
 
-// ---------- Universal approval flow (Send for Approval -> mail -> OTP, Director then SIU) ----------
-function randomToken() { return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`; }
-function randomOtp() { return String(Math.floor(100000 + Math.random() * 900000)); }
-
+// ---------- Universal approval flow (Send for Approval -> assign a specific staff approver -> they approve/deny directly) ----------
 export function createApprovalRequest(ds, { subjectType, subjectId, programmeId, academicYearId, cycleId, summary }) {
   const id = `AR-${ds.approvalRequests.length + 1}`;
   // chainLength is frozen here, the same way a shortlist/merit batch freezes its own approvals
@@ -861,42 +901,28 @@ export function createApprovalRequest(ds, { subjectType, subjectId, programmeId,
   const chainLength = effectiveApprovalChain(ds.programmes.find((p) => p.id === programmeId)).length;
   const req = {
     id, subjectType, subjectId, programmeId, academicYearId, cycleId, summary, chainLength,
-    levelIndex: 0, status: "pending", mailIds: [], createdOn: nowISO().slice(0, 10)
+    levelIndex: 0, status: "pending", currentApproverStaffId: null, createdOn: nowISO().slice(0, 10)
   };
   ds.approvalRequests.push(req);
   return req;
 }
 
-export function sendApprovalMail(ds, requestId, { to, subject, body }) {
+// Sends the request to one specific staff member holding the current level's role — they alone can
+// decide it (see decideApproval). Re-assignable at any point while the request is still pending at
+// that level, e.g. if the sender picked the wrong person.
+export function assignApprover(ds, requestId, staffId) {
   const req = ds.approvalRequests.find((r) => r.id === requestId);
   if (!req) return { error: "Approval request not found." };
-  if (!to || !to.trim()) return { error: "Recipient email is required." };
-  // levelLabel is snapshotted at send time, not resolved live: the popup approval tab that drives OTP
-  // entry has no dataset access of its own (see handlePopupMessage), and a historical mail shouldn't
-  // retroactively relabel itself if the chain is renamed later anyway.
-  const chain = effectiveApprovalChain(ds.programmes.find((p) => p.id === req.programmeId));
-  const levelLabel = (chain[req.levelIndex] || {}).name || `Level ${req.levelIndex + 1}`;
-  const mail = {
-    id: `MAIL-${ds.sentMails.length + 1}`, approvalRequestId: requestId, levelIndex: req.levelIndex, levelLabel,
-    to: to.trim(), subject, body, sentOn: nowISO().slice(0, 10), token: randomToken(), otp: null, status: "pending"
-  };
-  ds.sentMails.push(mail);
-  if (!req.mailIds) req.mailIds = [];
-  req.mailIds[req.levelIndex] = mail.id;
-  return { ok: true, mail };
+  if (req.status !== "pending") return { error: "This approval is no longer pending." };
+  const staff = ds.staff.find((s) => s.id === staffId && s.status === "Active");
+  if (!staff) return { error: "Select a valid, active staff member." };
+  req.currentApproverStaffId = staffId;
+  return { ok: true, request: req };
 }
 
-export function generateMailOtp(ds, mailId) {
-  const mail = ds.sentMails.find((m) => m.id === mailId);
-  if (!mail) return { error: "Mail not found." };
-  if (mail.status !== "pending") return { error: "This approval is no longer pending." };
-  mail.otp = randomOtp();
-  return { ok: true, otp: mail.otp, to: mail.to };
-}
-
-function finalizeApprovalSubject(ds, req, levelIndex, isLast) {
-  if (req.subjectType === "shortlist") approveShortlistList(ds, req.subjectId, levelIndex, "approved", "");
-  else if (req.subjectType === "merit") approveMeritBatch(ds, req.subjectId, levelIndex, "approved", "");
+function finalizeApprovalSubject(ds, req, levelIndex, isLast, comments) {
+  if (req.subjectType === "shortlist") approveShortlistList(ds, req.subjectId, levelIndex, "approved", comments || "");
+  else if (req.subjectType === "merit") approveMeritBatch(ds, req.subjectId, levelIndex, "approved", comments || "");
   else if (req.subjectType === "assessment-params" && isLast) {
     // subjectId is "<programmeId>:<type>" — the rubric is per-programme, so the bare type alone (e.g.
     // "PI") isn't unique across programmes; see saveAssessmentParam for where this key is built.
@@ -907,43 +933,33 @@ function finalizeApprovalSubject(ds, req, levelIndex, isLast) {
     }
   }
 }
-function rejectApprovalSubject(ds, req) {
-  if (req.subjectType === "shortlist") approveShortlistList(ds, req.subjectId, req.levelIndex, "rejected", "");
-  else if (req.subjectType === "merit") approveMeritBatch(ds, req.subjectId, req.levelIndex, "rejected", "");
+function rejectApprovalSubject(ds, req, comments) {
+  if (req.subjectType === "shortlist") approveShortlistList(ds, req.subjectId, req.levelIndex, "rejected", comments || "");
+  else if (req.subjectType === "merit") approveMeritBatch(ds, req.subjectId, req.levelIndex, "rejected", comments || "");
   else if (req.subjectType === "assessment-params") {
     const [programmeId, type] = req.subjectId.split(":");
     if (ds.assessmentParamsDraft[programmeId]) ds.assessmentParamsDraft[programmeId][type] = null;
   }
 }
 
-export function verifyMailOtp(ds, mailId, entered) {
-  const mail = ds.sentMails.find((m) => m.id === mailId);
-  if (!mail) return { error: "Mail not found." };
-  if (mail.status !== "pending") return { error: "This approval is no longer pending." };
-  if (!mail.otp || String(entered || "").trim() !== mail.otp) return { error: "Incorrect OTP. Please try again." };
-  mail.status = "approved";
-  const req = ds.approvalRequests.find((r) => r.id === mail.approvalRequestId);
+// The assigned approver decides directly — no mail/OTP round-trip. decision is "approved" or "rejected".
+export function decideApproval(ds, requestId, staffId, decision, comments) {
+  const req = ds.approvalRequests.find((r) => r.id === requestId);
   if (!req) return { error: "Approval request not found." };
-  // Frozen at request creation (req.chainLength) rather than read live — see createApprovalRequest.
-  const isLast = req.levelIndex >= req.chainLength - 1;
-  finalizeApprovalSubject(ds, req, req.levelIndex, isLast);
-  if (isLast) {
-    req.status = "approved";
+  if (req.status !== "pending") return { error: "This approval is no longer pending." };
+  if (req.currentApproverStaffId !== staffId) return { error: "This request isn't assigned to you." };
+  if (decision === "approved") {
+    // Frozen at request creation (req.chainLength) rather than read live — see createApprovalRequest.
+    const isLast = req.levelIndex >= req.chainLength - 1;
+    finalizeApprovalSubject(ds, req, req.levelIndex, isLast, comments);
+    req.currentApproverStaffId = null;
+    if (isLast) req.status = "approved";
+    else req.levelIndex += 1;
   } else {
-    req.levelIndex += 1;
+    req.status = "rejected";
+    req.currentApproverStaffId = null;
+    rejectApprovalSubject(ds, req, comments);
   }
-  return { ok: true, request: req };
-}
-
-export function rejectMail(ds, mailId) {
-  const mail = ds.sentMails.find((m) => m.id === mailId);
-  if (!mail) return { error: "Mail not found." };
-  if (mail.status !== "pending") return { error: "This approval is no longer pending." };
-  mail.status = "rejected";
-  const req = ds.approvalRequests.find((r) => r.id === mail.approvalRequestId);
-  if (!req) return { error: "Approval request not found." };
-  req.status = "rejected";
-  rejectApprovalSubject(ds, req);
   return { ok: true, request: req };
 }
 
@@ -952,7 +968,7 @@ export function allocateCandidate(ds, candidateId, sessionId, groupId) {
   const group = session && session.groups.find((g) => g.id === groupId);
   const c = session && ds.candidates.find((x) => x.id === candidateId && x.programmeId === session.programmeId && x.academicYearId === session.academicYearId && x.cycleId === session.cycleId);
   if (!c || !group) return { error: "Not found." };
-  if (c.shortlistStatus !== "approved") return { error: "Candidate must be fully approved before allocation." };
+  if (c.shortlistStatus !== "shortlist-approved") return { error: "Candidate must be fully approved before allocation." };
   if (c.allocation) return { error: "Candidate already has an active Session allocation." };
   if (group.candidateIds.length >= group.capacity) return { error: `Group ${group.name} is at capacity (${group.capacity}).` };
   group.candidateIds.push(c.id);
@@ -1222,11 +1238,11 @@ export function approvePanelist(ds, panelistId, levelIndex, decision) {
 export function saveApprovalLevel(ds, programmeId, id, form) {
   const p = ds.programmes.find((x) => x.id === programmeId);
   if (!p) return { error: "Programme not found." };
-  if (!form.name || !form.name.trim()) return { error: "Level name is required." };
+  if (!form.roleId) return { error: "Select a role for this approval level." };
+  if (!ds.roles.some((r) => r.id === form.roleId && r.instituteId === p.instituteId)) return { error: "Select a valid role." };
   if (!p.approvalChain) p.approvalChain = [];
   const record = {
-    id: id || `AC-${Date.now()}`, seq: Number(form.seq) || p.approvalChain.length + 1,
-    name: form.name.trim(), approverEmail: (form.approverEmail || "").trim()
+    id: id || `AC-${Date.now()}`, seq: Number(form.seq) || p.approvalChain.length + 1, roleId: form.roleId
   };
   if (id) { const idx = p.approvalChain.findIndex((l) => l.id === id); if (idx !== -1) p.approvalChain[idx] = record; }
   else p.approvalChain.push(record);
@@ -1344,10 +1360,11 @@ export function lockPanelistScore(ds, candidateId, panelistId, programmeId, acad
   c.piScoreLocked[panelistId] = true;
 }
 
-export function setVerification(ds, candidateId, docKey, value, programmeId, academicYearId, cycleId) {
+export function setVerification(ds, candidateId, docKey, value, remarks, programmeId, academicYearId, cycleId) {
   const c = ds.candidates.find((x) => x.id === candidateId && x.programmeId === programmeId && x.academicYearId === academicYearId && x.cycleId === cycleId);
   if (!c || !c.verification.documents[docKey]) return;
   c.verification.documents[docKey].status = value;
+  c.verification.documents[docKey].remarks = remarks || null;
   recomputeOutcome(ds, c);
 }
 
@@ -1378,7 +1395,7 @@ export function setScoringFormula(ds, programmeId, weights) {
 // A candidate with no applicable documents at all (e.g. OPEN category under the default config) counts
 // as verified by default. Every document that applies to this candidate's category (see
 // programme.requiredDocuments) must be marked Valid.
-function verificationComplete(c, requiredDocuments) {
+export function verificationComplete(c, requiredDocuments) {
   return (requiredDocuments || []).every((doc) => {
     if (!doc.appliesToCategories.includes(c.category)) return true;
     const entry = c.verification.documents[doc.key];
@@ -1399,6 +1416,12 @@ function recomputeOutcome(ds, c) {
     const entry = c.verification.documents[doc.key];
     return !!entry && entry.status === "invalid";
   });
+  // Draft -> Doc Verified is automatic, the instant every applicable document is Valid — that's the
+  // real gate confirmShortlist checks (see there). Only ever advances from Draft: a candidate already
+  // past it (shortlisted, approved) never gets pulled back here just because verification re-runs.
+  if (c.shortlistStatus === "draft" && !anyDocumentInvalid && verificationComplete(c, requiredDocuments)) {
+    c.shortlistStatus = "doc-verified";
+  }
   if (anyDocumentInvalid) {
     c.outcome = "ineligible";
   } else if (c.piAttendance === "present" && c.piTotal != null && c.apvScore != null && verificationComplete(c, requiredDocuments)) {

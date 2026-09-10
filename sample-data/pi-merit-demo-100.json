@@ -9754,7 +9754,8 @@
         "verification",
         "final-scores",
         "merit-releases",
-        "waiting-list"
+        "waiting-list",
+        "pending-approvals"
       ],
       "isDefault": true
     }

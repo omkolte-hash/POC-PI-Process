@@ -4,8 +4,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
   generateDataset, createInstitute, createProgramme, setApvScore, setScoringFormula,
-  moveCandidatesAllocation, confirmShortlist, createApprovalRequest, sendApprovalMail,
-  generateMailOtp, verifyMailOtp, createAdmissionCycle, activeCycleId, cyclesForScope,
+  moveCandidatesAllocation, confirmShortlist, createApprovalRequest, assignApprover, decideApproval,
+  createAdmissionCycle, activeCycleId, cyclesForScope,
   setActiveCycle, deleteAdmissionCycle, buildCandidateDocuments, approveShortlistList, revertShortlist,
   runMeritProcessing, approveMeritBatch, savePanelist, approvePanelist, fmtDateTime,
   unassignPanelist, panelistInstituteId, panelistServesProgramme,
@@ -16,7 +16,7 @@ import {
 function makeReadyCandidate(ds, programmeId, academicYearId, overrides) {
   const c = {
     id: overrides.id, programmeId, academicYearId, name: overrides.name || overrides.id,
-    category: "OPEN", shortlistStatus: "approved", allocation: { sessionId: "S1", groupId: "G1" },
+    category: "OPEN", shortlistStatus: "shortlist-approved", allocation: { sessionId: "S1", groupId: "G1" },
     piAttendance: "present", piTotal: overrides.piTotal, slatScore: overrides.slatScore || 0,
     apvScore: null, piScores: {}, piNotes: {}, piScoreLocked: {}, piTotal_: undefined,
     verification: { documents: {} }, outcome: null, finalScore: null,
@@ -282,13 +282,14 @@ test("editing the approval chain mid-flight does not desync the approval request
   const prog = createProgramme(ds, { instituteId: inst.id, name: "Test Programme", code: "TP" });
   const p = ds.programmes.find((x) => x.id === prog.id);
   p.approvalChain = [
-    { id: "L1", seq: 1, name: "Director", approverEmail: "" },
-    { id: "L2", seq: 2, name: "Registrar", approverEmail: "" },
-    { id: "L3", seq: 3, name: "SIU", approverEmail: "" }
+    { id: "L1", seq: 1, roleId: "R1" },
+    { id: "L2", seq: 2, roleId: "R2" },
+    { id: "L3", seq: 3, roleId: "R3" }
   ];
+  ds.staff.push({ id: "STAFF-1", instituteId: inst.id, name: "Approver", roleId: "R1", status: "Active" });
   const ay = ds.activeAcademicYearByProgramme[prog.id];
   const c = makeReadyCandidate(ds, prog.id, ay, { id: "C4", piTotal: 30, slatScore: 50 });
-  c.shortlistStatus = "yet-to-shortlist";
+  c.shortlistStatus = "doc-verified";
 
   const { list } = confirmShortlist(ds, { programmeId: prog.id, academicYearId: ay, filter: { groups: [] }, rankField: null, mode: "all", value: null });
   assert.equal(list.approvals.length, 3);
@@ -297,21 +298,21 @@ test("editing the approval chain mid-flight does not desync the approval request
   assert.equal(req.chainLength, 3);
 
   // Level 0 (Director) approves.
-  let mail = sendApprovalMail(ds, req.id, { to: "a@b.com", subject: "s", body: "b" }).mail;
-  verifyMailOtp(ds, mail.id, generateMailOtp(ds, mail.id).otp);
+  assignApprover(ds, req.id, "STAFF-1");
+  decideApproval(ds, req.id, "STAFF-1", "approved", "");
   assert.equal(req.levelIndex, 1);
   assert.equal(list.currentLevelIndex, 1);
 
   // Admin removes a level from the chain while this request is mid-flight (now 2 levels).
   p.approvalChain = [
-    { id: "L1", seq: 1, name: "Director", approverEmail: "" },
-    { id: "L2", seq: 2, name: "Registrar", approverEmail: "" }
+    { id: "L1", seq: 1, roleId: "R1" },
+    { id: "L2", seq: 2, roleId: "R2" }
   ];
 
   // Level 1 (Registrar) approves. Bug: live chain length (2) makes levelIndex 1 look like the
   // last level (1 >= 2-1); the frozen chainLength (3) correctly knows one level still remains.
-  mail = sendApprovalMail(ds, req.id, { to: "a@b.com", subject: "s", body: "b" }).mail;
-  verifyMailOtp(ds, mail.id, generateMailOtp(ds, mail.id).otp);
+  assignApprover(ds, req.id, "STAFF-1");
+  decideApproval(ds, req.id, "STAFF-1", "approved", "");
 
   assert.equal(req.status, "pending", "request must not be marked approved — a level still remains");
   assert.equal(req.levelIndex, 2);
@@ -375,14 +376,14 @@ test("buildCandidateDocuments seeds a real PDF, not a plaintext stub", () => {
 });
 
 // Feedback: once any approval level rejects a shortlist, Director/SIU can click "Revert Shortlist"
-// to put its candidates back to Draft (yet-to-shortlist), and can't do it twice or on a live list.
-test("revertShortlist resets a rejected shortlist's candidates to yet-to-shortlist", () => {
+// to put its candidates back to Doc Verified, and can't do it twice or on a live list.
+test("revertShortlist resets a rejected shortlist's candidates to doc-verified", () => {
   const ds = generateDataset();
   const inst = createInstitute(ds, { name: "Test Institute", code: "TI" });
   const prog = createProgramme(ds, { instituteId: inst.id, name: "Test Programme", code: "TP" });
   const ay = ds.activeAcademicYearByProgramme[prog.id];
   const c = makeReadyCandidate(ds, prog.id, ay, { id: "C5", piTotal: 30, slatScore: 50 });
-  c.shortlistStatus = "yet-to-shortlist";
+  c.shortlistStatus = "doc-verified";
 
   const { list } = confirmShortlist(ds, { programmeId: prog.id, academicYearId: ay, filter: { groups: [] }, rankField: null, mode: "all", value: null });
 
@@ -391,12 +392,12 @@ test("revertShortlist resets a rejected shortlist's candidates to yet-to-shortli
 
   approveShortlistList(ds, list.id, 0, "rejected", "");
   assert.equal(list.status, "rejected");
-  assert.equal(c.shortlistStatus, "yet-to-shortlist", "rejection already returns candidates to the pool");
+  assert.equal(c.shortlistStatus, "doc-verified", "rejection already returns candidates to the pool");
 
   const res = revertShortlist(ds, list.id);
   assert.ok(res.ok);
   assert.equal(res.count, 1);
-  assert.equal(c.shortlistStatus, "yet-to-shortlist", "reverted candidate lands in the Draft/yet-to-shortlist bucket");
+  assert.equal(c.shortlistStatus, "doc-verified", "reverted candidate lands in the Doc Verified bucket");
   assert.equal(c.shortlistId, null);
   assert.ok(list.reverted, "list is flagged reverted so the button doesn't offer itself again");
 });
@@ -410,7 +411,7 @@ test("approveShortlistList records a decision timestamp alongside the existing d
   const prog = createProgramme(ds, { instituteId: inst.id, name: "Test Programme", code: "TP" });
   const ay = ds.activeAcademicYearByProgramme[prog.id];
   const c = makeReadyCandidate(ds, prog.id, ay, { id: "C6", piTotal: 30, slatScore: 50 });
-  c.shortlistStatus = "yet-to-shortlist";
+  c.shortlistStatus = "doc-verified";
 
   const { list } = confirmShortlist(ds, { programmeId: prog.id, academicYearId: ay, filter: { groups: [] }, rankField: null, mode: "all", value: null });
   approveShortlistList(ds, list.id, 0, "approved", "");
@@ -610,10 +611,10 @@ test("sendGroupMeetingNotification refuses when the group has no candidates", ()
   assert.equal(ds.sentMails.length, before, "refusal must not send any mail");
 });
 
-test("normalizeDataset backfills a missing mailIds array on an already-shaped approvalRequest", () => {
-  // Regression for a real crash: "Cannot read properties of undefined (reading '0')" in
-  // approvalButtonState, from an approvalRequest record that had levelIndex/chainLength (so it
-  // skipped every other migration branch) but no mailIds array.
+test("normalizeDataset backfills a missing currentApproverStaffId on an already-shaped approvalRequest", () => {
+  // Regression for the old mailIds-based crash's equivalent under the direct-approve model: an
+  // approvalRequest record that had levelIndex/chainLength (so it skipped every other migration
+  // branch) but no currentApproverStaffId must resolve to null, not undefined.
   const ds = normalizeDataset({
     approvalRequests: [{
       id: "AR-1", subjectType: "shortlist", subjectId: "SL-1",
@@ -623,24 +624,5 @@ test("normalizeDataset backfills a missing mailIds array on an already-shaped ap
   });
 
   const req = ds.approvalRequests.find((r) => r.id === "AR-1");
-  assert.ok(Array.isArray(req.mailIds), "mailIds must be backfilled to an array");
-  assert.equal(req.mailIds.length, 0);
-});
-
-test("sendApprovalMail still works if req.mailIds was somehow missing at write time", () => {
-  const ds = generateDataset();
-  const inst = createInstitute(ds, { name: "Test Institute", code: "TI" });
-  const prog = createProgramme(ds, { instituteId: inst.id, name: "Test Programme", code: "TP" });
-  ds.approvalRequests.push({
-    id: "AR-X", subjectType: "shortlist", subjectId: "SL-X",
-    programmeId: prog.id, academicYearId: "AY1", cycleId: null,
-    levelIndex: 0, chainLength: 1, status: "pending", summary: "test", createdOn: "2026-01-01"
-    // mailIds intentionally omitted
-  });
-
-  const res = sendApprovalMail(ds, "AR-X", { to: "a@b.com", subject: "s", body: "b" });
-
-  assert.ok(res.ok);
-  const req = ds.approvalRequests.find((r) => r.id === "AR-X");
-  assert.equal(req.mailIds[0], res.mail.id);
+  assert.equal(req.currentApproverStaffId, null, "currentApproverStaffId must be backfilled to null");
 });

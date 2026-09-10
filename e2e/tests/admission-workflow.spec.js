@@ -9,6 +9,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   mockFilePicker, trackConsoleErrors, openSampleFile, loginInstitute, loginPanelist, gotoNav, gotoPageDirect, fieldByLabel,
+  createStaffMember, approveTwice,
 } from './helpers.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -64,10 +65,10 @@ test('full admission lifecycle: programme creation through provisional letters',
 
   await test.step('Create a fresh Programme and make it active', async () => {
     await gotoNav(page, 'Programmes', 'Programmes');
-    await fieldByLabel(page, 'Programme Name').locator('input').fill(PROGRAMME.name);
-    await fieldByLabel(page, 'Programme Code').locator('input').fill(PROGRAMME.code);
-    await fieldByLabel(page, 'Description').locator('input').fill(PROGRAMME.description);
     await page.locator('button:has-text("Create Programme")').click();
+    await fieldByLabel(page, 'Programme Name').locator('textarea').fill(PROGRAMME.name);
+    await fieldByLabel(page, 'Description').locator('textarea').fill(PROGRAMME.description);
+    await page.locator('.dialog button:has-text("Save")').click();
     await expect(page.locator('table')).toContainText(PROGRAMME.name);
 
     // A programme only auto-activates if none was active yet; this institute already has MBA
@@ -140,15 +141,20 @@ test('full admission lifecycle: programme creation through provisional letters',
     for (const id of SC_IDS) {
       const row = page.locator('tr', { hasText: id });
       await expect(row).toBeVisible();
-      await row.locator('button:has-text("View")').first().click();
-      const modal = page.locator('.dialog', { hasText: 'View Document' });
+      await row.locator('button:has-text("View Documents")').click();
+      const modal = page.locator('.dialog-backdrop .dialog');
       await expect(modal).toBeVisible();
       await modal.locator('button:has-text("Mark as Valid")').click();
-      await modal.locator('input[type="checkbox"]').check();
-      await modal.locator('button:has-text("Submit")').click();
+      await expect(page.locator('.toast-pop')).toContainText('Marked Valid.');
+      await modal.locator('button:has-text("Close")').click();
       await expect(modal).toBeHidden();
     }
-    await expect(page.locator('tr', { hasText: SC_IDS[0] })).toContainText('Valid');
+  });
+
+  let director, siu;
+  await test.step('Create Director and SIU staff for the approval chain', async () => {
+    director = await createStaffMember(page, 'E2E Director ' + Date.now(), 'Director');
+    siu = await createStaffMember(page, 'E2E SIU ' + Date.now(), 'SIU');
   });
 
   await test.step('Shortlist all 6 OPEN candidates', async () => {
@@ -169,9 +175,10 @@ test('full admission lifecycle: programme creation through provisional letters',
   });
 
   await test.step('Approve the shortlist (Director, then SIU)', async () => {
-    await approveTwice(page, context, {
-      returnToOrigin: () => gotoNav(page, 'Candidates', 'Shortlist Approval'),
-      mailTo: 'director@e2e.test',
+    await approveTwice(page, {
+      returnToOrigin: async () => { await gotoNav(page, 'Candidates', 'Shortlist Approval'); },
+      directorCreds: director, siuCreds: siu,
+      reselectProgramme: () => selectProgramme(page),
     });
     await gotoNav(page, 'Candidates', 'Shortlist Approval');
     await expect(page.locator('table')).toContainText('Approved');
@@ -350,6 +357,10 @@ test('full admission lifecycle: programme creation through provisional letters',
         await page.locator('button:has-text("Save")').click();
         await page.waitForTimeout(300);
       }
+      // View opens a right-side drawer over the Candidate List, not a separate page — close it
+      // before the next iteration's gotoNav, otherwise its backdrop blocks the sidebar click.
+      await page.locator('[title="Close"]').click();
+      await page.waitForTimeout(200);
     }
   });
 
@@ -365,9 +376,10 @@ test('full admission lifecycle: programme creation through provisional letters',
   });
 
   await test.step('Approve the merit batch (Director, then SIU)', async () => {
-    await approveTwice(page, context, {
-      returnToOrigin: () => gotoNav(page, 'Merit', 'Merit Approval'),
-      mailTo: 'director@e2e.test',
+    await approveTwice(page, {
+      returnToOrigin: async () => { await gotoNav(page, 'Merit', 'Merit Approval'); },
+      directorCreds: director, siuCreds: siu,
+      reselectProgramme: () => selectProgramme(page),
     });
     await gotoNav(page, 'Merit', 'Merit Approval');
     await expect(page.locator('table')).toContainText('Approved');
@@ -429,34 +441,3 @@ test('full admission lifecycle: programme creation through provisional letters',
 
   expect(errors, `console/page errors seen during the full journey:\n${errors.join('\n')}`).toEqual([]);
 });
-
-/**
- * Drives the universal Director -> SIU approval flow twice (once per level) from whatever page
- * currently shows a "Send for Approval" button. Handles the real popup tab + in-page OTP.
- */
-async function approveTwice(page, context, { returnToOrigin, mailTo }) {
-  for (let level = 0; level < 2; level++) {
-    await returnToOrigin();
-    await page.locator('button:has-text("Send for Approval")').first().click();
-    await expect(fieldByLabel(page, 'To').locator('input')).toBeVisible();
-    await fieldByLabel(page, 'To').locator('input').fill(mailTo);
-    await page.locator('button:has-text("Send")').click();
-    await expect(page.locator('button:has-text("Open Approval Link")').first()).toBeVisible();
-
-    const [popup] = await Promise.all([
-      context.waitForEvent('page'),
-      page.locator('button:has-text("Open Approval Link")').first().click(),
-    ]);
-    await popup.waitForLoadState();
-    await popup.locator('button:has-text("Approve")').click();
-
-    const otpLocator = popup.locator('strong[style*="monospace"]');
-    await expect(otpLocator).toBeVisible();
-    const otp = (await otpLocator.innerText()).trim();
-    await popup.locator('input[placeholder="6-digit code"]').fill(otp);
-    await popup.locator('button:has-text("Confirm Approval")').click();
-    await expect(popup.locator('text=You can close this tab now.')).toBeVisible();
-    await popup.close();
-    await page.waitForTimeout(400);
-  }
-}

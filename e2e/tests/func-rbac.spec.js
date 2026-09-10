@@ -5,7 +5,7 @@
 import { test, expect } from '@playwright/test';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { mockFilePicker, openSampleFile, loginInstitute, gotoNav, gotoPageDirect, fieldByLabel } from './helpers.js';
+import { mockFilePicker, openSampleFile, loginInstitute, gotoNav, gotoPageDirect, fieldByLabel, createStaffMember, approveTwice } from './helpers.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CANDIDATES_CSV = path.join(__dirname, 'fixtures', 'candidates.csv');
@@ -59,7 +59,6 @@ test('Staff member only sees their role\'s pages after login; Settings is never 
   await page.waitForTimeout(200);
   await expect(page.locator('.apsSideLink', { hasText: /^Candidates$/ })).toBeVisible();
   await expect(page.locator('.apsSideGroup', { hasText: 'Verification' })).toBeVisible();
-  await expect(page.locator('.apsSideGroup', { hasText: 'Documents' })).toBeVisible();
 
   // ...but Settings (Roles & Permissions / User Memberships / Academic Years / etc.) is reserved
   // for the institute admin login and must not appear in the sidebar for any staff role, however
@@ -82,42 +81,12 @@ test('Staff member only sees their role\'s pages after login; Settings is never 
 // selected. Build a fresh programme with its own cycle, PI assessment, an imported candidate
 // and a session/group with that candidate allocated — the minimum a Coordinator needs to see
 // a Session/Group to join and a roster row to mark.
-// Copied from admission-workflow.spec.js's approveTwice: opens the approval-link popup and
-// completes the OTP flow, twice (Director then SIU) — Candidate Allocation only lists candidates
-// whose shortlist has cleared both approval levels.
-async function approveTwice(page, context, { returnToOrigin, mailTo }) {
-  for (let level = 0; level < 2; level++) {
-    await returnToOrigin();
-    await page.locator('button:has-text("Send for Approval")').first().click();
-    await expect(fieldByLabel(page, 'To').locator('input')).toBeVisible();
-    await fieldByLabel(page, 'To').locator('input').fill(mailTo);
-    await page.locator('button:has-text("Send")').click();
-    await expect(page.locator('button:has-text("Open Approval Link")').first()).toBeVisible();
-
-    const [popup] = await Promise.all([
-      context.waitForEvent('page'),
-      page.locator('button:has-text("Open Approval Link")').first().click(),
-    ]);
-    await popup.waitForLoadState();
-    await popup.locator('button:has-text("Approve")').click();
-
-    const otpLocator = popup.locator('strong[style*="monospace"]');
-    await expect(otpLocator).toBeVisible();
-    const otp = (await otpLocator.innerText()).trim();
-    await popup.locator('input[placeholder="6-digit code"]').fill(otp);
-    await popup.locator('button:has-text("Confirm Approval")').click();
-    await expect(popup.locator('text=You can close this tab now.')).toBeVisible();
-    await popup.close();
-    await page.waitForTimeout(400);
-  }
-}
-
-async function setupProgrammeWithAllocatedCandidate(page, context, programmeName) {
+async function setupProgrammeWithAllocatedCandidate(page, programmeName) {
   await gotoNav(page, 'Programmes', 'Programmes');
-  await fieldByLabel(page, 'Programme Name').locator('input').fill(programmeName);
-  await fieldByLabel(page, 'Programme Code').locator('input').fill(programmeName.replace(/[^A-Z0-9]/gi, '').slice(0, 10));
-  await fieldByLabel(page, 'Description').locator('input').fill('QA RBAC test programme.');
   await page.locator('button:has-text("Create Programme")').click();
+  await fieldByLabel(page, 'Programme Name').locator('textarea').fill(programmeName);
+  await fieldByLabel(page, 'Description').locator('textarea').fill('QA RBAC test programme.');
+  await page.locator('.dialog button:has-text("Save")').click();
   await expect(page.locator('table')).toContainText(programmeName);
   await page.locator('header select').nth(1).selectOption({ label: programmeName });
   await page.waitForTimeout(300);
@@ -160,15 +129,22 @@ async function setupProgrammeWithAllocatedCandidate(page, context, programmeName
   await page.locator('button:has-text("Confirm & Commit")').click();
   await expect(page.locator('.toast-pop')).toContainText('new candidate');
 
+  const director = await createStaffMember(page, 'QA RBAC Director ' + Date.now(), 'Director');
+  const siu = await createStaffMember(page, 'QA RBAC SIU ' + Date.now(), 'SIU');
+
   // Candidate Allocation only lists candidates whose shortlist cleared both approval levels.
   await gotoNav(page, 'Candidates', 'Create Shortlist');
   await page.locator('label.radio:has-text("All Matching")').click();
   await page.locator('button:has-text("Preview Shortlist")').click();
   await page.locator('button:has-text("Confirm Shortlist")').click();
   await expect(page.locator('.toast-pop')).toBeVisible();
-  await approveTwice(page, context, {
-    returnToOrigin: () => gotoNav(page, 'Candidates', 'Shortlist Approval'),
-    mailTo: 'director@qa-rbac.test',
+  await approveTwice(page, {
+    returnToOrigin: async () => { await gotoNav(page, 'Candidates', 'Shortlist Approval'); },
+    directorCreds: director, siuCreds: siu,
+    reselectProgramme: async () => {
+      await page.locator('header select').nth(1).selectOption({ label: programmeName });
+      await page.waitForTimeout(300);
+    },
   });
 
   await gotoNav(page, 'PI Management', 'Sessions');
@@ -216,11 +192,11 @@ async function addStaff(page, name, email, roleLabel) {
   return match[2]; // password
 }
 
-test('Coordinator can mark PI attendance; the staff-role Panelist sees the same page read-only', async ({ page, context }) => {
+test('Coordinator can mark PI attendance; the staff-role Panelist sees the same page read-only', async ({ page }) => {
   test.setTimeout(90_000);
   await loginInstitute(page);
   const programmeName = `QA-RBAC-${Date.now()}`;
-  await setupProgrammeWithAllocatedCandidate(page, context, programmeName);
+  await setupProgrammeWithAllocatedCandidate(page, programmeName);
   const coordEmail = `qa-coord-${Date.now()}@test.edu`;
   const coordPassword = await addStaff(page, 'QA Coordinator', coordEmail, 'Coordinator');
   const panelistEmail = `qa-panelist-${Date.now()}@test.edu`;

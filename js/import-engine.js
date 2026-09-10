@@ -11,7 +11,7 @@
 // picker-based transform library (no free-text formula language). MongoDB/API/Excel/SQL sources are
 // intentionally not implemented — only their extension point (SOURCE_TYPES) exists — per explicit
 // instruction to keep this demo CSV-only while the rest of the pipeline stays fully generic.
-import { parseCsvText, nowISO, buildCandidateDocuments, DEFAULT_REQUIRED_DOCUMENTS } from "./admission-engine.js";
+import { parseCsvText, nowISO, buildCandidateDocuments, DEFAULT_REQUIRED_DOCUMENTS, verificationComplete } from "./admission-engine.js";
 
 // ============================================================================
 // Data Source Manager
@@ -492,14 +492,19 @@ export function commitImportJob(ds, job) {
   preview.finalRows.forEach((row) => {
     const id = String(row[job.candidateIdField]);
     const category = row[job.categoryField];
+    const documents = buildCandidateDocuments(id, category, requiredDocuments);
+    // Draft, or Doc Verified immediately if this category has no applicable document at all (e.g. OPEN
+    // under the default config) — otherwise an OPEN candidate would be stuck un-shortlistable until some
+    // unrelated action (PI score, APV) happened to trigger recomputeOutcome's own Draft->Doc Verified step.
+    const shortlistStatus = verificationComplete({ category, verification: { documents } }, requiredDocuments) ? "doc-verified" : "draft";
     const candidate = {
       id, programmeId: job.programmeId, academicYearId: job.academicYearId, cycleId: job.cycleId, category,
       ...row, // generic spread: every other mapped field lands under whatever target name the institute chose
-      shortlistStatus: "yet-to-shortlist", shortlistId: null,
+      shortlistStatus, shortlistId: null,
       allocation: null, piId: null,
       registrationAttendance: "pending", piAttendance: "pending",
       piScores: {}, piNotes: {}, piScoreLocked: {}, piTotal: null, apvScore: null,
-      verification: { documents: buildCandidateDocuments(id, category, requiredDocuments) },
+      verification: { documents },
       outcome: null, finalScore: null, meritCategory: null, meritBatchId: null, rank: null, waitingListNumber: null,
       meritApproval: [], meritListReleaseId: null,
       timeline: [{ label: "Imported", date: nowISO().slice(0, 10) }],

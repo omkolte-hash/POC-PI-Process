@@ -32,32 +32,6 @@ a:hover{color:var(--color-accent);text-decoration:underline}
 </style>
 </helmet>
 <div style="display:flex;height:100vh;width:100%;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);overflow:hidden">
-  <sc-if value="{{ showPopupApproval }}"><div style="flex:1;display:flex;align-items:center;justify-content:center;padding:var(--space-6)">
-    <div class="card elev-lg" style="padding:var(--space-6);max-width:460px;width:100%">
-      <div style="font-family:var(--font-heading);font-weight:var(--font-heading-weight);font-size:22px;margin-bottom:var(--space-1)">Approval Request</div>
-      <sc-if value="{{ popupError }}"><p style="color:var(--color-accent-700);font-size:13px">{{ popupError }}</p></sc-if>
-      <sc-if value="{{ popupDone }}"><div>
-        <p style="font-size:14px">{{ popupResultMsg }}</p>
-        <p style="font-size:12px;opacity:0.6">You can close this tab now.</p>
-      </div></sc-if>
-      <sc-if value="{{ popupLoaded }}">
-        <sc-if value="{{ popupAlreadyDecided }}"><p style="font-size:13px;opacity:0.7">This request has already been decided — no action needed.</p></sc-if>
-        <div style="font-size:13px;opacity:0.75;margin-bottom:var(--space-3)">{{ popupSummary }}</div>
-        <div style="font-size:12px;opacity:0.6;margin-bottom:var(--space-4)">Approval level: <strong>{{ popupLevelLabel }}</strong> &middot; Sent to: {{ popupTo }}</div>
-        <sc-if value="{{ popupShowActions }}"><div style="display:flex;gap:var(--space-2)">
-          <button type="button" class="btn btn-primary" onClick="{{ onPopupApprove }}" disabled="{{ popupBusy }}">Approve</button>
-          <button type="button" class="btn btn-secondary" onClick="{{ onPopupReject }}" disabled="{{ popupBusy }}">Reject</button>
-        </div></sc-if>
-        <sc-if value="{{ popupOtpStage }}"><div style="padding:var(--space-3);border-radius:var(--radius-md);background:color-mix(in srgb, var(--color-accent) 10%, transparent);margin-bottom:var(--space-4);font-size:13px">
-          Simulated email sent to <strong>{{ popupOtpSentTo }}</strong> — OTP: <strong style="font-family:monospace;font-size:16px">{{ popupOtpValue }}</strong>
-        </div></sc-if>
-        <sc-if value="{{ popupOtpStage }}"><div>
-          <div class="field"><label>Enter OTP</label><input class="input" value="{{ popupOtpEntered }}" onChange="{{ onPopupOtpEnteredChange }}" placeholder="6-digit code" /></div>
-          <button type="button" class="btn btn-primary btn-block" onClick="{{ onPopupOtpSubmit }}" disabled="{{ popupBusy }}" style="margin-top:var(--space-3)">Confirm Approval</button>
-        </div></sc-if>
-      </sc-if>
-    </div>
-  </div></sc-if>
   <sc-if value="{{ showFileGate }}"><div style="flex:1;display:flex;align-items:center;justify-content:center;padding:var(--space-6)">
     <div class="card elev-lg" style="padding:var(--space-6);max-width:460px;width:100%">
       <div style="font-family:var(--font-heading);font-weight:var(--font-heading-weight);font-size:24px;margin-bottom:2px">Admission Processing</div>
@@ -144,7 +118,6 @@ a:hover{color:var(--color-accent);text-decoration:underline}
           <sc-if value="{{ noCycleOption }}"><option value="">No Cycle — create one</option></sc-if>
           <sc-for list="{{ cycleOptions }}" as="cy" hint-placeholder-count="2"><option value="{{ cy.id }}" selected="{{ cy.selected }}">{{ cy.name }}</option></sc-for>
         </select></div></sc-if>
-        <sc-if value="{{ fileName }}"><span class="tag tag-neutral" title="Saving to this file on every change"><i data-lucide="file-json" style="width:12px;height:12px"></i>{{ fileName }}</span></sc-if>
         <sc-if value="{{ notFileConnected }}"><span class="tag tag-accent" title="Changes are not being saved to disk">Not Saving</span></sc-if>
         <sc-if value="{{ currentUserName }}"><div style="font-size:12px;text-align:right;line-height:1.3">
           <div style="font-weight:600">{{ currentUserName }}</div>
@@ -609,14 +582,14 @@ a:hover{color:var(--color-accent);text-decoration:underline}
               <option value="ALL">All Categories</option>
               <sc-for list="{{ categories }}" as="cat" hint-placeholder-count="5"><option value="{{ cat.id }}">{{ cat.label }}</option></sc-for>
             </select></div>
-            <div class="field" style="margin:0"><label>Shortlist Status</label><select class="input" value="{{ clFilterStatus }}" onChange="{{ onClFilterStatus }}">
+            <div class="field" style="margin:0"><label>Status</label><select class="input" value="{{ clFilterStatus }}" onChange="{{ onClFilterStatus }}">
               <option value="ALL">All Statuses</option>
-              <sc-for list="{{ clStatusOptions }}" as="s" hint-placeholder-count="5"><option value="{{ s }}">{{ s }}</option></sc-for>
+              <sc-for list="{{ clStatusOptions }}" as="s" hint-placeholder-count="5"><option value="{{ s.value }}">{{ s.label }}</option></sc-for>
             </select></div>
             <div class="field" style="margin:0;flex:1;max-width:280px"><label>Search</label><input class="input" placeholder="Applicant ID or name" value="{{ clSearch }}" onChange="{{ onClSearch }}" /></div>
           </div>
           <div style="font-size:13px;opacity:0.6;margin-bottom:var(--space-2)">{{ clResultCount }} candidates</div>
-          <table class="table"><thead><tr><th>Applicant ID</th><th>Name</th><th>Category</th><th>Gender</th><th style="text-align:right">SLAT Score</th><th>Shortlist Status</th><th>Allocation</th><th>Outcome</th><sc-for list="{{ clExtraColumns }}" as="col" hint-placeholder-count="3"><th>{{ col }}</th></sc-for><th></th></tr></thead><tbody>
+          <table class="table"><thead><tr><th>Applicant ID</th><th>Name</th><th>Category</th><th>Gender</th><th style="text-align:right">SLAT Score</th><th>Status</th><th>Allocation</th><th>Outcome</th><sc-for list="{{ clExtraColumns }}" as="col" hint-placeholder-count="3"><th>{{ col }}</th></sc-for><th></th></tr></thead><tbody>
             <sc-for list="{{ clRows }}" as="c" hint-placeholder-count="12">
               <tr><td>{{ c.id }}</td><td>{{ c.name }}</td><td>{{ c.category }}</td><td>{{ c.gender }}</td><td style="text-align:right">{{ c.slatScore }}</td>
                 <td><span class="{{ c.tagCls }}">{{ c.statusLabel }}</span></td><td>{{ c.allocationLabel }}</td><td>{{ c.outcomeLabel }}</td>
@@ -624,75 +597,18 @@ a:hover{color:var(--color-accent);text-decoration:underline}
                 <td><button type="button" class="btn btn-ghost" onClick="{{ c.onView }}">View</button></td></tr>
             </sc-for>
           </tbody></table>
-        </div></sc-if>
-        <sc-if value="{{ pageIsCandidateProfile }}"><div>
-          <div style="display:flex;gap:var(--space-3);margin-bottom:var(--space-4);align-items:flex-end">
-            <div class="field" style="margin:0;max-width:260px"><label>Search by Applicant ID or Name</label><input class="input" placeholder="e.g. SLAT-10023" value="{{ profileSearch }}" onChange="{{ onProfileSearchChange }}" /></div>
-            <button type="button" class="btn btn-secondary" onClick="{{ onProfileSearch }}">Search</button>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:var(--space-3);flex-wrap:wrap;gap:var(--space-2)">
+            <div style="font-size:12px;opacity:0.65">Showing {{ clPagination.showingLabel }}</div>
+            <div style="display:flex;align-items:center;gap:var(--space-2)">
+              <label style="font-size:12px;opacity:0.65;margin:0">Rows per page</label>
+              <select class="input" style="width:auto" value="{{ clPagination.pageSize }}" onChange="{{ clPagination.onPageSizeChange }}">
+                <sc-for list="{{ clPagination.pageSizeOptions }}" as="n" hint-placeholder-count="4"><option value="{{ n }}">{{ n }}</option></sc-for>
+              </select>
+              <button type="button" class="btn btn-ghost" onClick="{{ clPagination.onPrev }}" disabled="{{ clPagination.disablePrev }}">Prev</button>
+              <span style="font-size:12px">Page {{ clPagination.page }} of {{ clPagination.totalPages }}</span>
+              <button type="button" class="btn btn-ghost" onClick="{{ clPagination.onNext }}" disabled="{{ clPagination.disableNext }}">Next</button>
+            </div>
           </div>
-          <sc-if value="{{ profileNotFound }}"><p>No candidate found in the active programme/academic year.</p></sc-if>
-          <sc-if value="{{ profileCandidate }}"><div>
-            <div class="card elev-sm" style="padding:var(--space-4);margin-bottom:var(--space-4);display:flex;flex-direction:row;gap:var(--space-4);align-items:center">
-              <div style="width:64px;height:64px;border-radius:50%;background:var(--color-accent-100);color:var(--color-accent-700);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-size:22px;flex:none">{{ profileCandidate.initials }}</div>
-              <div style="flex:1">
-                <div style="font-family:var(--font-heading);font-size:24px">{{ profileCandidate.name }}</div>
-                <div style="font-size:13px;opacity:0.65">{{ profileCandidate.id }} &middot; {{ profileCandidate.institute }} &middot; {{ profileCandidate.programme }} &middot; {{ profileCandidate.academicYear }} &middot; {{ profileCandidate.gender }} &middot; {{ profileCandidate.education }}</div>
-              </div>
-              <span class="{{ profileCandidate.tagCls }}">{{ profileCandidate.statusLabel }}</span>
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4)">
-              <div class="card" style="padding:var(--space-4)">
-                <div class="card-title" style="font-size:15px;margin-bottom:var(--space-2)">SLAT</div>
-                <div>Score: <strong>{{ profileCandidate.slatScore }}</strong></div>
-                <div>Percentile: <strong>{{ profileCandidate.slatPercentile }}</strong></div>
-                <div>Category: <strong>{{ profileCandidate.category }}</strong></div>
-              </div>
-              <div class="card" style="padding:var(--space-4)">
-                <div class="card-title" style="font-size:15px;margin-bottom:var(--space-2)">PI</div>
-                <div>Session: <strong>{{ profileCandidate.session }}</strong></div>
-                <div>Group: <strong>{{ profileCandidate.group }}</strong></div>
-                <div>Zoom Room: <strong>{{ profileCandidate.zoomRoom }}</strong></div>
-                <div>Reporting Time: <strong>{{ profileCandidate.reportingTime }}</strong></div>
-                <div>Registration Attendance: <span class="{{ profileCandidate.regTagCls }}">{{ profileCandidate.regTagLabel }}</span></div>
-                <div>PI Attendance: <span class="{{ profileCandidate.piTagCls }}">{{ profileCandidate.piTagLabel }}</span></div>
-                <div>PI Score: <strong>{{ profileCandidate.piScore }}</strong></div>
-              </div>
-              <div class="card" style="padding:var(--space-4)">
-                <div class="card-title" style="font-size:15px;margin-bottom:var(--space-2)">Verification</div>
-                <div>Category Verification: <strong>{{ profileCandidate.categoryVerif }}</strong></div>
-              </div>
-              <div class="card" style="padding:var(--space-4)">
-                <div class="card-title" style="font-size:15px;margin-bottom:var(--space-2)">Imported Details</div>
-                <sc-for list="{{ profileCandidate.importedDetails }}" as="f" hint-placeholder-count="4">
-                  <div>{{ f.key }}: <strong>{{ f.value }}</strong></div>
-                </sc-for>
-              </div>
-              <div class="card" style="padding:var(--space-4)">
-                <div class="card-title" style="font-size:15px;margin-bottom:var(--space-2)">APV (Academic Profile Verification)</div>
-                <div style="display:flex;gap:var(--space-2);align-items:flex-end">
-                  <div class="field" style="margin:0;max-width:140px"><label>APV Score (out of 10)</label><input class="input" type="number" min="0" max="10" step="1" value="{{ profileCandidate.apvScoreValue }}" onChange="{{ onApvChange }}" /></div>
-                  <button type="button" class="btn btn-primary" onClick="{{ onApvSave }}">Save</button>
-                </div>
-                <div style="margin-top:var(--space-2)">PI + APV Score: <strong>{{ profileCandidate.piApvScore }}</strong></div>
-              </div>
-              <div class="card" style="padding:var(--space-4)">
-                <div class="card-title" style="font-size:15px;margin-bottom:var(--space-2)">Merit</div>
-                <div>Final Score: <strong>{{ profileCandidate.finalScore }}</strong></div>
-                <div>Rank: <strong>{{ profileCandidate.rank }}</strong></div>
-                <div>Outcome: <strong>{{ profileCandidate.outcome }}</strong></div>
-                <div>Merit List Release: <strong>{{ profileCandidate.release }}</strong></div>
-                <div>Waiting List Number: <strong>{{ profileCandidate.wlNumber }}</strong></div>
-              </div>
-            </div>
-            <div class="card elev-sm" style="padding:var(--space-4);margin-top:var(--space-4)">
-              <div class="card-title" style="margin-bottom:var(--space-3)">Audit Timeline</div>
-              <sc-for list="{{ profileCandidate.timeline }}" as="ev" hint-placeholder-count="6">
-                <div style="display:flex;gap:var(--space-3);padding:6px 0;border-bottom:1px solid var(--color-divider)">
-                  <div style="width:100px;font-size:12px;opacity:0.6">{{ ev.date }}</div><div style="font-size:14px">{{ ev.label }}</div>
-                </div>
-              </sc-for>
-            </div>
-          </div></sc-if>
         </div></sc-if>
         <sc-if value="{{ pageIsShortlist }}"><div>
           <div class="card elev-sm" style="padding:var(--space-4);margin-bottom:var(--space-4)">
@@ -730,6 +646,10 @@ a:hover{color:var(--color-accent);text-decoration:underline}
               </div>
               <sc-if value="{{ slIsCount }}"><div class="field" style="margin:0;max-width:160px"><label>Number of Candidates</label><input class="input" type="number" value="{{ slValue }}" onChange="{{ onSlValueChange }}" /></div></sc-if>
               <sc-if value="{{ slIsCutoff }}"><div class="field" style="margin:0;max-width:160px"><label>Minimum Value</label><input class="input" type="number" value="{{ slValue }}" onChange="{{ onSlValueChange }}" /></div></sc-if>
+              <div style="display:flex;gap:var(--space-3);margin-left:auto">
+                <button type="button" class="btn btn-secondary" onClick="{{ onSlPreview }}">Preview Shortlist</button>
+                <button type="button" class="btn btn-primary" onClick="{{ onSlConfirm }}" disabled="{{ slConfirmDisabled }}">Confirm Shortlist</button>
+              </div>
             </div>
           </div>
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-3);margin-bottom:var(--space-4)">
@@ -742,10 +662,6 @@ a:hover{color:var(--color-accent);text-decoration:underline}
               <tr style="{{ r.rowStyle }}"><td>{{ r.rank }}</td><td>{{ r.id }}</td><td>{{ r.name }}</td><td>{{ r.category }}</td><td style="text-align:right">{{ r.rankValue }}</td><td>{{ r.willBe }}</td></tr>
             </sc-for>
           </tbody></table>
-          <div style="margin-top:var(--space-4);display:flex;gap:var(--space-3)">
-            <button type="button" class="btn btn-secondary" onClick="{{ onSlPreview }}">Preview Shortlist</button>
-            <button type="button" class="btn btn-primary" onClick="{{ onSlConfirm }}" disabled="{{ slConfirmDisabled }}">Confirm Shortlist</button>
-          </div>
         </div></sc-if>
         <sc-if value="{{ pageIsShortlistApprovals }}"><div>
           <table class="table"><thead><tr><th>Shortlist</th><th>Criteria</th><th style="text-align:right">Candidates</th><th>Created</th><th></th><th></th></tr></thead><tbody>
@@ -760,6 +676,18 @@ a:hover{color:var(--color-accent);text-decoration:underline}
               </tr>
             </sc-for>
           </tbody></table>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:var(--space-3);flex-wrap:wrap;gap:var(--space-2)">
+            <div style="font-size:12px;opacity:0.65">Showing {{ saPagination.showingLabel }}</div>
+            <div style="display:flex;align-items:center;gap:var(--space-2)">
+              <label style="font-size:12px;opacity:0.65;margin:0">Rows per page</label>
+              <select class="input" style="width:auto" value="{{ saPagination.pageSize }}" onChange="{{ saPagination.onPageSizeChange }}">
+                <sc-for list="{{ saPagination.pageSizeOptions }}" as="n" hint-placeholder-count="4"><option value="{{ n }}">{{ n }}</option></sc-for>
+              </select>
+              <button type="button" class="btn btn-ghost" onClick="{{ saPagination.onPrev }}" disabled="{{ saPagination.disablePrev }}">Prev</button>
+              <span style="font-size:12px">Page {{ saPagination.page }} of {{ saPagination.totalPages }}</span>
+              <button type="button" class="btn btn-ghost" onClick="{{ saPagination.onNext }}" disabled="{{ saPagination.disableNext }}">Next</button>
+            </div>
+          </div>
         </div></sc-if>
         <sc-if value="{{ pageIsShortlistDetail }}"><div>
           <button type="button" class="btn btn-ghost" style="margin-bottom:var(--space-4)" onClick="{{ onBackToShortlistApprovals }}"><i data-lucide="arrow-left" style="width:14px;height:14px"></i>Back to Shortlist Approvals</button>
@@ -1364,68 +1292,63 @@ a:hover{color:var(--color-accent);text-decoration:underline}
             </select></div>
             <div class="field" style="margin:0;max-width:200px"><label>Institute Document Status</label><select class="input" value="{{ cvInstituteStatusFilter }}" onChange="{{ onCvInstituteStatusFilter }}">
               <option value="ALL">All</option>
+              <option value="draft">Draft</option>
               <option value="valid">Valid</option>
               <option value="invalid">InValid</option>
             </select></div>
           </div>
-          <p style="font-size:12px;opacity:0.6;margin-top:0">Candidates with no applicable document under this programme's Document Requirements aren't listed here. Approving/rejecting a document only happens from the View panel.</p>
+          <p style="font-size:12px;opacity:0.6;margin-top:0">Candidates with no applicable document under this programme's Document Requirements aren't listed here. Marking a document Valid/Invalid only happens from the View Documents panel.</p>
           <div style="font-size:13px;opacity:0.6;margin-bottom:var(--space-3)">{{ cvResultCount }} candidate(s)</div>
           <table class="table"><thead><tr>
-            <th>S.No</th><th>Student ID</th><th>Name</th><th>Category</th>
-            <th>Final Attendance Status</th>
-            <sc-for list="{{ cvDocColumns }}" as="col" hint-placeholder-count="2"><th>{{ col.label }}</th></sc-for>
+            <th>S.No</th><th>Student ID</th><th>Name</th><th>Category</th><th>Documents</th>
           </tr></thead><tbody>
             <sc-for list="{{ cvRows }}" as="r" hint-placeholder-count="10">
               <tr>
                 <td>{{ r.sno }}</td><td>{{ r.id }}</td><td>{{ r.name }}</td><td>{{ r.category }}</td>
-                <td>{{ r.finalAttLabel }}</td>
-                <sc-for list="{{ r.docs }}" as="doc" hint-placeholder-count="2">
-                  <td><sc-if value="{{ doc.applicable }}"><span class="{{ doc.cls }}">{{ doc.label }}</span> <button type="button" class="btn btn-primary" onClick="{{ doc.onView }}">View</button></sc-if>
-                    <sc-if value="{{ doc.notApplicable }}"><span style="opacity:0.5">N/A</span></sc-if></td>
-                </sc-for>
+                <td><button type="button" class="btn btn-primary" onClick="{{ r.onViewDocs }}">View Documents</button></td>
               </tr>
             </sc-for>
           </tbody></table>
           <sc-if value="{{ cvNoResults }}"><p style="font-size:13px;opacity:0.6">No candidates match the current filters.</p></sc-if>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:var(--space-3);flex-wrap:wrap;gap:var(--space-2)">
+            <div style="font-size:12px;opacity:0.65">Showing {{ cvPagination.showingLabel }}</div>
+            <div style="display:flex;align-items:center;gap:var(--space-2)">
+              <label style="font-size:12px;opacity:0.65;margin:0">Rows per page</label>
+              <select class="input" style="width:auto" value="{{ cvPagination.pageSize }}" onChange="{{ cvPagination.onPageSizeChange }}">
+                <sc-for list="{{ cvPagination.pageSizeOptions }}" as="n" hint-placeholder-count="4"><option value="{{ n }}">{{ n }}</option></sc-for>
+              </select>
+              <button type="button" class="btn btn-ghost" onClick="{{ cvPagination.onPrev }}" disabled="{{ cvPagination.disablePrev }}">Prev</button>
+              <span style="font-size:12px">Page {{ cvPagination.page }} of {{ cvPagination.totalPages }}</span>
+              <button type="button" class="btn btn-ghost" onClick="{{ cvPagination.onNext }}" disabled="{{ cvPagination.disableNext }}">Next</button>
+            </div>
+          </div>
 
           <sc-if value="{{ cvModalOpen }}"><div class="dialog-backdrop">
-            <div class="dialog" style="width:min(680px,100%)">
-              <div class="dialog-title">View Document</div>
+            <div class="dialog" style="width:min(720px,100%);max-height:90vh;overflow-y:auto">
+              <div class="dialog-title">{{ cvModal.candidateName }} &middot; {{ cvModal.candidateId }}</div>
               <div class="dialog-body">
-                <div style="font-size:13px;opacity:0.7;margin-bottom:var(--space-3)">{{ cvModal.candidateId }} &middot; {{ cvModal.candidateName }}</div>
-                <sc-if value="{{ cvModal.showDocNav }}"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-3)">
-                  <button type="button" class="btn btn-secondary btn-sm" onClick="{{ cvModal.onPrev }}" disabled="{{ cvModal.prevDisabled }}"><i data-lucide="chevron-left" style="width:14px;height:14px"></i> Previous</button>
-                  <span style="font-size:12px;opacity:0.6">{{ cvModal.docPositionLabel }}</span>
-                  <button type="button" class="btn btn-secondary btn-sm" onClick="{{ cvModal.onNext }}" disabled="{{ cvModal.nextDisabled }}">Next <i data-lucide="chevron-right" style="width:14px;height:14px"></i></button>
-                </div></sc-if>
-                <table class="table" style="margin-bottom:var(--space-3)"><thead><tr><th>Document Type</th><th>View Document</th><th>Document Name</th><th>Status</th></tr></thead><tbody>
-                  <tr>
-                    <td>{{ cvModal.docTypeLabel }}</td>
-                    <td>
-                      <sc-if value="{{ cvModal.hasDoc }}"><a href="{{ cvModal.dataUrl }}" target="_blank" rel="noopener">{{ cvModal.fileName }}</a></sc-if>
-                      <sc-if value="{{ cvModal.noDoc }}"><span style="opacity:0.5">No document uploaded</span></sc-if>
-                    </td>
-                    <td>{{ cvModal.fileName }}</td>
-                    <td>
-                      <sc-if value="{{ cvModal.hasDoc }}"><span class="{{ cvModal.statusBadgeCls }}">{{ cvModal.statusBadgeLabel }}</span></sc-if>
-                      <sc-if value="{{ cvModal.noDoc }}"><span style="opacity:0.5">&mdash;</span></sc-if>
-                    </td>
-                  </tr>
-                </tbody></table>
-                <sc-if value="{{ cvModal.hasDoc }}"><div>
-                  <div class="field"><label>Document Status *</label>
-                    <div style="display:flex;gap:var(--space-2)">
-                      <button type="button" class="btn doc-verify-btn doc-verify-valid {{ cvModal.validActiveCls }}" onClick="{{ cvModal.onMarkValid }}">Mark as Valid</button>
-                      <button type="button" class="btn doc-verify-btn doc-verify-invalid {{ cvModal.invalidActiveCls }}" onClick="{{ cvModal.onMarkInvalid }}">Mark as Invalid</button>
-                    </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-2)">
+                  <div style="font-weight:600">{{ cvModal.docTypeLabel }}</div>
+                  <div style="display:flex;align-items:center;gap:var(--space-2)">
+                    <span class="{{ cvModal.statusCls }}">{{ cvModal.statusLabel }}</span>
+                    <span style="font-size:12px;opacity:0.6">{{ cvModal.docProgressLabel }}</span>
                   </div>
-                  <label style="display:flex;align-items:center;gap:6px;font-size:13px;margin-top:var(--space-2);cursor:pointer">
-                    <input type="checkbox" checked="{{ cvModal.checked }}" onChange="{{ cvModal.onCheckToggle }}" />I have reviewed this document.
-                  </label>
-                </div></sc-if>
+                </div>
+                <sc-if value="{{ cvModal.hasDoc }}"><iframe src="{{ cvModal.dataUrl }}" title="Document preview" style="width:100%;height:280px;border:1px solid var(--color-divider);border-radius:var(--radius-md);margin-bottom:var(--space-3)"></iframe></sc-if>
+                <sc-if value="{{ cvModal.noDoc }}"><div style="padding:var(--space-4);text-align:center;opacity:0.5;border:1px dashed var(--color-divider);border-radius:var(--radius-md);margin-bottom:var(--space-3)">No document uploaded</div></sc-if>
+
+                <div class="field" style="margin-bottom:var(--space-3)">
+                  <label>Remarks</label>
+                  <textarea class="input" rows="2" placeholder="Reason for validating/invalidating this document" value="{{ cvModal.remarks }}" onChange="{{ cvModal.onRemarksChange }}"></textarea>
+                </div>
+
+                <div style="display:flex;gap:var(--space-2);margin-bottom:var(--space-4)">
+                  <button type="button" class="btn btn-success" onClick="{{ cvModal.onMarkValid }}">Mark as Valid</button>
+                  <button type="button" class="btn btn-danger" onClick="{{ cvModal.onMarkInvalid }}">Mark as Invalid</button>
+                  <sc-if value="{{ cvModal.canNext }}"><button type="button" class="btn btn-outline-secondary" onClick="{{ cvModal.onNext }}">Next</button></sc-if>
+                </div>
               </div>
               <div class="dialog-actions">
-                <sc-if value="{{ cvModal.showSubmit }}"><button type="button" class="btn btn-primary" onClick="{{ cvModal.onSubmit }}">Submit</button></sc-if>
                 <button type="button" class="btn btn-ghost" onClick="{{ cvModal.onClose }}">Close</button>
               </div>
             </div>
@@ -1474,12 +1397,36 @@ a:hover{color:var(--color-accent);text-decoration:underline}
               <tr><td>{{ r.rank }}</td><td>{{ r.id }}</td><td>{{ r.name }}</td><td style="text-align:right">{{ r.pi }}</td><td style="text-align:right">{{ r.apv }}</td><td style="text-align:right">{{ r.piApv }}</td><td style="text-align:right">{{ r.slat }}</td><td style="text-align:right">{{ r.final }}</td><td><span class="{{ r.tagCls }}">{{ r.statusLabel }}</span></td></tr>
             </sc-for>
           </tbody></table>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4);flex-wrap:wrap;gap:var(--space-2)">
+            <div style="font-size:12px;opacity:0.65">Showing {{ mpPagination.showingLabel }}</div>
+            <div style="display:flex;align-items:center;gap:var(--space-2)">
+              <label style="font-size:12px;opacity:0.65;margin:0">Rows per page</label>
+              <select class="input" style="width:auto" value="{{ mpPagination.pageSize }}" onChange="{{ mpPagination.onPageSizeChange }}">
+                <sc-for list="{{ mpPagination.pageSizeOptions }}" as="n" hint-placeholder-count="4"><option value="{{ n }}">{{ n }}</option></sc-for>
+              </select>
+              <button type="button" class="btn btn-ghost" onClick="{{ mpPagination.onPrev }}" disabled="{{ mpPagination.disablePrev }}">Prev</button>
+              <span style="font-size:12px">Page {{ mpPagination.page }} of {{ mpPagination.totalPages }}</span>
+              <button type="button" class="btn btn-ghost" onClick="{{ mpPagination.onNext }}" disabled="{{ mpPagination.disableNext }}">Next</button>
+            </div>
+          </div>
           <div class="card-title" style="margin-bottom:var(--space-2);font-size:16px">Already Decided</div>
           <table class="table"><thead><tr><th>Rank</th><th>Applicant ID</th><th>Name</th><th style="text-align:right">PI</th><th style="text-align:right">APV</th><th style="text-align:right">PI+APV</th><th style="text-align:right">SLAT</th><th style="text-align:right">Final</th><th>Outcome</th></tr></thead><tbody>
             <sc-for list="{{ mpDecidedRows }}" as="r" hint-placeholder-count="6">
               <tr><td>{{ r.rank }}</td><td>{{ r.id }}</td><td>{{ r.name }}</td><td style="text-align:right">{{ r.pi }}</td><td style="text-align:right">{{ r.apv }}</td><td style="text-align:right">{{ r.piApv }}</td><td style="text-align:right">{{ r.slat }}</td><td style="text-align:right">{{ r.final }}</td><td><span class="{{ r.tagCls }}">{{ r.statusLabel }}</span></td></tr>
             </sc-for>
           </tbody></table>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:var(--space-3);flex-wrap:wrap;gap:var(--space-2)">
+            <div style="font-size:12px;opacity:0.65">Showing {{ mpDecidedPagination.showingLabel }}</div>
+            <div style="display:flex;align-items:center;gap:var(--space-2)">
+              <label style="font-size:12px;opacity:0.65;margin:0">Rows per page</label>
+              <select class="input" style="width:auto" value="{{ mpDecidedPagination.pageSize }}" onChange="{{ mpDecidedPagination.onPageSizeChange }}">
+                <sc-for list="{{ mpDecidedPagination.pageSizeOptions }}" as="n" hint-placeholder-count="4"><option value="{{ n }}">{{ n }}</option></sc-for>
+              </select>
+              <button type="button" class="btn btn-ghost" onClick="{{ mpDecidedPagination.onPrev }}" disabled="{{ mpDecidedPagination.disablePrev }}">Prev</button>
+              <span style="font-size:12px">Page {{ mpDecidedPagination.page }} of {{ mpDecidedPagination.totalPages }}</span>
+              <button type="button" class="btn btn-ghost" onClick="{{ mpDecidedPagination.onNext }}" disabled="{{ mpDecidedPagination.disableNext }}">Next</button>
+            </div>
+          </div>
         </div></sc-if>
         <sc-if value="{{ pageIsMeritApproval }}"><div>
           <div class="field" style="margin-bottom:var(--space-4);max-width:260px"><label>Category</label><select class="input" value="{{ maCategory }}" onChange="{{ onMaCategory }}">
@@ -1497,6 +1444,18 @@ a:hover{color:var(--color-accent);text-decoration:underline}
               </tr>
             </sc-for>
           </tbody></table>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:var(--space-3);flex-wrap:wrap;gap:var(--space-2)">
+            <div style="font-size:12px;opacity:0.65">Showing {{ maPagination.showingLabel }}</div>
+            <div style="display:flex;align-items:center;gap:var(--space-2)">
+              <label style="font-size:12px;opacity:0.65;margin:0">Rows per page</label>
+              <select class="input" style="width:auto" value="{{ maPagination.pageSize }}" onChange="{{ maPagination.onPageSizeChange }}">
+                <sc-for list="{{ maPagination.pageSizeOptions }}" as="n" hint-placeholder-count="4"><option value="{{ n }}">{{ n }}</option></sc-for>
+              </select>
+              <button type="button" class="btn btn-ghost" onClick="{{ maPagination.onPrev }}" disabled="{{ maPagination.disablePrev }}">Prev</button>
+              <span style="font-size:12px">Page {{ maPagination.page }} of {{ maPagination.totalPages }}</span>
+              <button type="button" class="btn btn-ghost" onClick="{{ maPagination.onNext }}" disabled="{{ maPagination.disableNext }}">Next</button>
+            </div>
+          </div>
         </div></sc-if>
         <sc-if value="{{ pageIsMeritBatchDetail }}"><div>
           <button type="button" class="btn btn-ghost" style="margin-bottom:var(--space-4)" onClick="{{ onBackToMeritApproval }}"><i data-lucide="arrow-left" style="width:14px;height:14px"></i>Back to Merit Approval</button>
@@ -1570,6 +1529,18 @@ a:hover{color:var(--color-accent);text-decoration:underline}
               <tr><td>{{ r.id }}</td><td>{{ r.category }}</td><td>{{ r.source }}</td><td>{{ r.method }}</td><td style="text-align:right">{{ r.count }}</td><td>{{ r.lastFeeDate }}</td><td>{{ r.nextDate }}</td></tr>
             </sc-for>
           </tbody></table>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:var(--space-3);flex-wrap:wrap;gap:var(--space-2)">
+            <div style="font-size:12px;opacity:0.65">Showing {{ mrPagination.showingLabel }}</div>
+            <div style="display:flex;align-items:center;gap:var(--space-2)">
+              <label style="font-size:12px;opacity:0.65;margin:0">Rows per page</label>
+              <select class="input" style="width:auto" value="{{ mrPagination.pageSize }}" onChange="{{ mrPagination.onPageSizeChange }}">
+                <sc-for list="{{ mrPagination.pageSizeOptions }}" as="n" hint-placeholder-count="4"><option value="{{ n }}">{{ n }}</option></sc-for>
+              </select>
+              <button type="button" class="btn btn-ghost" onClick="{{ mrPagination.onPrev }}" disabled="{{ mrPagination.disablePrev }}">Prev</button>
+              <span style="font-size:12px">Page {{ mrPagination.page }} of {{ mrPagination.totalPages }}</span>
+              <button type="button" class="btn btn-ghost" onClick="{{ mrPagination.onNext }}" disabled="{{ mrPagination.disableNext }}">Next</button>
+            </div>
+          </div>
         </div></sc-if>
         <sc-if value="{{ pageIsWaitingList }}"><div>
           <div class="field" style="margin-bottom:var(--space-4);max-width:260px"><label>Category</label><select class="input" value="{{ wlCategory }}" onChange="{{ onWlCategory }}">
@@ -1582,6 +1553,18 @@ a:hover{color:var(--color-accent);text-decoration:underline}
               <tr><td>{{ r.wlNumber }}</td><td>{{ r.id }}</td><td>{{ r.name }}</td><td>{{ r.category }}</td><td style="text-align:right">{{ r.final }}</td><td><span class="{{ r.tagCls }}">{{ r.statusLabel }}</span></td></tr>
             </sc-for>
           </tbody></table>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:var(--space-3);flex-wrap:wrap;gap:var(--space-2)">
+            <div style="font-size:12px;opacity:0.65">Showing {{ wlPagination.showingLabel }}</div>
+            <div style="display:flex;align-items:center;gap:var(--space-2)">
+              <label style="font-size:12px;opacity:0.65;margin:0">Rows per page</label>
+              <select class="input" style="width:auto" value="{{ wlPagination.pageSize }}" onChange="{{ wlPagination.onPageSizeChange }}">
+                <sc-for list="{{ wlPagination.pageSizeOptions }}" as="n" hint-placeholder-count="4"><option value="{{ n }}">{{ n }}</option></sc-for>
+              </select>
+              <button type="button" class="btn btn-ghost" onClick="{{ wlPagination.onPrev }}" disabled="{{ wlPagination.disablePrev }}">Prev</button>
+              <span style="font-size:12px">Page {{ wlPagination.page }} of {{ wlPagination.totalPages }}</span>
+              <button type="button" class="btn btn-ghost" onClick="{{ wlPagination.onNext }}" disabled="{{ wlPagination.disableNext }}">Next</button>
+            </div>
+          </div>
         </div></sc-if>
         <sc-if value="{{ pageIsProvisionalLetters }}"><div>
           <p style="font-size:12px;opacity:0.6;margin-top:0">Candidates whose Merit List has been released for this programme &mdash; select some or print all to generate their Provisional Admission Letter (with Annexure I fee details and a barcode).</p>
@@ -1608,6 +1591,18 @@ a:hover{color:var(--color-accent);text-decoration:underline}
             </sc-for>
           </tbody></table>
           <sc-if value="{{ plNoResults }}"><p style="font-size:13px;opacity:0.6">No candidates with a released merit list yet for this programme.</p></sc-if>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:var(--space-3);flex-wrap:wrap;gap:var(--space-2)">
+            <div style="font-size:12px;opacity:0.65">Showing {{ plPagination.showingLabel }}</div>
+            <div style="display:flex;align-items:center;gap:var(--space-2)">
+              <label style="font-size:12px;opacity:0.65;margin:0">Rows per page</label>
+              <select class="input" style="width:auto" value="{{ plPagination.pageSize }}" onChange="{{ plPagination.onPageSizeChange }}">
+                <sc-for list="{{ plPagination.pageSizeOptions }}" as="n" hint-placeholder-count="4"><option value="{{ n }}">{{ n }}</option></sc-for>
+              </select>
+              <button type="button" class="btn btn-ghost" onClick="{{ plPagination.onPrev }}" disabled="{{ plPagination.disablePrev }}">Prev</button>
+              <span style="font-size:12px">Page {{ plPagination.page }} of {{ plPagination.totalPages }}</span>
+              <button type="button" class="btn btn-ghost" onClick="{{ plPagination.onNext }}" disabled="{{ plPagination.disableNext }}">Next</button>
+            </div>
+          </div>
         </div></sc-if>
         <sc-if value="{{ pageIsReportsDashboard }}"><div>
           <div style="display:flex;justify-content:flex-end;gap:var(--space-2);margin-bottom:var(--space-4)">
@@ -1633,6 +1628,18 @@ a:hover{color:var(--color-accent);text-decoration:underline}
               <tr><td>{{ r.id }}</td><td>{{ r.name }}</td><td>{{ r.category }}</td><td style="text-align:right">{{ r.slat }}</td><td style="text-align:right">{{ r.pi }}</td><td>{{ r.outcome }}</td></tr>
             </sc-for>
           </tbody></table>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:var(--space-3);flex-wrap:wrap;gap:var(--space-2)">
+            <div style="font-size:12px;opacity:0.65">Showing {{ rcPagination.showingLabel }}</div>
+            <div style="display:flex;align-items:center;gap:var(--space-2)">
+              <label style="font-size:12px;opacity:0.65;margin:0">Rows per page</label>
+              <select class="input" style="width:auto" value="{{ rcPagination.pageSize }}" onChange="{{ rcPagination.onPageSizeChange }}">
+                <sc-for list="{{ rcPagination.pageSizeOptions }}" as="n" hint-placeholder-count="4"><option value="{{ n }}">{{ n }}</option></sc-for>
+              </select>
+              <button type="button" class="btn btn-ghost" onClick="{{ rcPagination.onPrev }}" disabled="{{ rcPagination.disablePrev }}">Prev</button>
+              <span style="font-size:12px">Page {{ rcPagination.page }} of {{ rcPagination.totalPages }}</span>
+              <button type="button" class="btn btn-ghost" onClick="{{ rcPagination.onNext }}" disabled="{{ rcPagination.disableNext }}">Next</button>
+            </div>
+          </div>
         </div></sc-if>
         <sc-if value="{{ pageIsReportsSessions }}"><div>
           <table class="table"><thead><tr><th>Session</th><th>Date</th><th style="text-align:right">Allocated</th><th style="text-align:right">Present</th><th style="text-align:right">Absent</th><th style="text-align:right">Not Marked</th></tr></thead><tbody>
@@ -1641,46 +1648,33 @@ a:hover{color:var(--color-accent);text-decoration:underline}
             </sc-for>
           </tbody></table>
         </div></sc-if>
-        <sc-if value="{{ pageIsMailCompose }}"><div>
-          <sc-if value="{{ mcFound }}"><div>
-            <div class="card elev-sm" style="padding:var(--space-4)">
-              <div class="card-title" style="margin-bottom:var(--space-1)">{{ mcLevelLabel }}</div>
-              <p style="font-size:13px;opacity:0.65;margin-top:0;margin-bottom:var(--space-4)">{{ mcSummary }}</p>
-              <div class="field"><label>To *</label><input class="input" type="email" value="{{ mcTo }}" onChange="{{ onMcToChange }}" placeholder="director@institute.edu.in" /></div>
-              <div class="field"><label>Subject</label><input class="input" value="{{ mcSubject }}" onChange="{{ onMcSubjectChange }}" /></div>
-              <div class="field"><label>Body</label><textarea class="input" rows="6" value="{{ mcBody }}" onChange="{{ onMcBodyChange }}"></textarea></div>
-              <div style="display:flex;gap:var(--space-2);margin-top:var(--space-2)">
-                <button type="button" class="btn btn-primary" onClick="{{ onMcSend }}"><i data-lucide="send" style="width:14px;height:14px"></i>Send</button>
-                <button type="button" class="btn btn-ghost" onClick="{{ onMcCancel }}">Cancel</button>
-              </div>
-            </div>
-          </div></sc-if>
-        </div></sc-if>
         <sc-if value="{{ pageIsSentMail }}"><div>
-          <p style="font-size:12px;opacity:0.6;margin-top:0">Approval requests you've sent, across Shortlists, Merit Lists, and Assessment Parameters. Open the link to approve or reject &mdash; only works from this running session.</p>
-          <table class="table"><thead><tr><th>Regarding</th><th>Level</th><th>To</th><th>Subject</th><th>Sent</th><th>Status</th><th></th></tr></thead><tbody>
+          <p style="font-size:12px;opacity:0.6;margin-top:0">Notifications this institute has sent out — PI meeting links, and staff/panelist login credentials. Shortlist, Merit List, and Assessment Parameters approvals now go directly to the approver's Pending Approvals tab instead of by mail.</p>
+          <table class="table"><thead><tr><th>Regarding</th><th>To</th><th>Subject</th><th>Sent</th><th>Status</th></tr></thead><tbody>
             <sc-for list="{{ smRows }}" as="r" hint-placeholder-count="4">
-              <tr><td>{{ r.summary }}</td><td>{{ r.level }}</td><td>{{ r.to }}</td><td>{{ r.subject }}</td><td>{{ r.sentOn }}</td>
+              <tr><td>{{ r.summary }}</td><td>{{ r.to }}</td><td>{{ r.subject }}</td><td>{{ r.sentOn }}</td>
                 <td><span class="{{ r.tagCls }}">{{ r.statusLabel }}</span></td>
-                <td><sc-if value="{{ r.showLink }}"><button type="button" class="btn btn-ghost" onClick="{{ r.onOpenLink }}">Open Approval Link&hellip;</button></sc-if></td>
               </tr>
             </sc-for>
           </tbody></table>
         </div></sc-if>
         <sc-if value="{{ pageIsPendingApprovals }}"><div>
-          <p style="font-size:12px;opacity:0.6;margin-top:0">Every Shortlist, Merit List, and Assessment Parameters approval still waiting on a Director or SIU decision, across all programmes.</p>
-          <div style="font-size:13px;opacity:0.6;margin-bottom:var(--space-3)">{{ paResultCount }} pending</div>
-          <table class="table"><thead><tr><th>Request</th><th>Type</th><th>Regarding</th><th>Level</th><th>Requested</th><th>Mail Status</th><th></th></tr></thead><tbody>
+          <sc-if value="{{ paIsMine }}"><p style="font-size:12px;opacity:0.6;margin-top:0">Shortlist, Merit List, and Assessment Parameters approvals currently assigned to you.</p></sc-if>
+          <sc-if value="{{ paIsMine }}"><div style="font-size:13px;opacity:0.6;margin-bottom:var(--space-3)">{{ paResultCount }} pending</div></sc-if>
+          <sc-if value="{{ paIsAll }}"><p style="font-size:12px;opacity:0.6;margin-top:0">Every Shortlist, Merit List, and Assessment Parameters approval still pending, across all programmes.</p></sc-if>
+          <table class="table"><thead><tr><th>Request</th><th>Type</th><th>Regarding</th><th>Level</th><th>Requested</th><th>Assigned To</th><th></th><th></th></tr></thead><tbody>
             <sc-for list="{{ paRows }}" as="r" hint-placeholder-count="4">
-              <tr><td>{{ r.id }}</td><td>{{ r.type }}</td><td>{{ r.summary }}</td><td>{{ r.level }}</td><td>{{ r.createdOn }}</td><td>{{ r.mailStatus }}</td>
+              <tr><td>{{ r.id }}</td><td>{{ r.type }}</td><td>{{ r.summary }}</td><td>{{ r.level }}</td><td>{{ r.createdOn }}</td><td>{{ r.approverName }}</td>
+                <td style="min-width:200px"><sc-if value="{{ r.canDecide }}"><input class="input" value="{{ r.remarks }}" onChange="{{ r.onRemarksChange }}" placeholder="Remarks (optional)" /></sc-if></td>
                 <td style="white-space:nowrap">
-                  <sc-if value="{{ r.showLink }}"><button type="button" class="btn btn-ghost" onClick="{{ r.onOpenLink }}">Open Approval Link&hellip;</button></sc-if>
+                  <sc-if value="{{ r.canDecide }}"><button type="button" class="btn btn-primary" onClick="{{ r.onApprove }}">Approve</button></sc-if>
+                  <sc-if value="{{ r.canDecide }}"><button type="button" class="btn btn-secondary" onClick="{{ r.onReject }}">Deny</button></sc-if>
                   <button type="button" class="btn btn-ghost" onClick="{{ r.onView }}">View</button>
                 </td>
               </tr>
             </sc-for>
           </tbody></table>
-          <sc-if value="{{ paNoResults }}"><p style="font-size:13px;opacity:0.6">Nothing pending — every sent approval has been decided.</p></sc-if>
+          <sc-if value="{{ paNoResults }}"><p style="font-size:13px;opacity:0.6">Nothing pending here.</p></sc-if>
         </div></sc-if>
         <sc-if value="{{ pageIsSuperAdminDashboard }}"><div>
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-3);margin-bottom:var(--space-4)">
@@ -1726,21 +1720,27 @@ a:hover{color:var(--color-accent);text-decoration:underline}
           </tbody></table>
         </div></sc-if>
         <sc-if value="{{ pageIsProgrammes }}"><div>
-          <div class="card elev-sm" style="padding:var(--space-4);margin-bottom:var(--space-4)">
-            <div class="card-title" style="margin-bottom:var(--space-3)">Create Programme</div>
-            <div style="display:grid;grid-template-columns:repeat(3,1fr) auto;gap:var(--space-3);align-items:end">
-              <div class="field" style="margin:0"><label>Programme Name</label><input class="input" value="{{ npName }}" onChange="{{ onNpName }}" /></div>
-              <div class="field" style="margin:0"><label>Programme Code</label><input class="input" value="{{ npCode }}" onChange="{{ onNpCode }}" placeholder="e.g. BSC-DS" /></div>
-              <div class="field" style="margin:0"><label>Description</label><input class="input" value="{{ npDescription }}" onChange="{{ onNpDescription }}" /></div>
-              <button type="button" class="btn btn-primary" onClick="{{ onCreateProgramme }}">Create Programme</button>
-            </div>
-          </div>
-          <table class="table"><thead><tr><th>Programme</th><th>Code</th><th>Academic Years</th><th>Status</th><th></th></tr></thead><tbody>
+          <button type="button" class="btn btn-primary" style="margin-bottom:var(--space-4)" onClick="{{ onNpOpen }}"><i data-lucide="circle-plus" style="width:15px;height:15px"></i>Create Programme</button>
+          <table class="table"><thead><tr><th>Programme</th><th>Academic Years</th><th>Status</th><th></th></tr></thead><tbody>
             <sc-for list="{{ programmeRows }}" as="p" hint-placeholder-count="3">
-              <tr><td>{{ p.name }}</td><td>{{ p.code }}</td><td>{{ p.academicYears }}</td><td><span class="{{ p.tagCls }}">{{ p.statusLabel }}</span></td>
+              <tr><td>{{ p.name }}</td><td>{{ p.academicYears }}</td><td><span class="{{ p.tagCls }}">{{ p.statusLabel }}</span></td>
                 <td style="white-space:nowrap"><button type="button" class="btn btn-ghost" onClick="{{ p.onSelect }}">Open Academic Years</button><button type="button" class="btn btn-ghost" onClick="{{ p.onFees }}">Fee Structure</button><button type="button" class="btn btn-ghost" onClick="{{ p.onDocs }}">Document Requirements</button><button type="button" class="btn btn-ghost" onClick="{{ p.onApprovalChain }}">Approval Chain</button></td></tr>
             </sc-for>
           </tbody></table>
+
+          <sc-if value="{{ npShowForm }}"><div class="dialog-backdrop">
+            <div class="dialog" style="width:min(520px,100%)">
+              <div class="dialog-title">Create Programme</div>
+              <div class="dialog-body">
+                <div class="field"><label>Programme Name</label><textarea class="input" rows="2" maxlength="300" value="{{ npName }}" onChange="{{ onNpName }}"></textarea></div>
+                <div class="field"><label>Description</label><textarea class="input" rows="4" maxlength="300" value="{{ npDescription }}" onChange="{{ onNpDescription }}"></textarea></div>
+              </div>
+              <div class="dialog-actions">
+                <button type="button" class="btn btn-primary" onClick="{{ onCreateProgramme }}">Save</button>
+                <button type="button" class="btn btn-ghost" onClick="{{ onNpCancel }}">Cancel</button>
+              </div>
+            </div>
+          </div></sc-if>
         </div></sc-if>
         <sc-if value="{{ pageIsProgrammeFees }}"><div>
           <button type="button" class="btn btn-ghost" style="margin-bottom:var(--space-4)" onClick="{{ onPgFeeBack }}"><i data-lucide="arrow-left" style="width:14px;height:14px"></i>Back to Programmes</button>
@@ -1818,9 +1818,11 @@ a:hover{color:var(--color-accent);text-decoration:underline}
             <div class="card-title" style="margin-bottom:var(--space-3)">Approval Chain &mdash; {{ acProgrammeName }}</div>
             <p style="font-size:12px;opacity:0.6;margin-top:0">Who must approve Shortlist, Merit List, and Assessment Parameter changes for this programme, and in what order. At least one level is required.</p>
             <div class="card elev-sm" style="padding:var(--space-4);margin-bottom:var(--space-4)">
-              <div style="display:grid;grid-template-columns:2fr 2fr 1fr;gap:var(--space-4);margin-bottom:var(--space-4)">
-                <div class="field" style="margin:0"><label>Level Name *</label><input class="input" placeholder="e.g. Director" value="{{ acName }}" onChange="{{ onAcNameChange }}" /></div>
-                <div class="field" style="margin:0"><label>Approver Email</label><input class="input" type="email" placeholder="director@institute.edu" value="{{ acApproverEmail }}" onChange="{{ onAcApproverEmailChange }}" /></div>
+              <div style="display:grid;grid-template-columns:2fr 1fr;gap:var(--space-4);margin-bottom:var(--space-4)">
+                <div class="field" style="margin:0"><label>Approver Role *</label><select class="input" value="{{ acRoleId }}" onChange="{{ onAcRoleIdChange }}">
+                  <option value="">-----Select-----</option>
+                  <sc-for list="{{ acRoleOptions }}" as="ro" hint-placeholder-count="6"><option value="{{ ro.id }}">{{ ro.name }}</option></sc-for>
+                </select></div>
                 <div class="field" style="margin:0"><label>Sequence No</label><input class="input" value="{{ acSeq }}" onChange="{{ onAcSeqChange }}" /></div>
               </div>
               <div style="display:flex;gap:var(--space-2)">
@@ -1828,10 +1830,10 @@ a:hover{color:var(--color-accent);text-decoration:underline}
                 <button type="button" class="btn btn-secondary" onClick="{{ onAcClear }}">Clear</button>
               </div>
             </div>
-            <table class="table"><thead><tr><th>S.No.</th><th>Level Name</th><th>Approver Email</th><th></th><th></th></tr></thead><tbody>
+            <table class="table"><thead><tr><th>S.No.</th><th>Approver Role</th><th></th><th></th></tr></thead><tbody>
               <sc-for list="{{ acRows }}" as="r" hint-placeholder-count="2">
                 <tr>
-                  <td>{{ r.sno }}</td><td>{{ r.name }}</td><td>{{ r.approverEmail }}</td>
+                  <td>{{ r.sno }}</td><td>{{ r.roleName }}</td>
                   <td><button type="button" class="btn btn-icon btn-ghost" onClick="{{ r.onEdit }}"><i data-lucide="pencil" style="width:16px;height:16px"></i></button></td>
                   <td><button type="button" class="btn btn-icon btn-ghost" onClick="{{ r.onDelete }}"><i data-lucide="trash-2" style="width:16px;height:16px"></i></button></td>
                 </tr>
@@ -2504,12 +2506,18 @@ a:hover{color:var(--color-accent);text-decoration:underline}
         </select>
       </div>
     </div>
-    <div class="field mb-3" style="max-width:200px">
-      <label>Status</label>
-      <select class="input form-select" onChange="{{ onMbStatusChange }}">
-        <option value="Active" selected="{{ mbStatusIsActive }}">Active</option>
-        <option value="Inactive" selected="{{ mbStatusIsInactive }}">Inactive</option>
-      </select>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);margin-bottom:var(--space-4)">
+      <div class="field" style="margin:0">
+        <label>Password</label>
+        <input class="input form-control" value="{{ mbFormPassword }}" onChange="{{ onMbPasswordChange }}" placeholder="{{ mbPasswordPlaceholder }}" />
+      </div>
+      <div class="field" style="margin:0;max-width:200px">
+        <label>Status</label>
+        <select class="input form-select" onChange="{{ onMbStatusChange }}">
+          <option value="Active" selected="{{ mbStatusIsActive }}">Active</option>
+          <option value="Inactive" selected="{{ mbStatusIsInactive }}">Inactive</option>
+        </select>
+      </div>
     </div>
     <div class="d-flex gap-2">
       <button type="button" class="btn btn-primary" onClick="{{ onMbSave }}">{{ mbSaveLabel }}</button>
@@ -2613,238 +2621,6 @@ a:hover{color:var(--color-accent);text-decoration:underline}
 
     </div>
   </div>
-
-</div>
-</sc-if>
-<sc-if value="{{ pageIsDocumentCollection }}">
-<div style="padding:24px;max-width:1200px">
-
-  <div class="d-flex align-items-center justify-content-between mb-4">
-    <h4 style="margin:0;font-family:var(--font-heading);font-weight:var(--font-heading-weight)">Document Collection</h4>
-  </div>
-
-  <!-- Tabs -->
-  <ul class="nav nav-tabs mb-4">
-    <li class="nav-item">
-      <button class="nav-link" onclick="{{ onDocTabTypes }}" style="{{ docTabTypesStyle }}">Document Types</button>
-    </li>
-    <li class="nav-item">
-      <button class="nav-link" onclick="{{ onDocTabLog }}" style="{{ docTabLogStyle }}">Submission Log</button>
-    </li>
-    <li class="nav-item">
-      <button class="nav-link" onclick="{{ onDocTabCompleteness }}" style="{{ docTabCompletenessStyle }}">Candidate Completeness</button>
-    </li>
-  </ul>
-
-  <!-- TAB 1: Document Types -->
-  <sc-if value="{{ docTabIsTypes }}">
-    <div>
-      <div class="d-flex align-items-center justify-content-between mb-3">
-        <h5 class="mb-0 fw-semibold">Document Types</h5>
-        <button type="button" class="btn btn-primary btn-sm" onclick="{{ onToggleAddDocTypeForm }}">
-          <i data-lucide="plus" style="width:14px;height:14px"></i> Add Document Type
-        </button>
-      </div>
-
-      <!-- Add form -->
-      <sc-if value="{{ docTypeFormVisible }}">
-        <div style="background:#f8f9fa;border:1px solid #dee2e6;border-radius:8px;padding:16px;margin-bottom:16px">
-          <div class="row g-3">
-            <div class="col-md-4">
-              <label class="form-label fw-medium" style="font-size:13px">Type Name <span class="text-danger">*</span></label>
-              <input type="text" id="doc-type-name" class="form-control form-control-sm" placeholder="e.g. Migration Certificate">
-            </div>
-            <div class="col-md-2">
-              <label class="form-label fw-medium" style="font-size:13px">Required</label>
-              <div class="form-check mt-1">
-                <input class="form-check-input" type="checkbox" id="doc-type-required">
-                <label class="form-check-label" for="doc-type-required" style="font-size:13px">Required</label>
-              </div>
-            </div>
-            <div class="col-md-3">
-              <label class="form-label fw-medium" style="font-size:13px">Accepted Formats</label>
-              <div class="d-flex gap-3 flex-wrap mt-1">
-                <div class="form-check"><input class="form-check-input" type="checkbox" id="fmt-pdf" value="PDF"><label class="form-check-label" for="fmt-pdf" style="font-size:13px">PDF</label></div>
-                <div class="form-check"><input class="form-check-input" type="checkbox" id="fmt-jpg" value="JPG"><label class="form-check-label" for="fmt-jpg" style="font-size:13px">JPG</label></div>
-                <div class="form-check"><input class="form-check-input" type="checkbox" id="fmt-png" value="PNG"><label class="form-check-label" for="fmt-png" style="font-size:13px">PNG</label></div>
-                <div class="form-check"><input class="form-check-input" type="checkbox" id="fmt-docx" value="DOCX"><label class="form-check-label" for="fmt-docx" style="font-size:13px">DOCX</label></div>
-              </div>
-            </div>
-            <div class="col-md-2">
-              <label class="form-label fw-medium" style="font-size:13px">Max Size (MB)</label>
-              <input type="number" id="doc-type-maxmb" class="form-control form-control-sm" min="1" max="50" value="5">
-            </div>
-            <div class="col-md-1">
-              <label class="form-label fw-medium" style="font-size:13px">Status</label>
-              <select id="doc-type-status" class="form-select form-select-sm">
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
-              </select>
-            </div>
-          </div>
-          <div class="mt-3 d-flex gap-2">
-            <button type="button" class="btn btn-primary btn-sm" onclick="{{ onAddDocType }}">Save</button>
-            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="{{ onToggleAddDocTypeForm }}">Cancel</button>
-          </div>
-        </div>
-      </sc-if>
-
-      <div style="background:var(--color-surface);border:1px solid var(--color-divider);border-radius:8px;overflow:hidden">
-        <table class="table table-hover table-sm mb-0">
-          <thead style="background:#f1f3f5;font-size:12px;text-transform:uppercase;letter-spacing:.04em">
-            <tr>
-              <th class="px-3 py-2">Type Name</th>
-              <th class="px-3 py-2">Required</th>
-              <th class="px-3 py-2">Formats</th>
-              <th class="px-3 py-2">Max Size</th>
-              <th class="px-3 py-2">Status</th>
-              <th class="px-3 py-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody style="font-size:13px">
-            <sc-for list="{{ docTypes }}" as="dt">
-              <tr>
-                <td class="px-3 py-2 fw-medium">{{ dt.name }}</td>
-                <td class="px-3 py-2">
-                  <sc-if value="{{ dt.required }}"><span class="badge bg-danger">Required</span></sc-if>
-                  <sc-if value="{{ dt.notRequired }}"><span class="badge bg-secondary">Optional</span></sc-if>
-                </td>
-                <td class="px-3 py-2" style="font-family:monospace;font-size:12px">{{ dt.formats }}</td>
-                <td class="px-3 py-2">{{ dt.maxMb }} MB</td>
-                <td class="px-3 py-2">
-                  <sc-if value="{{ dt.isActive }}"><span class="badge bg-success">Active</span></sc-if>
-                  <sc-if value="{{ dt.isInactive }}"><span class="badge bg-secondary">Inactive</span></sc-if>
-                </td>
-                <td class="px-3 py-2">
-                  <button type="button" class="btn btn-ghost btn-sm" onclick="{{ dt.onToggleStatus }}" style="font-size:11px;padding:2px 8px">
-                    <i data-lucide="{{ dt.toggleIcon }}" style="width:12px;height:12px"></i> {{ dt.toggleLabel }}
-                  </button>
-                </td>
-              </tr>
-            </sc-for>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </sc-if>
-
-  <!-- TAB 2: Submission Log -->
-  <sc-if value="{{ docTabIsLog }}">
-    <div>
-      <div class="d-flex gap-2 mb-3" style="flex-wrap:wrap">
-        <select class="form-select form-select-sm" style="max-width:220px" onchange="{{ onDocSubTypeFilter }}">
-          <option value="">All Document Types</option>
-          <sc-for list="{{ docTypeFilterOptions }}" as="opt">
-            <sc-if value="{{ opt.selected }}"><option value="{{ opt.name }}" selected>{{ opt.name }}</option></sc-if>
-            <sc-if value="{{ opt.notSelected }}"><option value="{{ opt.name }}">{{ opt.name }}</option></sc-if>
-          </sc-for>
-        </select>
-        <select class="form-select form-select-sm" style="max-width:160px" onchange="{{ onDocSubStatusFilter }}">
-          <option value="">All Statuses</option>
-          <option value="Accepted">Accepted</option>
-          <option value="Rejected">Rejected</option>
-          <option value="Pending">Pending</option>
-        </select>
-        <div style="font-size:13px;opacity:0.6;align-self:center;margin-left:4px">{{ docSubFilteredCount }} record(s)</div>
-      </div>
-
-      <div style="background:var(--color-surface);border:1px solid var(--color-divider);border-radius:8px;overflow:hidden">
-        <table class="table table-hover table-sm mb-0">
-          <thead style="background:#f1f3f5;font-size:12px;text-transform:uppercase;letter-spacing:.04em">
-            <tr>
-              <th class="px-3 py-2">Timestamp</th>
-              <th class="px-3 py-2">Candidate</th>
-              <th class="px-3 py-2">App No</th>
-              <th class="px-3 py-2">Doc Type</th>
-              <th class="px-3 py-2">Status</th>
-              <th class="px-3 py-2">Rejection Reason</th>
-              <th class="px-3 py-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody style="font-size:13px">
-            <sc-if value="{{ docSubNoRows }}">
-              <tr><td colspan="7" style="text-align:center;opacity:0.5;padding:32px">No submissions match the selected filters.</td></tr>
-            </sc-if>
-            <sc-for list="{{ docSubmissions }}" as="sub">
-              <tr>
-                <td class="px-3 py-2" style="font-size:12px;opacity:0.7;white-space:nowrap">{{ sub.ts }}</td>
-                <td class="px-3 py-2 fw-medium">{{ sub.candidate }}</td>
-                <td class="px-3 py-2" style="font-family:monospace;font-size:12px">{{ sub.appNo }}</td>
-                <td class="px-3 py-2">{{ sub.docType }}</td>
-                <td class="px-3 py-2">
-                  <sc-if value="{{ sub.isAccepted }}"><span class="badge bg-success">Accepted</span></sc-if>
-                  <sc-if value="{{ sub.isRejected }}"><span class="badge bg-danger">Rejected</span></sc-if>
-                  <sc-if value="{{ sub.isPending }}"><span class="badge bg-warning text-dark">Pending</span></sc-if>
-                </td>
-                <td class="px-3 py-2" style="font-size:12px;color:#6c757d;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ sub.rejectionReason }}</td>
-                <td class="px-3 py-2">
-                  <sc-if value="{{ sub.canAct }}">
-                    <div class="d-flex gap-1">
-                      <button type="button" class="btn btn-outline-success btn-sm" onclick="{{ sub.onAccept }}" style="font-size:11px;padding:2px 8px">Accept</button>
-                      <button type="button" class="btn btn-outline-danger btn-sm" onclick="{{ sub.onReject }}" style="font-size:11px;padding:2px 8px">Reject</button>
-                    </div>
-                  </sc-if>
-                  <sc-if value="{{ sub.cannotAct }}"><span style="color:#adb5bd;font-size:12px">—</span></sc-if>
-                </td>
-              </tr>
-            </sc-for>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </sc-if>
-
-  <!-- TAB 3: Candidate Completeness -->
-  <sc-if value="{{ docTabIsCompleteness }}">
-    <div>
-      <div style="background:var(--color-surface);border:1px solid var(--color-divider);border-radius:8px;overflow:hidden">
-        <table class="table table-hover table-sm mb-0">
-          <thead style="background:#f1f3f5;font-size:12px;text-transform:uppercase;letter-spacing:.04em">
-            <tr>
-              <th class="px-3 py-2">Candidate Name</th>
-              <th class="px-3 py-2">App No</th>
-              <th class="px-3 py-2 text-center">10th Cert</th>
-              <th class="px-3 py-2 text-center">12th Cert</th>
-              <th class="px-3 py-2 text-center">ID Proof</th>
-              <th class="px-3 py-2 text-center">Photo</th>
-              <th class="px-3 py-2 text-center">Overall</th>
-              <th class="px-3 py-2"></th>
-            </tr>
-          </thead>
-          <tbody style="font-size:13px">
-            <sc-for list="{{ docCandidates }}" as="cand">
-              <tr>
-                <td class="px-3 py-2 fw-medium">{{ cand.name }}</td>
-                <td class="px-3 py-2" style="font-family:monospace;font-size:12px">{{ cand.appNo }}</td>
-                <td class="px-3 py-2 text-center">
-                  <sc-if value="{{ cand.has10th }}"><i data-lucide="circle-check" style="width:16px;height:16px;color:#198754"></i></sc-if>
-                  <sc-if value="{{ cand.no10th }}"><i data-lucide="circle-x" style="width:16px;height:16px;color:#dc3545"></i></sc-if>
-                </td>
-                <td class="px-3 py-2 text-center">
-                  <sc-if value="{{ cand.has12th }}"><i data-lucide="circle-check" style="width:16px;height:16px;color:#198754"></i></sc-if>
-                  <sc-if value="{{ cand.no12th }}"><i data-lucide="circle-x" style="width:16px;height:16px;color:#dc3545"></i></sc-if>
-                </td>
-                <td class="px-3 py-2 text-center">
-                  <sc-if value="{{ cand.hasId }}"><i data-lucide="circle-check" style="width:16px;height:16px;color:#198754"></i></sc-if>
-                  <sc-if value="{{ cand.noId }}"><i data-lucide="circle-x" style="width:16px;height:16px;color:#dc3545"></i></sc-if>
-                </td>
-                <td class="px-3 py-2 text-center">
-                  <sc-if value="{{ cand.hasPhoto }}"><i data-lucide="circle-check" style="width:16px;height:16px;color:#198754"></i></sc-if>
-                  <sc-if value="{{ cand.noPhoto }}"><i data-lucide="circle-x" style="width:16px;height:16px;color:#adb5bd"></i></sc-if>
-                </td>
-                <td class="px-3 py-2 text-center"><span class="{{ cand.overallCls }}">{{ cand.overallLabel }}</span></td>
-                <td class="px-3 py-2">
-                  <button type="button" class="btn btn-ghost btn-sm" onclick="{{ cand.onSendReminder }}" style="font-size:11px;padding:2px 8px;white-space:nowrap">
-                    <i data-lucide="bell" style="width:12px;height:12px"></i> Remind
-                  </button>
-                </td>
-              </tr>
-            </sc-for>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </sc-if>
 
 </div>
 </sc-if>
@@ -3861,6 +3637,104 @@ a:hover{color:var(--color-accent);text-decoration:underline}
 </sc-if>
       <sc-if value="{{ notLoaded }}"><div style="opacity:0.6;padding:var(--space-6)">Loading admission cycle data&hellip;</div></sc-if>
     </main>
+    <sc-if value="{{ cdDrawerOpen }}"><div class="dialog-backdrop" style="display:flex;justify-content:flex-end;align-items:stretch;padding:0">
+      <div class="dialog" style="width:min(480px,100%);height:100vh;max-height:100vh;border-radius:0;margin:0;animation:slide-in-right .18s ease-out both;overflow-y:auto">
+        <sc-if value="{{ profileNotFound }}"><div class="dialog-body">
+          <p>No candidate found in the active programme/academic year.</p>
+          <div class="dialog-actions"><button type="button" class="btn btn-ghost" onClick="{{ onCloseCandidateDrawer }}">Close</button></div>
+        </div></sc-if>
+        <sc-if value="{{ profileCandidate }}"><div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:var(--space-3);margin-bottom:var(--space-3)">
+            <div style="display:flex;gap:var(--space-3);align-items:center">
+              <div style="width:52px;height:52px;border-radius:50%;background:var(--color-accent-100);color:var(--color-accent-700);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-size:18px;flex:none">{{ profileCandidate.initials }}</div>
+              <div>
+                <div style="font-family:var(--font-heading);font-size:20px">{{ profileCandidate.name }}</div>
+                <div style="font-size:12px;opacity:0.65">{{ profileCandidate.id }} &middot; {{ profileCandidate.programme }} &middot; {{ profileCandidate.academicYear }}</div>
+              </div>
+            </div>
+            <button type="button" class="btn btn-icon btn-ghost" title="Close" onClick="{{ onCloseCandidateDrawer }}"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+          </div>
+          <span class="{{ profileCandidate.tagCls }}">{{ profileCandidate.statusLabel }}</span>
+          <div style="font-size:13px;opacity:0.65;margin:var(--space-2) 0 var(--space-3)">{{ profileCandidate.gender }} &middot; {{ profileCandidate.education }} &middot; {{ profileCandidate.institute }}</div>
+
+          <div class="card" style="padding:var(--space-3);margin-bottom:var(--space-3)">
+            <div class="card-title" style="font-size:14px;margin-bottom:6px">SLAT</div>
+            <div>Score: <strong>{{ profileCandidate.slatScore }}</strong> &middot; Percentile: <strong>{{ profileCandidate.slatPercentile }}</strong> &middot; Category: <strong>{{ profileCandidate.category }}</strong></div>
+          </div>
+
+          <div class="card" style="padding:var(--space-3);margin-bottom:var(--space-3)">
+            <div class="card-title" style="font-size:14px;margin-bottom:6px">PI</div>
+            <div>Session: <strong>{{ profileCandidate.session }}</strong></div>
+            <div>Group: <strong>{{ profileCandidate.group }}</strong> &middot; Zoom Room: <strong>{{ profileCandidate.zoomRoom }}</strong></div>
+            <div>Reporting Time: <strong>{{ profileCandidate.reportingTime }}</strong></div>
+            <div>Registration Attendance: <span class="{{ profileCandidate.regTagCls }}">{{ profileCandidate.regTagLabel }}</span> &middot; PI Attendance: <span class="{{ profileCandidate.piTagCls }}">{{ profileCandidate.piTagLabel }}</span></div>
+            <div>PI Score: <strong>{{ profileCandidate.piScore }}</strong></div>
+          </div>
+
+          <div class="card" style="padding:var(--space-3);margin-bottom:var(--space-3)">
+            <div class="card-title" style="font-size:14px;margin-bottom:6px">Documents Uploaded</div>
+            <sc-if value="{{ profileCandidate.noDocsUploaded }}"><div style="font-size:13px;opacity:0.6">No documents applicable for this category.</div></sc-if>
+            <sc-for list="{{ profileCandidate.docsUploaded }}" as="doc" hint-placeholder-count="2">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--color-divider)">
+                <span>{{ doc.label }}</span>
+                <span style="display:flex;align-items:center;gap:8px">
+                  <span class="{{ doc.statusCls }}">{{ doc.statusLabel }}</span>
+                  <sc-if value="{{ doc.hasDoc }}"><a href="{{ doc.dataUrl }}" target="_blank" rel="noopener">Preview</a></sc-if>
+                </span>
+              </div>
+            </sc-for>
+          </div>
+
+          <div class="card" style="padding:var(--space-3);margin-bottom:var(--space-3)">
+            <div class="card-title" style="font-size:14px;margin-bottom:6px">Imported Details</div>
+            <sc-for list="{{ profileCandidate.importedDetails }}" as="f" hint-placeholder-count="4">
+              <div>{{ f.key }}: <strong>{{ f.value }}</strong></div>
+            </sc-for>
+          </div>
+
+          <div class="card" style="padding:var(--space-3);margin-bottom:var(--space-3)">
+            <div class="card-title" style="font-size:14px;margin-bottom:6px">APV (Academic Profile Verification)</div>
+            <div style="display:flex;gap:var(--space-2);align-items:flex-end">
+              <div class="field" style="margin:0;max-width:140px"><label>APV Score (out of 10)</label><input class="input" type="number" min="0" max="10" step="1" value="{{ profileCandidate.apvScoreValue }}" onChange="{{ onApvChange }}" /></div>
+              <button type="button" class="btn btn-primary" onClick="{{ onApvSave }}">Save</button>
+            </div>
+            <div style="margin-top:var(--space-2)">PI + APV Score: <strong>{{ profileCandidate.piApvScore }}</strong></div>
+          </div>
+
+          <div class="card" style="padding:var(--space-3);margin-bottom:var(--space-3)">
+            <div class="card-title" style="font-size:14px;margin-bottom:6px">Merit</div>
+            <div>Final Score: <strong>{{ profileCandidate.finalScore }}</strong> &middot; Rank: <strong>{{ profileCandidate.rank }}</strong></div>
+            <div>Outcome: <strong>{{ profileCandidate.outcome }}</strong></div>
+            <div>Merit List Release: <strong>{{ profileCandidate.release }}</strong> &middot; Waiting List Number: <strong>{{ profileCandidate.wlNumber }}</strong></div>
+          </div>
+
+          <div class="card" style="padding:var(--space-3)">
+            <div class="card-title" style="font-size:14px;margin-bottom:6px">Audit Timeline</div>
+            <sc-for list="{{ profileCandidate.timeline }}" as="ev" hint-placeholder-count="6">
+              <div style="display:flex;gap:var(--space-3);padding:6px 0;border-bottom:1px solid var(--color-divider)">
+                <div style="width:90px;font-size:12px;opacity:0.6">{{ ev.date }}</div><div style="font-size:13px">{{ ev.label }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div></sc-if>
+      </div>
+    </div></sc-if>
+    <sc-if value="{{ sfaOpen }}"><div class="dialog-backdrop">
+      <div class="dialog" style="width:min(480px,100%)">
+        <div class="dialog-title">Send for Approval &mdash; {{ sfaLevelLabel }}</div>
+        <div class="dialog-body">
+          <p style="font-size:13px;opacity:0.7;margin-top:0">{{ sfaSummary }}</p>
+          <sc-if value="{{ sfaNoStaff }}"><p style="font-size:13px;color:var(--color-accent-700)">No active staff member holds the {{ sfaLevelLabel }} role yet. Add one under Settings &rsaquo; User Memberships.</p></sc-if>
+          <sc-if value="{{ sfaHasStaff }}"><div class="field"><label>Send to *</label><select class="input" value="{{ sfaStaffId }}" onChange="{{ onSfaStaffChange }}">
+            <sc-for list="{{ sfaStaffOptions }}" as="s" hint-placeholder-count="3"><option value="{{ s.id }}">{{ s.name }}</option></sc-for>
+          </select></div></sc-if>
+        </div>
+        <div class="dialog-actions">
+          <button type="button" class="btn btn-primary" onClick="{{ onSfaSend }}" disabled="{{ sfaNoStaff }}">Send</button>
+          <button type="button" class="btn btn-ghost" onClick="{{ onSfaCancel }}">Cancel</button>
+        </div>
+      </div>
+    </div></sc-if>
   </div></sc-if>
   <sc-if value="{{ showPanelistPortal }}"><div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
     <header style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:var(--space-4);padding:var(--space-3) var(--space-6);border-bottom:1px solid var(--color-divider);background:var(--color-surface)">
@@ -3990,8 +3864,8 @@ async function idbClearHandle() {
 // natural parent list instead.
 const SESSION_STORAGE_KEY = "aps-session";
 const PAGE_RESTORE_FALLBACK = {
-  "candidate-profile": "candidate-list", "shortlist-detail": "shortlist-approvals",
-  "merit-batch-detail": "merit-approval", "panelist-detail": "panelists", "mail-compose": "dashboard"
+  "shortlist-detail": "shortlist-approvals",
+  "merit-batch-detail": "merit-approval", "panelist-detail": "panelists"
 };
 
 // Pages that operate on candidate-pipeline data — creating an admission cycle is a hard
@@ -3999,7 +3873,7 @@ const PAGE_RESTORE_FALLBACK = {
 // the active programme+year, each shows a "create a cycle first" prompt instead of its content.
 // Grows incrementally as cycleId is threaded through more of the data model.
 const CYCLE_GATED_PAGES = new Set([
-  "import-candidates", "import-wizard", "candidate-list", "candidate-profile",
+  "import-candidates", "import-wizard", "candidate-list",
   "shortlist", "shortlist-approvals", "shortlist-detail",
   "sessions", "candidate-allocation", "zoom-rooms", "panelist-allocation",
   "pi-attendance", "pi-scoring", "verification",
@@ -4327,20 +4201,19 @@ class Component extends DCLogic {
     ij: null, ijStep: "sources", ijNewName: "", ijPasteText: "", ijDatasetFileName: "", ijSourceError: "",
     ijConfigIssues: [], ijMappingError: "", ijSaveConfigName: "", ijCommittedSummary: null,
     selectedMeritBatchId: null, selectedPanelistId: null, apvDraftId: null, apvDraft: "",
-    mcRequestId: null, mcReturnPage: "dashboard", mcTo: "", mcSubject: "", mcBody: "",
-    popupMode: false, approvalToken: "", popupPayload: null, popupError: "",
-    popupOtpSentTo: "", popupOtpValue: "", popupOtpStage: false, popupOtpEntered: "", popupDone: false, popupResultMsg: "", popupBusy: false,
+    sfaOpen: false, sfaSubjectType: "", sfaSubjectId: "", sfaProgrammeId: "", sfaAcademicYearId: "",
+    sfaSummary: "", sfaLevelLabel: "", sfaStaffOptions: [], sfaStaffId: "", paRemarks: {},
     auth: null, loginRole: "institute", loginEmail: "", loginPassword: "", loginError: "",
-    npName: "", npCode: "", npDescription: "", ciName: "", ciCode: "", ciAdminName: "", ciAdminEmail: "", ciAdminMobile: "",
+    npShowForm: false, npName: "", npDescription: "", ciName: "", ciCode: "", ciAdminName: "", ciAdminEmail: "", ciAdminMobile: "",
     newYearLabel: "", clFilterCategory: "ALL", clFilterStatus: "ALL", clSearch: "", selectedCandidateId: null, selectedShortlistId: null,
-    profileSearch: "", slFilter: { groups: [] }, slRankField: "", slMode: "count", slValue: "", slPreviewed: false,
+    slFilter: { groups: [] }, slRankField: "", slMode: "count", slValue: "", slPreviewed: false,
     scCandidateId: "",
     scSessionFilter: "ALL", scGroupFilter: "ALL", scSearch: "",
     atSessionFilter: "ALL", atGroupFilter: "ALL", atJoinedSessionId: null, atJoinedGroupId: null,
     atSearch: "", atStatusFilter: "ALL", atConfirm: null,
     vCandidateId: "", fsCategory: "ALL", mpCategory: "OPEN", mpCriteria: "count", mpCount: "", mpCutoff: "", mpWaitingSize: "",
     cvSearch: "", cvCategoryFilter: "ALL", cvInstituteStatusFilter: "ALL",
-    cvModalCandidateId: null, cvModalDocType: null, cvModalChecked: false, cvModalStatus: "",
+    cvModalCandidateId: null, cvModalDocIndex: 0, cvModalRemarks: "",
     maCategory: "ALL", mrCategory: "ALL", mrDates: {}, mrWlCategory: "OPEN", mrWlCount: "", mrWlLastFeeDate: "", mrWlNextDate: "", wlCategory: "ALL",
     pgFeeProgrammeId: null, pgFeeDraft: null,
     plSelectedIds: [],
@@ -4367,14 +4240,6 @@ class Component extends DCLogic {
   };
 
   componentDidMount() {
-    const token = new URLSearchParams(window.location.search).get("approval");
-    if (token) {
-      this.setState({ popupMode: true, approvalToken: token });
-      window.addEventListener("message", (e) => this.handlePopupMessage(e));
-      if (window.opener) window.opener.postMessage({ __aps: true, type: "request", token }, window.location.origin);
-      else this.setState({ popupError: "This approval link only works when opened from the Sent Mail tab in an active session (it wasn't opened from a running app tab)." });
-      return;
-    }
     try {
       const saved = JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY) || "null");
       if (saved && saved.auth) {
@@ -4382,7 +4247,6 @@ class Component extends DCLogic {
         this.setState({ auth: saved.auth, page });
       }
     } catch (err) { /* corrupt or unavailable sessionStorage — just show the login screen */ }
-    window.addEventListener("message", (e) => this.handleApprovalMessage(e));
     Promise.all([import("./js/admission-engine.js"), import("./js/import-engine.js")]).then(async ([mod, importMod]) => {
       this.engine = mod;
       this.importEngine = importMod;
@@ -4415,8 +4279,13 @@ class Component extends DCLogic {
           this._wfBuilder = new WorkflowBuilder(root, this.state.wfDraft, (draft) => this.setState({ wfDraft: draft }));
         }
       } else {
-        mainEl.style.padding = "";
+        // Restore the actual base layout (see <main>'s own style="...") rather than clearing to "" —
+        // clearing wipes the overflow-y/padding this DOM mutation itself set on a previous render
+        // (React never reapplies an unchanged static style string, so "" would stick forever, leaving
+        // every non-Workflow-Builder page unscrollable once Workflow Builder had been visited once).
+        mainEl.style.padding = "var(--space-6)";
         mainEl.style.overflow = "";
+        mainEl.style.overflowY = "auto";
         if (this._wfBuilder) { this._wfBuilder.destroy(); this._wfBuilder = null; }
       }
     }
@@ -4446,6 +4315,26 @@ class Component extends DCLogic {
     this.setState({ toast: msg });
     clearTimeout(this._toastTimer);
     this._toastTimer = setTimeout(() => this.setState({ toast: null }), 3200);
+  }
+  paginate(items, key) {
+    const pageKey = `${key}Page`, sizeKey = `${key}PageSize`;
+    const pageSize = this.state[sizeKey] || 20;
+    const totalCount = items.length;
+    const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+    const page = Math.min(Math.max(1, this.state[pageKey] || 1), totalPages);
+    const start = (page - 1) * pageSize;
+    return {
+      pageItems: items.slice(start, start + pageSize),
+      pagination: {
+        page, totalPages, totalCount, start,
+        showingLabel: totalCount === 0 ? "0 of 0" : `${start + 1}-${Math.min(start + pageSize, totalCount)} of ${totalCount}`,
+        pageSize, pageSizeOptions: [20, 25, 100, 150],
+        disablePrev: page <= 1, disableNext: page >= totalPages,
+        onPrev: () => this.setState({ [pageKey]: page - 1 }),
+        onNext: () => this.setState({ [pageKey]: page + 1 }),
+        onPageSizeChange: (e) => this.setState({ [sizeKey]: Number(e.target.value), [pageKey]: 1 })
+      }
+    };
   }
   async onOpenExistingFile() {
     if (!window.showOpenFilePicker) {
@@ -4558,76 +4447,6 @@ class Component extends DCLogic {
     if (msg) this.showToast(typeof msg === "function" ? msg(res) : msg);
     return res;
   }
-  // Opener side: replies to a popup approval tab opened via Sent Mail's "Open Approval Link".
-  handleApprovalMessage(e) {
-    if (e.origin !== window.location.origin) return;
-    const msg = e.data;
-    if (!msg || !msg.__aps || !this.state.data) return;
-    const findMail = () => this.state.data.sentMails.find((m) => m.token === msg.token);
-    if (msg.type === "request") {
-      const mail = findMail();
-      if (!mail) { e.source.postMessage({ __aps: true, type: "data", token: msg.token, error: "This approval link is no longer valid." }, window.location.origin); return; }
-      const req = this.state.data.approvalRequests.find((r) => r.id === mail.approvalRequestId);
-      e.source.postMessage({
-        __aps: true, type: "data", token: msg.token,
-        payload: { summary: req ? req.summary : "—", levelLabel: mail.levelLabel, to: mail.to, subject: mail.subject, status: mail.status }
-      }, window.location.origin);
-    } else if (msg.type === "approve-start") {
-      const mail = findMail();
-      if (!mail) return;
-      const res = this.mutate((ds) => this.engine.generateMailOtp(ds, mail.id));
-      this.showToast(res.error ? res.error : `Simulated: OTP emailed to ${res.to}.`);
-      e.source.postMessage({ __aps: true, type: "otp-sent", token: msg.token, to: res.to, otp: res.otp, error: res.error }, window.location.origin);
-    } else if (msg.type === "otp-submit") {
-      const mail = findMail();
-      if (!mail) return;
-      const res = this.mutate((ds) => this.engine.verifyMailOtp(ds, mail.id, msg.otp), (r) => r.error ? r.error : "Approval recorded via OTP.");
-      e.source.postMessage({ __aps: true, type: "otp-result", token: msg.token, ok: !res.error, error: res.error }, window.location.origin);
-    } else if (msg.type === "reject") {
-      const mail = findMail();
-      if (!mail) return;
-      const res = this.mutate((ds) => this.engine.rejectMail(ds, mail.id), (r) => r.error ? r.error : "Rejected.");
-      e.source.postMessage({ __aps: true, type: "reject-result", token: msg.token, ok: !res.error, error: res.error }, window.location.origin);
-    }
-  }
-  // Popup side: this tab has no data of its own — everything is relayed to/from the opener tab.
-  handlePopupMessage(e) {
-    if (e.origin !== window.location.origin) return;
-    const msg = e.data;
-    if (!msg || !msg.__aps || msg.token !== this.state.approvalToken) return;
-    if (msg.type === "data") {
-      if (msg.error) this.setState({ popupError: msg.error });
-      else this.setState({ popupPayload: msg.payload });
-    } else if (msg.type === "otp-sent") {
-      this.setState({ popupBusy: false });
-      if (msg.error) this.setState({ popupError: msg.error });
-      else this.setState({ popupOtpSentTo: msg.to, popupOtpValue: msg.otp, popupOtpStage: true, popupError: "" });
-    } else if (msg.type === "otp-result") {
-      this.setState({ popupBusy: false });
-      if (msg.ok) this.setState({ popupDone: true, popupResultMsg: "Approved." });
-      else this.setState({ popupError: msg.error });
-    } else if (msg.type === "reject-result") {
-      this.setState({ popupBusy: false });
-      if (msg.ok) this.setState({ popupDone: true, popupResultMsg: "Rejected — sent back for revision." });
-      else this.setState({ popupError: msg.error });
-    }
-  }
-  onPopupApprove() {
-    if (!window.opener) return;
-    this.setState({ popupBusy: true, popupError: "" });
-    window.opener.postMessage({ __aps: true, type: "approve-start", token: this.state.approvalToken }, window.location.origin);
-  }
-  onPopupReject() {
-    if (!window.opener) return;
-    this.setState({ popupBusy: true, popupError: "" });
-    window.opener.postMessage({ __aps: true, type: "reject", token: this.state.approvalToken }, window.location.origin);
-  }
-  onPopupOtpSubmit() {
-    if (!window.opener) return;
-    if (!this.state.popupOtpEntered.trim()) { this.setState({ popupError: "Enter the OTP." }); return; }
-    this.setState({ popupBusy: true, popupError: "" });
-    window.opener.postMessage({ __aps: true, type: "otp-submit", token: this.state.approvalToken, otp: this.state.popupOtpEntered.trim() }, window.location.origin);
-  }
   setAcademicYear(e) { this.mutate((ds) => { this.engine.setActiveAcademicYear(ds, ds.activeProgrammeId, e.target.value); }); }
   setProgramme(e) { this.mutate((ds) => { ds.activeProgrammeId = e.target.value; }); }
 
@@ -4668,12 +4487,12 @@ class Component extends DCLogic {
   fillSampleCred(role, cred) {
     this.setState({ loginRole: role, loginEmail: cred.email, loginPassword: cred.password, loginError: "" });
   }
-  onLogout() { this.setState({ auth: null, loginEmail: "", loginPassword: "", page: "dashboard", pnJoinedSessionId: null, pnJoinedGroupId: null, pnSelectedCandidateId: null, atJoinedSessionId: null, atJoinedGroupId: null, atSessionFilter: "ALL", atGroupFilter: "ALL", atSearch: "", atStatusFilter: "ALL", atConfirm: null }); }
+  onLogout() { this.setState({ auth: null, loginEmail: "", loginPassword: "", page: "dashboard", pnJoinedSessionId: null, pnJoinedGroupId: null, pnSelectedCandidateId: null, atJoinedSessionId: null, atJoinedGroupId: null, atSessionFilter: "ALL", atGroupFilter: "ALL", atSearch: "", atStatusFilter: "ALL", atConfirm: null, selectedCandidateId: null }); }
   statusTag(key) {
     const m = (this.engine && this.engine.STATUS_META[key]) || { label: key, cls: "tag-neutral" };
     return { tagCls: `tag ${m.cls}`, statusLabel: m.label };
   }
-  viewCandidate(id) { this.goTo("candidate-profile", { selectedCandidateId: id }); }
+  viewCandidate(id) { this.setState({ selectedCandidateId: id }); }
   viewShortlist(id) { this.goTo("shortlist-detail", { selectedShortlistId: id }); }
   viewMeritBatch(id) { this.goTo("merit-batch-detail", { selectedMeritBatchId: id }); }
   viewPanelist(id) { this.goTo("panelist-detail", { selectedPanelistId: id }); }
@@ -4693,55 +4512,72 @@ class Component extends DCLogic {
     const matches = d.approvalRequests.filter((r) => r.subjectType === subjectType && r.subjectId === subjectId);
     return matches.length ? matches[matches.length - 1] : null;
   }
+  // A chain level is {id, seq, roleId} — resolves to that role's name, or falls back to the level's
+  // own (legacy) name if it somehow has no roleId yet (e.g. the role it pointed to was deleted).
+  approvalLevelLabel(d, lvl) {
+    if (!lvl) return "";
+    if (lvl.roleId) return (d.roles.find((r) => r.id === lvl.roleId) || {}).name || lvl.roleId;
+    return lvl.name || "";
+  }
   // chain is the resolved approval chain (programme.approvalChain for shortlist/merit/assessment-params
   // subjects) — callers resolve it via this.engine.effectiveApprovalChain(programme) since it varies by
   // req.programmeId, not something this generic helper can look up itself.
-  approvalButtonState(req, chain) {
+  approvalButtonState(d, req, chain) {
     if (!req) return { showSend: true, tagLabel: "", tagCls: "" };
     if (req.status === "rejected") return { showSend: true, tagLabel: "Rejected", tagCls: "tag tag-neutral" };
     if (req.status === "approved") return { showSend: false, tagLabel: "Approved", tagCls: "tag tag-accent" };
-    const levelName = (chain && chain[req.levelIndex] && chain[req.levelIndex].name) || `Level ${req.levelIndex + 1}`;
-    // mailIds is backfilled on load (see normalizeDataset) and always set on creation, but this is
-    // the one chokepoint every approval display (shortlist/merit/assessment-params) routes through,
-    // so guard here too rather than trust every past and future writer got the shape right.
-    if ((req.mailIds || [])[req.levelIndex]) {
-      return { showSend: false, tagLabel: `Pending ${levelName}`, tagCls: req.levelIndex === 0 ? "tag tag-neutral" : "tag tag-outline" };
+    const levelName = this.approvalLevelLabel(d, chain[req.levelIndex]) || `Level ${req.levelIndex + 1}`;
+    if (req.currentApproverStaffId) {
+      const staff = d.staff.find((s) => s.id === req.currentApproverStaffId);
+      return { showSend: false, tagLabel: `Pending ${levelName}${staff ? " — " + staff.name : ""}`, tagCls: req.levelIndex === 0 ? "tag tag-neutral" : "tag tag-outline" };
     }
     if (req.levelIndex === 0) return { showSend: true, tagLabel: "", tagCls: "" };
-    const priorName = (chain && chain[req.levelIndex - 1] && chain[req.levelIndex - 1].name) || `Level ${req.levelIndex}`;
+    const priorName = this.approvalLevelLabel(d, chain[req.levelIndex - 1]) || `Level ${req.levelIndex}`;
     return { showSend: true, tagLabel: `${priorName} Approved`, tagCls: "tag tag-outline" };
   }
-  onSendForApproval(subjectType, subjectId, programmeId, academicYearId, summary, returnPage, detailText, cycleId) {
+  // Opens the "Send for Approval" popup (see buildSendForApprovalPopup) instead of navigating away —
+  // the sender picks one specific active staff member holding the current level's role; the request
+  // itself isn't created until they confirm (onSfaSend), so cancelling leaves no orphan request behind.
+  onSendForApproval(subjectType, subjectId, programmeId, academicYearId, cycleId, summary) {
     const d = this.state.data;
+    const programme = d.programmes.find((p) => p.id === programmeId);
     let req = this.findApprovalRequest(d, subjectType, subjectId);
-    if (!req || req.status === "rejected" || req.status === "approved") {
-      req = this.mutate((ds) => this.engine.createApprovalRequest(ds, { subjectType, subjectId, programmeId, academicYearId, cycleId, summary }));
-    }
-    const chain = this.engine.effectiveApprovalChain(d.programmes.find((p) => p.id === programmeId));
-    const level = chain[req.levelIndex] || { name: `Level ${req.levelIndex + 1}`, approverEmail: "" };
-    this.goTo("mail-compose", {
-      mcRequestId: req.id, mcReturnPage: returnPage,
-      mcTo: level.approverEmail || "", mcSubject: `Approval needed — ${summary} (${level.name} level)`,
-      mcBody: `Please review and approve: ${summary}.\n\n${detailText || ""}\nOpen Approvals › Sent Mail in the app and use the approval link on this mail to Approve or Reject.`
+    if (req && (req.status === "rejected" || req.status === "approved")) req = null;
+    const chain = this.engine.effectiveApprovalChain(programme);
+    const levelIndex = req ? req.levelIndex : 0;
+    const level = chain[levelIndex];
+    const roleId = level ? level.roleId : null;
+    const eligibleStaff = d.staff.filter((s) => s.instituteId === programme.instituteId && s.roleId === roleId && s.status === "Active");
+    this.setState({
+      sfaOpen: true, sfaSubjectType: subjectType, sfaSubjectId: subjectId,
+      sfaProgrammeId: programmeId, sfaAcademicYearId: academicYearId, sfaCycleId: cycleId, sfaSummary: summary,
+      sfaLevelLabel: this.approvalLevelLabel(d, level) || `Level ${levelIndex + 1}`,
+      sfaStaffOptions: eligibleStaff.map((s) => ({ id: s.id, name: s.name })),
+      sfaStaffId: eligibleStaff[0] ? eligibleStaff[0].id : ""
     });
   }
-  formatCandidateListForMail(d, candidateIds, programmeId, academicYearId, scoreLabel, scoreFn) {
-    const rows = candidateIds.map((id) => d.candidates.find((c) => c.id === id && c.programmeId === programmeId && c.academicYearId === academicYearId)).filter(Boolean);
-    const shown = rows.slice(0, 30).map((c) => `${c.id} — ${c.name} — ${scoreLabel} ${scoreFn(c)}`);
-    const more = rows.length > 30 ? `\n...and ${rows.length - 30} more (see the app for the full list).` : "";
-    return `Candidates (${rows.length}):\n${shown.join("\n")}${more}\n`;
+  onSfaStaffChange(e) { this.setState({ sfaStaffId: e.target.value }); }
+  onSfaCancel() { this.setState({ sfaOpen: false }); }
+  onSfaSend() {
+    const s = this.state;
+    if (!s.sfaStaffId) { this.showToast("Select a staff member."); return; }
+    const res = this.mutate((ds) => {
+      let req = this.findApprovalRequest(ds, s.sfaSubjectType, s.sfaSubjectId);
+      if (!req || req.status === "rejected" || req.status === "approved") {
+        req = this.engine.createApprovalRequest(ds, { subjectType: s.sfaSubjectType, subjectId: s.sfaSubjectId, programmeId: s.sfaProgrammeId, academicYearId: s.sfaAcademicYearId, cycleId: s.sfaCycleId, summary: s.sfaSummary });
+      }
+      return this.engine.assignApprover(ds, req.id, s.sfaStaffId);
+    }, (r) => (r && r.error) ? r.error : "Sent for approval.");
+    if (res && !res.error) this.setState({ sfaOpen: false });
   }
-  onMcSend() {
-    const { mcRequestId, mcTo, mcSubject, mcBody } = this.state;
-    if (!mcTo.trim()) { this.showToast("Enter a recipient email."); return; }
-    const res = this.mutate((ds) => this.engine.sendApprovalMail(ds, mcRequestId, { to: mcTo, subject: mcSubject, body: mcBody }),
-      (r) => r.error ? r.error : "Mail sent — open it from Approvals › Sent Mail.");
-    if (res && res.ok) this.goTo("sent-mail");
-  }
-  onMcCancel() { this.goTo(this.state.mcReturnPage); }
-  onOpenApprovalLink(token) {
-    const url = `${window.location.origin}${window.location.pathname}?approval=${token}`;
-    window.open(url, "_blank");
+  buildSendForApprovalPopup() {
+    const s = this.state;
+    return {
+      sfaOpen: !!s.sfaOpen, sfaLevelLabel: s.sfaLevelLabel || "", sfaSummary: s.sfaSummary || "",
+      sfaStaffOptions: s.sfaStaffOptions || [], sfaStaffId: s.sfaStaffId || "",
+      sfaNoStaff: !(s.sfaStaffOptions && s.sfaStaffOptions.length), sfaHasStaff: !!(s.sfaStaffOptions && s.sfaStaffOptions.length),
+      onSfaStaffChange: (e) => this.onSfaStaffChange(e), onSfaSend: () => this.onSfaSend(), onSfaCancel: () => this.onSfaCancel()
+    };
   }
   onCreateYear() {
     const label = this.state.newYearLabel.trim();
@@ -4817,14 +4653,16 @@ class Component extends DCLogic {
     const inst = this.state.data.institutes.find((i) => i.id === auth.instituteId);
     return inst ? inst.adminEmail : "Institute Admin";
   }
+  onNpOpen() { this.setState({ npShowForm: true, npName: "", npDescription: "" }); }
+  onNpCancel() { this.setState({ npShowForm: false, npName: "", npDescription: "" }); }
   onCreateProgramme() {
     const f = this.state;
-    if (!f.npName.trim() || !f.npCode.trim()) { this.showToast("Programme name and code are required."); return; }
+    if (!f.npName.trim()) { this.showToast("Programme name is required."); return; }
     this.mutate((ds) => {
-      const programme = this.engine.createProgramme(ds, { instituteId: this.state.auth.instituteId, name: f.npName, code: f.npCode, description: f.npDescription, actor: this.currentActor() });
+      const programme = this.engine.createProgramme(ds, { instituteId: this.state.auth.instituteId, name: f.npName, description: f.npDescription, actor: this.currentActor() });
       if (!ds.activeProgrammeId) ds.activeProgrammeId = programme.id;
     }, "Programme created.");
-    this.setState({ npName: "", npCode: "", npDescription: "" });
+    this.setState({ npShowForm: false, npName: "", npDescription: "" });
   }
   onCreateInstitute() {
     const f = this.state;
@@ -5131,7 +4969,6 @@ class Component extends DCLogic {
       { title: "Verification", items: [["verification", "Category Verification", "shield-check"]] },
       { title: "Merit", items: [["final-scores", "Final Scores", "award"], ["merit-processing", "Merit Processing", "cog"], ["merit-approval", "Merit Approval", "badge-check"], ["merit-releases", "Merit Releases", "megaphone"], ["waiting-list", "Waiting List", "list-ordered"], ["provisional-letters", "Provisional Letters", "mail"], ["formula-builder", "Formula Builder", "function-square"], ["offer-management", "Offer Management", "file-badge-2"]] },
       { title: "Workflow", items: [["workflow-builder", "Workflow Builder", "git-branch-plus"], ["workflow-instances", "Workflow Instances", "git-branch"], ["wf-sample-test", "Node Sample Tester", "test-tube-2"]] },
-      { title: "Documents", items: [["document-collection", "Document Collection", "folder-open"]] },
       { title: "Reports", items: [["reports-dashboard", "Dashboard", "chart-column"], ["reports-candidates", "Candidate Reports", "file-text"], ["reports-sessions", "Session Reports", "calendar-clock"]] },
       { title: "Approvals", items: [["sent-mail", "Sent Mail", "send"], ["pending-approvals", "Pending Approvals", "inbox"]] },
       { title: "Corrections", items: [["reopen-corrections", "Reopen & Corrections", "rotate-ccw"]] },
@@ -5212,7 +5049,7 @@ class Component extends DCLogic {
       "academic-year": ["Settings", "Academic Years"], "assessment-config": ["Settings", "Assessment / PI Configuration"],
       "assessment-parameter": ["Settings", "Assessment Parameter"],
       "import-candidates": ["Candidates", "Import Candidates"], "import-wizard": ["Candidates", "Import Candidates"],
-      "candidate-list": ["Candidates", "Candidates"], "candidate-profile": ["Candidates", "Candidate Profile"],
+      "candidate-list": ["Candidates", "Candidates"],
       "shortlist-detail": ["Candidates", "Shortlist Detail"],
       shortlist: ["Candidates", "Create Shortlist"], "shortlist-approvals": ["Candidates", "Shortlist Approval"],
       sessions: ["PI Management", "PI Session Management"], "candidate-allocation": ["PI Management", "Candidate Allocation"],
@@ -5223,7 +5060,7 @@ class Component extends DCLogic {
       "final-scores": ["Merit", "Candidate Final Score"], "merit-processing": ["Merit", "Merit Processing"], "merit-approval": ["Merit", "Merit Approval"], "merit-batch-detail": ["Merit", "Merit Batch Detail"], "merit-releases": ["Merit", "Merit List Releases"], "waiting-list": ["Merit", "Waiting List"], "provisional-letters": ["Merit", "Provisional Letters"],
       "workflow-builder": ["Workflow", "Workflow Builder"],
       "reports-dashboard": ["Reports", "Reports Dashboard"], "reports-candidates": ["Reports", "Candidate Reports"], "reports-sessions": ["Reports", "Session Reports"],
-      "mail-compose": ["Approvals", "Send for Approval"], "sent-mail": ["Approvals", "Sent Mail"], "pending-approvals": ["Approvals", "Pending Approvals"],
+      "sent-mail": ["Approvals", "Sent Mail"], "pending-approvals": ["Approvals", "Pending Approvals"],
       "admission-cycles": ["Settings", "Admission Cycles"],
       "condition-builder": ["Tools", "Condition Builder"],
       "workflow-instances": ["Workflow", "Workflow Instances"],
@@ -5231,7 +5068,6 @@ class Component extends DCLogic {
       "roles-mgmt": ["Settings", "Roles & Permissions"],
       "user-memberships": ["Settings", "User Memberships"],
       "wf-sample-test": ["Workflow", "Node Sample Tester"],
-      "document-collection": ["Documents", "Document Collection"],
       "formula-builder": ["Merit", "Formula Builder"],
       "offer-management": ["Merit", "Offer Management"],
       "email-templates": ["Settings", "Email Templates"],
@@ -5240,21 +5076,6 @@ class Component extends DCLogic {
   }
 
   renderVals() {
-    if (this.state.popupMode) {
-      const s = this.state;
-      const p = s.popupPayload;
-      return {
-        showPopupApproval: true, notAuthed: false, authed: false, showFileGate: false,
-        popupLoaded: !!p, popupError: s.popupError,
-        popupSummary: p ? p.summary : "", popupLevelLabel: p ? `${p.levelLabel} Approval` : "",
-        popupTo: p ? p.to : "", popupAlreadyDecided: p && p.status !== "pending",
-        popupOtpStage: s.popupOtpStage, popupOtpSentTo: s.popupOtpSentTo, popupOtpValue: s.popupOtpValue,
-        popupOtpEntered: s.popupOtpEntered, onPopupOtpEnteredChange: (e) => this.setState({ popupOtpEntered: e.target.value }),
-        popupDone: s.popupDone, popupResultMsg: s.popupResultMsg, popupBusy: s.popupBusy,
-        popupShowActions: !!p && p.status === "pending" && !s.popupOtpStage && !s.popupDone,
-        onPopupApprove: () => this.onPopupApprove(), onPopupReject: () => this.onPopupReject(), onPopupOtpSubmit: () => this.onPopupOtpSubmit()
-      };
-    }
     if (this.state.needsFileReconnect) {
       return {
         showFileReconnect: true, showFileGate: false, notAuthed: false, authed: false,
@@ -5334,7 +5155,7 @@ class Component extends DCLogic {
     });
     const base = {
       authed: true, notAuthed: false, roleIsSuperAdmin, roleIsInstitute, roleIsInstituteAdmin, onLogout: () => this.onLogout(),
-      loaded: this.state.loaded, notLoaded: !this.state.loaded, fileName: this.state.fileName || "", notFileConnected: !this.state.fileName,
+      loaded: this.state.loaded, notLoaded: !this.state.loaded, notFileConnected: !this.state.fileName,
       toast: this.state.toast,
       navGroups, breadcrumbGroup: titles[0], pageTitle: titles[1],
       dashboardLinkStyle: linkStyle(page === "dashboard" || page === "super-admin-dashboard"),
@@ -5386,7 +5207,7 @@ class Component extends DCLogic {
       pageIsAcademicYear: page === "academic-year", pageIsAssessmentConfig: page === "assessment-config",
       pageIsAssessmentParameter: page === "assessment-parameter",
       pageIsImportJobs: page === "import-candidates" && !cycleGateBlocked, pageIsImportWizard: page === "import-wizard" && !cycleGateBlocked, pageIsCandidateList: page === "candidate-list" && !cycleGateBlocked,
-      pageIsCandidateProfile: page === "candidate-profile" && !cycleGateBlocked, pageIsShortlist: page === "shortlist" && !cycleGateBlocked, pageIsShortlistApprovals: page === "shortlist-approvals" && !cycleGateBlocked,
+      pageIsShortlist: page === "shortlist" && !cycleGateBlocked, pageIsShortlistApprovals: page === "shortlist-approvals" && !cycleGateBlocked,
       pageIsShortlistDetail: page === "shortlist-detail" && !cycleGateBlocked,
       pageIsSessions: page === "sessions" && !cycleGateBlocked, pageIsCandidateAllocation: page === "candidate-allocation" && !cycleGateBlocked, pageIsZoomRooms: page === "zoom-rooms" && !cycleGateBlocked,
       pageIsPanelists: page === "panelists", pageIsPanelistDetail: page === "panelist-detail", pageIsPanelistAllocation: page === "panelist-allocation" && !cycleGateBlocked,
@@ -5402,7 +5223,7 @@ class Component extends DCLogic {
       pageIsPanelistApprovalChain: page === "panelist-approval-chain",
       pageIsWorkflowBuilder: page === "workflow-builder",
       pageIsReportsDashboard: page === "reports-dashboard", pageIsReportsCandidates: page === "reports-candidates" && !cycleGateBlocked, pageIsReportsSessions: page === "reports-sessions" && !cycleGateBlocked,
-      pageIsMailCompose: page === "mail-compose", pageIsSentMail: page === "sent-mail", pageIsPendingApprovals: page === "pending-approvals",
+      pageIsSentMail: page === "sent-mail", pageIsPendingApprovals: page === "pending-approvals",
       pageIsAdmissionCycles: page === "admission-cycles",
       pageIsConditionBuilder: page === "condition-builder",
       pageIsWorkflowInstances: page === "workflow-instances",
@@ -5410,7 +5231,6 @@ class Component extends DCLogic {
       pageIsRolesMgmt: page === "roles-mgmt",
       pageIsUserMemberships: page === "user-memberships",
       pageIsWfSampleTest: page === "wf-sample-test",
-      pageIsDocumentCollection: page === "document-collection",
       pageIsFormulaBuilder: page === "formula-builder",
       pageIsOfferManagement: page === "offer-management",
       pageIsEmailTemplates: page === "email-templates",
@@ -5424,7 +5244,6 @@ class Component extends DCLogic {
     if (page === "import-candidates") Object.assign(base, this.buildImportJobs(d));
     if (page === "import-wizard") Object.assign(base, this.buildImportWizard(d));
     if (page === "candidate-list") Object.assign(base, this.buildCandidateList(d));
-    if (page === "candidate-profile") Object.assign(base, this.buildCandidateProfile(d));
     if (page === "shortlist") Object.assign(base, this.buildShortlist(d));
     if (page === "shortlist-approvals") Object.assign(base, this.buildShortlistApprovals(d));
     if (page === "shortlist-detail") Object.assign(base, this.buildShortlistDetail(d));
@@ -5445,7 +5264,6 @@ class Component extends DCLogic {
     if (page === "waiting-list") Object.assign(base, this.buildWaitingList(d));
     if (page === "provisional-letters") Object.assign(base, this.buildProvisionalLetters(d));
     if (page === "reports-dashboard") Object.assign(base, { categoryBreakdown: this.buildDashboard(d).categoryBreakdown });
-    if (page === "mail-compose") Object.assign(base, this.buildMailCompose(d));
     if (page === "sent-mail") Object.assign(base, this.buildSentMail(d));
     if (page === "pending-approvals") Object.assign(base, this.buildPendingApprovals(d));
     if (page === "reports-candidates") Object.assign(base, this.buildReportsCandidates(d));
@@ -5466,11 +5284,15 @@ class Component extends DCLogic {
     if (page === "roles-mgmt") Object.assign(base, this.buildRolesMgmt(d));
     if (page === "user-memberships") Object.assign(base, this.buildUserMemberships(d));
     if (page === "wf-sample-test") Object.assign(base, this.buildWfSampleTest(d));
-    if (page === "document-collection") Object.assign(base, this.buildDocumentCollection(d));
     if (page === "formula-builder") Object.assign(base, this.buildFormulaBuilder(d));
     if (page === "offer-management") Object.assign(base, this.buildOfferManagement(d));
     if (page === "email-templates") Object.assign(base, this.buildEmailTemplates(d));
     if (page === "print-templates") Object.assign(base, this.buildPrintTemplates(d));
+    // Right-side drawer: every "View" action across the app (Candidate List, Shortlist Detail, Final
+    // Scores, Merit Batch Detail, ...) opens this over whatever page is currently showing, instead of
+    // navigating to a separate Candidate Profile page.
+    Object.assign(base, this.buildCandidateDrawer(d));
+    Object.assign(base, this.buildSendForApprovalPopup());
     return base;
   }
 
@@ -6111,7 +5933,8 @@ class Component extends DCLogic {
     const formEmail = s.mbFormEmail != null ? s.mbFormEmail : "";
     const formRoleId = s.mbFormRoleId != null ? s.mbFormRoleId : "";
     const formStatus = s.mbFormStatus != null ? s.mbFormStatus : "Active";
-    const resetForm = { mbShowForm: false, mbEditId: null, mbFormName: "", mbFormEmail: "", mbFormRoleId: "", mbFormStatus: "Active" };
+    const formPassword = s.mbFormPassword != null ? s.mbFormPassword : "";
+    const resetForm = { mbShowForm: false, mbEditId: null, mbFormName: "", mbFormEmail: "", mbFormRoleId: "", mbFormStatus: "Active", mbFormPassword: "" };
 
     return {
       mbShowForm: showForm,
@@ -6119,13 +5942,16 @@ class Component extends DCLogic {
       mbSaveLabel: editId ? "Update" : "Add User",
       mbFormName: formName,
       mbFormEmail: formEmail,
+      mbFormPassword: formPassword,
+      mbPasswordPlaceholder: editId ? "Leave blank to keep current password" : "Leave blank to auto-generate",
       mbStatusIsActive: formStatus === "Active",
       mbStatusIsInactive: formStatus === "Inactive",
       onMbNameChange: (e) => this.setState({ mbFormName: e.target.value }),
       onMbEmailChange: (e) => this.setState({ mbFormEmail: e.target.value }),
       onMbRoleChange: (e) => this.setState({ mbFormRoleId: e.target.value }),
+      onMbPasswordChange: (e) => this.setState({ mbFormPassword: e.target.value }),
       onMbStatusChange: (e) => this.setState({ mbFormStatus: e.target.value }),
-      onMbToggleForm: () => this.setState({ mbShowForm: !s.mbShowForm, mbEditId: null, mbFormName: "", mbFormEmail: "", mbFormRoleId: "", mbFormStatus: "Active" }),
+      onMbToggleForm: () => this.setState({ mbShowForm: !s.mbShowForm, mbEditId: null, mbFormName: "", mbFormEmail: "", mbFormRoleId: "", mbFormStatus: "Active", mbFormPassword: "" }),
       onMbCancel: () => this.setState(resetForm),
       onMbSave: () => {
         const name = (this.state.mbFormName || "").trim();
@@ -6133,9 +5959,10 @@ class Component extends DCLogic {
         const roleId = this.state.mbFormRoleId || "";
         if (!name || !email || !roleId) { this.showToast("Name, email and role are required."); return; }
         const status = this.state.mbFormStatus || "Active";
+        const password = this.state.mbFormPassword || "";
         const editingId = this.state.mbEditId;
-        const res = this.mutate((ds) => this.engine.saveStaffMember(ds, instituteId, editingId, { name, email, roleId, status }),
-          (r) => (r && r.error) ? r.error : (r && r.credentials ? `User added. Login: ${r.credentials.loginId} / ${r.credentials.password}` : "User updated."));
+        const res = this.mutate((ds) => this.engine.saveStaffMember(ds, instituteId, editingId, { name, email, roleId, status, password }),
+          (r) => (r && r.error) ? r.error : (r && r.credentials ? `User ${editingId ? "updated" : "added"}. Login: ${r.credentials.loginId} / ${r.credentials.password}` : "User updated."));
         if (res && res.ok) this.setState(resetForm);
       },
       mbRoleOptions: roles.map((r) => ({ id: r.id, name: r.name, selected: r.id === formRoleId })),
@@ -6146,7 +5973,7 @@ class Component extends DCLogic {
         status: m.status,
         statusCls: m.status === "Active" ? "bg-success" : "bg-secondary",
         loginId: m.credentials ? m.credentials.loginId : "— no login issued —",
-        onEdit: () => this.setState({ mbShowForm: true, mbEditId: m.id, mbFormName: m.name, mbFormEmail: m.email, mbFormRoleId: m.roleId, mbFormStatus: m.status }),
+        onEdit: () => this.setState({ mbShowForm: true, mbEditId: m.id, mbFormName: m.name, mbFormEmail: m.email, mbFormRoleId: m.roleId, mbFormStatus: m.status, mbFormPassword: "" }),
         onDelete: () => this.mutate((ds) => this.engine.deleteStaffMember(ds, instituteId, m.id), "User removed.")
       }))
     };
@@ -6272,180 +6099,6 @@ class Component extends DCLogic {
       },
 
       onExportResultsCsv: () => this.showToast('Prototype note: export would download a CSV in the real system.')
-    };
-  }
-  buildDocumentCollection(d) {
-    // ponytail: tab state in localStorage geta_doc_active_tab; all sub-state keyed geta_doc_*
-    const TAB_KEY  = 'geta_doc_active_tab';
-    const TYPES_KEY = 'geta_doc_types';
-    const SUBS_KEY  = 'geta_doc_submissions';
-    const CANDS_KEY = 'geta_doc_candidates';
-
-    const DEFAULT_TYPES = [
-      { id: 1, name: "10th Certificate",      required: true,  formats: "PDF,JPG",     maxMb: 5, status: "Active" },
-      { id: 2, name: "12th Certificate",      required: true,  formats: "PDF,JPG",     maxMb: 5, status: "Active" },
-      { id: 3, name: "Government ID Proof",   required: true,  formats: "PDF,JPG,PNG", maxMb: 2, status: "Active" },
-      { id: 4, name: "Passport Photo",        required: false, formats: "JPG,PNG",     maxMb: 1, status: "Active" },
-      { id: 5, name: "Recommendation Letter", required: false, formats: "PDF,DOCX",    maxMb: 3, status: "Inactive" }
-    ];
-
-    const DEFAULT_SUBS = [
-      { id: "s01",  ts: "2026-09-01 09:12", candidate: "Aarav Mehta",      appNo: "APP-2026-001", docType: "10th Certificate",      status: "Accepted",  rejectionReason: "" },
-      { id: "s02",  ts: "2026-09-01 09:45", candidate: "Priya Sharma",     appNo: "APP-2026-002", docType: "12th Certificate",      status: "Accepted",  rejectionReason: "" },
-      { id: "s03",  ts: "2026-09-01 10:30", candidate: "Rahul Gupta",      appNo: "APP-2026-003", docType: "Government ID Proof",   status: "Rejected",  rejectionReason: "Document blurry, unable to verify details" },
-      { id: "s04",  ts: "2026-09-01 11:00", candidate: "Sneha Patel",      appNo: "APP-2026-004", docType: "Passport Photo",        status: "Pending",   rejectionReason: "" },
-      { id: "s05",  ts: "2026-09-02 08:55", candidate: "Vikram Nair",      appNo: "APP-2026-005", docType: "10th Certificate",      status: "Accepted",  rejectionReason: "" },
-      { id: "s06",  ts: "2026-09-02 09:20", candidate: "Ananya Iyer",      appNo: "APP-2026-006", docType: "12th Certificate",      status: "Rejected",  rejectionReason: "File size exceeds limit, reupload as compressed PDF" },
-      { id: "s07",  ts: "2026-09-02 10:10", candidate: "Rohan Desai",      appNo: "APP-2026-007", docType: "Government ID Proof",   status: "Pending",   rejectionReason: "" },
-      { id: "s08",  ts: "2026-09-02 11:30", candidate: "Kavya Reddy",      appNo: "APP-2026-008", docType: "Recommendation Letter", status: "Accepted",  rejectionReason: "" },
-      { id: "s09",  ts: "2026-09-03 09:05", candidate: "Arjun Singh",      appNo: "APP-2026-009", docType: "10th Certificate",      status: "Pending",   rejectionReason: "" },
-      { id: "s10", ts: "2026-09-03 09:40", candidate: "Divya Krishnan",   appNo: "APP-2026-010", docType: "Passport Photo",        status: "Accepted",  rejectionReason: "" },
-      { id: "s11", ts: "2026-09-03 10:15", candidate: "Karthik Menon",    appNo: "APP-2026-011", docType: "12th Certificate",      status: "Pending",   rejectionReason: "" },
-      { id: "s12", ts: "2026-09-03 11:00", candidate: "Pooja Joshi",      appNo: "APP-2026-012", docType: "Government ID Proof",   status: "Accepted",  rejectionReason: "" }
-    ];
-
-    const DEFAULT_CANDS = [
-      { id: "c01", name: "Aarav Mehta",    appNo: "APP-2026-001", has10th: true,  has12th: true,  hasId: true,  hasPhoto: true  },
-      { id: "c02", name: "Priya Sharma",   appNo: "APP-2026-002", has10th: true,  has12th: true,  hasId: false, hasPhoto: true  },
-      { id: "c03", name: "Rahul Gupta",    appNo: "APP-2026-003", has10th: true,  has12th: false, hasId: false, hasPhoto: false },
-      { id: "c04", name: "Sneha Patel",    appNo: "APP-2026-004", has10th: false, has12th: false, hasId: false, hasPhoto: false },
-      { id: "c05", name: "Vikram Nair",    appNo: "APP-2026-005", has10th: true,  has12th: true,  hasId: true,  hasPhoto: false },
-      { id: "c06", name: "Ananya Iyer",    appNo: "APP-2026-006", has10th: true,  has12th: false, hasId: true,  hasPhoto: true  },
-      { id: "c07", name: "Rohan Desai",    appNo: "APP-2026-007", has10th: true,  has12th: true,  hasId: true,  hasPhoto: true  },
-      { id: "c08", name: "Kavya Reddy",    appNo: "APP-2026-008", has10th: false, has12th: true,  hasId: true,  hasPhoto: false }
-    ];
-
-    let types = JSON.parse(localStorage.getItem(TYPES_KEY) || 'null') || DEFAULT_TYPES;
-    let subs  = JSON.parse(localStorage.getItem(SUBS_KEY)  || 'null') || DEFAULT_SUBS;
-    let cands = JSON.parse(localStorage.getItem(CANDS_KEY) || 'null') || DEFAULT_CANDS;
-    if (!localStorage.getItem(TYPES_KEY)) localStorage.setItem(TYPES_KEY, JSON.stringify(types));
-    if (!localStorage.getItem(SUBS_KEY))  localStorage.setItem(SUBS_KEY,  JSON.stringify(subs));
-    if (!localStorage.getItem(CANDS_KEY)) localStorage.setItem(CANDS_KEY, JSON.stringify(cands));
-
-    const activeTab = localStorage.getItem(TAB_KEY) || 'types';
-    const setTab = (t) => { localStorage.setItem(TAB_KEY, t); this.setState({}); };
-
-    const activeTabStyle   = 'color:var(--color-accent-700);border-bottom:2px solid var(--color-accent-700);font-weight:600;background:none;border-top:none;border-left:none;border-right:none;padding:8px 16px;cursor:pointer';
-    const inactiveTabStyle = 'color:var(--color-text);border:none;background:none;padding:8px 16px;cursor:pointer';
-
-    // ---- TAB 1: Document Types ----
-    const formVisible = this.state.docTypeFormVisible || false;
-
-    const onToggleAddDocTypeForm = () => this.setState({ docTypeFormVisible: !this.state.docTypeFormVisible });
-
-    const onAddDocType = () => {
-      const name   = (document.getElementById('doc-type-name')   || {}).value || '';
-      const maxMb  = parseInt((document.getElementById('doc-type-maxmb') || {}).value || '5', 10);
-      const req    = (document.getElementById('doc-type-required') || {}).checked || false;
-      const status = (document.getElementById('doc-type-status')  || {}).value || 'Active';
-      const fmts   = ['PDF','JPG','PNG','DOCX'].filter(f => {
-        const el = document.getElementById('fmt-' + f.toLowerCase());
-        return el && el.checked;
-      });
-      if (!name.trim()) { this.showToast('Name is required'); return; }
-      const newType = { id: Date.now(), name: name.trim(), required: req, formats: fmts.length ? fmts.join(',') : 'PDF', maxMb, status };
-      types = [...types, newType];
-      localStorage.setItem(TYPES_KEY, JSON.stringify(types));
-      this.showToast('Document type added');
-      this.setState({ docTypeFormVisible: false });
-    };
-
-    const docTypes = types.map(dt => ({
-      ...dt,
-      required: dt.required,
-      notRequired: !dt.required,
-      isActive:   dt.status === 'Active',
-      isInactive: dt.status !== 'Active',
-      toggleLabel: dt.status === 'Active' ? 'Deactivate' : 'Activate',
-      toggleIcon:  dt.status === 'Active' ? 'x-circle' : 'check-circle',
-      onToggleStatus: () => {
-        types = types.map(t => t.id === dt.id ? { ...t, status: t.status === 'Active' ? 'Inactive' : 'Active' } : t);
-        localStorage.setItem(TYPES_KEY, JSON.stringify(types));
-        this.showToast(`${dt.name} ${dt.status === 'Active' ? 'deactivated' : 'activated'}`);
-        this.setState({});
-      }
-    }));
-
-    // ---- TAB 2: Submission Log ----
-    const subTypeFilter   = this.state.docSubTypeFilter   || '';
-    const subStatusFilter = this.state.docSubStatusFilter || '';
-
-    let filteredSubs = subs;
-    if (subTypeFilter)   filteredSubs = filteredSubs.filter(s => s.docType === subTypeFilter);
-    if (subStatusFilter) filteredSubs = filteredSubs.filter(s => s.status === subStatusFilter);
-
-    const subStatusBadgeMap = { Accepted: 'success', Rejected: 'danger', Pending: 'warning' };
-
-    const docSubmissions = filteredSubs.map(sub => ({
-      ...sub,
-      isAccepted: sub.status === 'Accepted',
-      isRejected: sub.status === 'Rejected',
-      isPending:  sub.status === 'Pending',
-      canAct:     sub.status === 'Pending',
-      cannotAct:  sub.status !== 'Pending',
-      onAccept: () => {
-        subs = subs.map(s => s.id === sub.id ? { ...s, status: 'Accepted', rejectionReason: '' } : s);
-        localStorage.setItem(SUBS_KEY, JSON.stringify(subs));
-        this.showToast('Document accepted');
-        this.setState({});
-      },
-      onReject: () => {
-        const reason = window.prompt('Enter rejection reason:');
-        if (reason === null) return; // cancelled
-        subs = subs.map(s => s.id === sub.id ? { ...s, status: 'Rejected', rejectionReason: reason || 'No reason given' } : s);
-        localStorage.setItem(SUBS_KEY, JSON.stringify(subs));
-        this.showToast('Document rejected');
-        this.setState({});
-      }
-    }));
-
-    const activeTypeNames = types.filter(t => t.status === 'Active').map(t => ({ name: t.name, selected: t.name === subTypeFilter, notSelected: t.name !== subTypeFilter }));
-
-    // ---- TAB 3: Candidate Completeness ----
-    const docCandidates = cands.map(c => {
-      // required docs: 10th, 12th, ID. Photo is optional.
-      const requiredMet = c.has10th && c.has12th && c.hasId;
-      const anyRequired = c.has10th || c.has12th || c.hasId;
-      const overallCls   = requiredMet ? 'badge bg-success' : anyRequired ? 'badge bg-warning text-dark' : 'badge bg-danger';
-      const overallLabel = requiredMet ? 'Complete' : anyRequired ? 'Partial' : 'Incomplete';
-      return {
-        ...c,
-        no10th:  !c.has10th,
-        no12th:  !c.has12th,
-        noId:    !c.hasId,
-        hasPhoto: c.hasPhoto,
-        noPhoto: !c.hasPhoto,
-        overallCls,
-        overallLabel,
-        onSendReminder: () => this.showToast(`Reminder sent to ${c.name}`)
-      };
-    });
-
-    return {
-      // Tab state
-      docTabIsTypes:        activeTab === 'types',
-      docTabIsLog:          activeTab === 'log',
-      docTabIsCompleteness: activeTab === 'completeness',
-      docTabTypesStyle:        activeTab === 'types'        ? activeTabStyle : inactiveTabStyle,
-      docTabLogStyle:          activeTab === 'log'          ? activeTabStyle : inactiveTabStyle,
-      docTabCompletenessStyle: activeTab === 'completeness' ? activeTabStyle : inactiveTabStyle,
-      onDocTabTypes:        () => setTab('types'),
-      onDocTabLog:          () => setTab('log'),
-      onDocTabCompleteness: () => setTab('completeness'),
-      // Tab 1
-      docTypes,
-      docTypeFormVisible: formVisible,
-      onToggleAddDocTypeForm,
-      onAddDocType,
-      // Tab 2
-      docSubmissions,
-      docSubNoRows: docSubmissions.length === 0,
-      docSubFilteredCount: docSubmissions.length,
-      docTypeFilterOptions: activeTypeNames,
-      onDocSubTypeFilter:   (e) => this.setState({ docSubTypeFilter: e.target.value }),
-      onDocSubStatusFilter: (e) => this.setState({ docSubStatusFilter: e.target.value }),
-      // Tab 3
-      docCandidates
     };
   }
   // BUG-FORMULA-01 fix: was fully disconnected from real merit scoring — operated on 5 hardcoded
@@ -7191,14 +6844,14 @@ class Component extends DCLogic {
       kpi("SLAT Candidates (seeded)", cands.length, "users", "accent"),
       kpi("Paid (SLAT, univ. system)", staticStats.paid, "wallet", "accent"),
       kpi("Appeared (SLAT)", staticStats.appeared, "file-check", "accent"),
-      kpi("Yet to be Shortlisted", count((c) => c.shortlistStatus === "yet-to-shortlist"), "clock", "neutral"),
+      kpi("Yet to be Shortlisted", count((c) => c.shortlistStatus === "draft" || c.shortlistStatus === "doc-verified"), "clock", "neutral"),
       // Collapsed from 2 level-specific cards ("First/Second Level Approved") into one "Pending Approval"
       // + "Fully Approved" pair — a candidate's exact chain level lives on their shortlist record, and
       // different programmes can configure different chain lengths, so a truly per-level breakdown would
       // resize this card set as the active-programme selector changes. See admission-engine.js's
-      // shortlistStatus generalization (yet-to-shortlist | pending-approval | approved).
-      kpi("Pending Approval", count((c) => c.shortlistStatus === "pending-approval"), "filter", "accent"),
-      kpi("Fully Approved", count((c) => c.shortlistStatus === "approved"), "check-check", "accent"),
+      // shortlistStatus lifecycle (draft | doc-verified | shortlisted-pending | shortlist-approved).
+      kpi("Pending Approval", count((c) => c.shortlistStatus === "shortlisted-pending"), "filter", "accent"),
+      kpi("Fully Approved", count((c) => c.shortlistStatus === "shortlist-approved"), "check-check", "accent"),
       kpi("Allocated for PI", count((c) => !!c.allocation), "shuffle", "accent"),
       kpi("PI Appeared", count((c) => c.piAttendance === "present"), "video", "accent"),
       kpi("Merit Listed", count((c) => c.meritCategory === "merit"), "award", "accent-2"),
@@ -7206,9 +6859,10 @@ class Component extends DCLogic {
       kpi("Rejected", count((c) => c.meritCategory === "rejected"), "x-circle", "neutral"),
       kpi("Ineligible", count((c) => c.outcome === "ineligible"), "ban", "neutral")
     ];
+    const isShortlisted = (c) => c.shortlistStatus === "shortlisted-pending" || c.shortlistStatus === "shortlist-approved";
     const funnelDef = [
-      ["Imported", cands.length], ["Shortlisted", count((c) => c.shortlistStatus !== "yet-to-shortlist")],
-      ["Approved", count((c) => c.shortlistStatus === "approved" || !!c.allocation)], ["Allocated", count((c) => !!c.allocation)],
+      ["Imported", cands.length], ["Shortlisted", count(isShortlisted)],
+      ["Approved", count((c) => c.shortlistStatus === "shortlist-approved" || !!c.allocation)], ["Allocated", count((c) => !!c.allocation)],
       ["PI Completed", count((c) => c.piAttendance === "present")], ["Merit Processed", count((c) => !!c.meritCategory)]
     ];
     const funnel = funnelDef.map(([label, value], i) => ({ label, value, hasArrow: i < funnelDef.length - 1 }));
@@ -7216,8 +6870,8 @@ class Component extends DCLogic {
       const cc = cands.filter((c) => c.category === cat.id);
       return {
         label: cat.label, total: cc.length,
-        shortlisted: cc.filter((c) => c.shortlistStatus !== "yet-to-shortlist").length,
-        approved: cc.filter((c) => c.shortlistStatus === "approved" || !!c.allocation).length,
+        shortlisted: cc.filter(isShortlisted).length,
+        approved: cc.filter((c) => c.shortlistStatus === "shortlist-approved" || !!c.allocation).length,
         merit: cc.filter((c) => c.meritCategory === "merit").length,
         waiting: cc.filter((c) => c.meritCategory === "waiting").length,
         rejected: cc.filter((c) => c.meritCategory === "rejected").length,
@@ -7320,15 +6974,11 @@ class Component extends DCLogic {
         let req = this.findApprovalRequest(d, "assessment-params", subjectId);
         if (hasDraft && req && req.status === "approved") req = null;
         const programme = d.programmes.find((p) => p.id === pid);
-        const btn = this.approvalButtonState(req, this.engine.effectiveApprovalChain(programme));
+        const btn = this.approvalButtonState(d, req, this.engine.effectiveApprovalChain(programme));
         const draft = d.assessmentParamsDraft[pid][type] || [];
-        const paramLines = [...draft].sort((a, b) => a.seq - b.seq)
-          .map((p) => `Seq ${p.seq} — ${p.name} — Max ${p.max} — Allow zero: ${p.allowZero} — Allow decimal: ${p.allowDecimal}`)
-          .join("\n");
         return {
           apApprovalTagCls: btn.tagCls, apApprovalTagLabel: btn.tagLabel, apShowSend: hasDraft ? btn.showSend : false,
-          onApSendForApproval: () => this.onSendForApproval("assessment-params", subjectId, pid, ayid, `${programme ? programme.name : pid} — ${type} Assessment Parameters — ${draft.length} parameter(s)`, "assessment-parameter",
-            `Programme: ${programme ? programme.name : pid}\n\nParameters (${draft.length}):\n${paramLines}\n`)
+          onApSendForApproval: () => this.onSendForApproval("assessment-params", subjectId, pid, ayid, null, `${programme ? programme.name : pid} — ${type} Assessment Parameters — ${draft.length} parameter(s)`)
         };
       })()
     };
@@ -7347,7 +6997,7 @@ class Component extends DCLogic {
     const requiredDocuments = (programme && programme.requiredDocuments) || [];
     const needsVerification = (c) => requiredDocuments.some((doc) => doc.appliesToCategories.includes(c.category) && (c.verification.documents[doc.key] || {}).status !== "valid");
     const taskDefs = [
-      { label: "Shortlist Candidates", page: "shortlist", count: cands.filter((c) => c.shortlistStatus === "yet-to-shortlist").length },
+      { label: "Shortlist Candidates", page: "shortlist", count: cands.filter((c) => c.shortlistStatus === "doc-verified").length },
       { label: "Shortlist Approvals", page: "shortlist-approvals", count: d.shortlists.filter((l) => l.programmeId === pid && l.status === "pending").length },
       { label: "Verify Category Documents", page: "verification", count: cands.filter(needsVerification).length },
       { label: "PI Attendance", page: "pi-attendance", count: cands.filter((c) => c.allocation && c.piAttendance === "pending").length },
@@ -7528,15 +7178,16 @@ class Component extends DCLogic {
     const extraColumnSet = new Set();
     cands.forEach((c) => importedFieldsOf(c, shownFixed).forEach((f) => extraColumnSet.add(f.key)));
     const clExtraColumns = Array.from(extraColumnSet);
+    const { pageItems, pagination } = this.paginate(cands, "cl");
     return {
       categories: d.categories,
       clFilterCategory: this.state.clFilterCategory, onClFilterCategory: (e) => this.setState({ clFilterCategory: e.target.value }),
       clFilterStatus: this.state.clFilterStatus, onClFilterStatus: (e) => this.setState({ clFilterStatus: e.target.value }),
-      clStatusOptions: ["yet-to-shortlist", "pending-approval", "approved"],
+      clStatusOptions: ["draft", "doc-verified", "shortlisted-pending", "shortlist-approved"].map((v) => ({ value: v, label: this.statusTag(v).statusLabel })),
       clSearch: this.state.clSearch, onClSearch: (e) => this.setState({ clSearch: e.target.value }),
       clResultCount: cands.length,
-      clExtraColumns,
-      clRows: cands.map((c) => ({
+      clExtraColumns, clPagination: pagination,
+      clRows: pageItems.map((c) => ({
         id: c.id, name: c.name, category: c.category, gender: c.gender, slatScore: c.slatScore,
         ...this.statusTag(c.shortlistStatus),
         allocationLabel: c.allocation ? `${c.allocation.sessionId.split("-").pop()} / ${c.allocation.groupId}` : "\u2014",
@@ -7547,24 +7198,16 @@ class Component extends DCLogic {
     };
   }
 
-  onProfileSearch() {
-    const q = this.state.profileSearch.trim().toLowerCase();
-    const pid = this.state.data.activeProgrammeId, ayid = this.state.data.activeAcademicYearByProgramme[pid];
-    const cid = this.engine.activeCycleId(this.state.data, pid, ayid);
-    // Scoped to the active programme+year+cycle, same as every other list on this page — an
-    // Applicant ID is no longer unique on its own (the same person can exist in another cycle too),
-    // so searching without the cycle could match more than one candidate.
-    const c = this.state.data.candidates.find((x) => x.programmeId === pid && x.academicYearId === ayid && x.cycleId === cid &&
-      (x.id.toLowerCase() === q || x.name.toLowerCase() === q || x.id.toLowerCase().includes(q)));
-    this.setState({ selectedCandidateId: c ? c.id : null });
-    if (!c) this.showToast("No candidate found in the active cycle for that search.");
-  }
-  buildCandidateProfile(d) {
+  // Right-side drawer (see viewCandidate/onCloseCandidateDrawer) — replaces the old standalone
+  // Candidate Profile page. Computed unconditionally in renderVals() so it can open on top of
+  // whatever page is currently showing, not just one specific page.
+  onCloseCandidateDrawer() { this.setState({ selectedCandidateId: null }); }
+  buildCandidateDrawer(d) {
     const pid = d.activeProgrammeId, ayid = d.activeAcademicYearByProgramme[pid];
     const cid = this.engine.activeCycleId(d, pid, ayid);
-    const c = d.candidates.find((x) => x.id === this.state.selectedCandidateId && x.programmeId === pid && x.academicYearId === ayid && x.cycleId === cid);
+    const c = this.state.selectedCandidateId && d.candidates.find((x) => x.id === this.state.selectedCandidateId && x.programmeId === pid && x.academicYearId === ayid && x.cycleId === cid);
     const out = {
-      profileSearch: this.state.profileSearch, onProfileSearchChange: (e) => this.setState({ profileSearch: e.target.value }), onProfileSearch: () => this.onProfileSearch(),
+      cdDrawerOpen: !!this.state.selectedCandidateId, onCloseCandidateDrawer: () => this.onCloseCandidateDrawer(),
       profileCandidate: null, profileNotFound: !!this.state.selectedCandidateId && !c
     };
     if (!c) return out;
@@ -7596,11 +7239,12 @@ class Component extends DCLogic {
       zoomRoom: group ? group.zoomRoom.link : "\u2014", reportingTime: session ? session.reportingTime : "\u2014",
       regTagCls: reg.tagCls, regTagLabel: reg.statusLabel, piTagCls: pi.tagCls, piTagLabel: pi.statusLabel,
       piScore: c.piTotal != null ? `${c.piTotal} / ${piMaxTotal}` : "\u2014",
-      categoryVerif: (() => {
-        const docs = ((progForC && progForC.requiredDocuments) || []).filter((doc) => doc.appliesToCategories.includes(c.category));
-        if (!docs.length) return "\u2014";
-        return docs.map((doc) => `${doc.label}: ${(c.verification.documents[doc.key] || {}).status || "pending"}`).join(" \u00b7 ");
-      })(),
+      docsUploaded: ((progForC && progForC.requiredDocuments) || []).filter((doc) => doc.appliesToCategories.includes(c.category)).map((doc) => {
+        const entry = c.verification.documents[doc.key] || {};
+        const meta = this.cvDocStatusMeta(entry.status);
+        return { label: doc.label, statusLabel: meta.label, statusCls: meta.cls, hasDoc: !!entry.dataUrl, dataUrl: entry.dataUrl };
+      }),
+      noDocsUploaded: !((progForC && progForC.requiredDocuments) || []).some((doc) => doc.appliesToCategories.includes(c.category)),
       apvScoreValue: this.state.apvDraftId === c.id ? this.state.apvDraft : (c.apvScore != null ? c.apvScore : ""),
       piApvScore: c.finalScore ? `${c.finalScore.piApv} / ${piMaxTotal + 10}` : (verificationPending ? "Pending category verification" : "\u2014"),
       finalScore: c.finalScore ? `${c.finalScore.final} / ${piMaxTotal + 10}` : (verificationPending ? "Pending category verification" : "\u2014"), rank: c.rank || "\u2014",
@@ -7616,7 +7260,6 @@ class Component extends DCLogic {
     };
     return out;
   }
-
   // Shortlist filter — same {groups:[{conditions}]} DNF shape and onAddGroup/onAddCondition/onRemove/
   // onChange wiring as buildFilterBlock/onIjFilter* for the import wizard (js/import-engine.js's
   // evaluateFilter reads both), just without the "stage" indirection since shortlisting has only one
@@ -7686,7 +7329,7 @@ class Component extends DCLogic {
     const typeOf = (field) => { const o = fieldOptions.find((f) => f.value === field); return o ? o.type : "string"; };
     const rankField = this.state.slRankField;
     const rank = (c) => (rankField && c[rankField] != null ? c[rankField] : -Infinity);
-    const pool = scoped.filter((c) => c.shortlistStatus === "yet-to-shortlist" && this.importEngine.evaluateFilter(c, this.state.slFilter, typeOf));
+    const pool = scoped.filter((c) => c.shortlistStatus === "doc-verified" && this.importEngine.evaluateFilter(c, this.state.slFilter, typeOf));
     if (rankField) pool.sort((a, b) => rank(b) - rank(a));
     const mode = this.state.slMode;
     const value = Number(this.state.slValue);
@@ -7739,10 +7382,12 @@ class Component extends DCLogic {
     const cid = this.engine.activeCycleId(d, pid, ayid);
     const chain = this.engine.effectiveApprovalChain(d.programmes.find((p) => p.id === pid));
     const lists = d.shortlists.filter((l) => l.programmeId === pid && l.academicYearId === ayid && l.cycleId === cid);
+    const { pageItems: saPageItems, pagination: saPagination } = this.paginate(lists.slice().reverse(), "sa");
     return {
-      saRows: lists.slice().reverse().map((l) => {
+      saPagination,
+      saRows: saPageItems.map((l) => {
         const req = this.findApprovalRequest(d, "shortlist", l.id);
-        const btn = this.approvalButtonState(req, chain);
+        const btn = this.approvalButtonState(d, req, chain);
         const criteriaLabel = this.describeShortlistCriteria(l);
         // A rejected shortlist can never actually be re-approved (approveShortlistList refuses to touch a
         // non-"pending-*" list) \u2014 re-shortlisting makes a fresh list with its own id instead. So once the
@@ -7753,8 +7398,7 @@ class Component extends DCLogic {
           count: l.candidateIds.length, createdOn: this.engine.fmtDate(l.createdOn),
           approvalTagCls: btn.tagCls, approvalTagLabel: btn.tagLabel, showSend: btn.showSend && canResend,
           onView: () => this.viewShortlist(l.id),
-          onSendForApproval: () => this.onSendForApproval("shortlist", l.id, l.programmeId, l.academicYearId, `Shortlist ${l.id} \u2014 ${criteriaLabel}, ${l.candidateIds.length} candidate(s)`, "shortlist-approvals",
-            `Criteria: ${criteriaLabel}\n\n${this.formatCandidateListForMail(d, l.candidateIds, l.programmeId, l.academicYearId, l.rankField || "Rank", (c) => (l.rankField ? c[l.rankField] : "\u2014"))}`, l.cycleId)
+          onSendForApproval: () => this.onSendForApproval("shortlist", l.id, l.programmeId, l.academicYearId, l.cycleId, `Shortlist ${l.id} \u2014 ${criteriaLabel}, ${l.candidateIds.length} candidate(s)`)
         };
       })
     };
@@ -7765,7 +7409,7 @@ class Component extends DCLogic {
     const meta = this.shortlistStatusMeta(l.status);
     const req = this.findApprovalRequest(d, "shortlist", l.id);
     const chain = this.engine.effectiveApprovalChain(d.programmes.find((p) => p.id === l.programmeId));
-    const btn = this.approvalButtonState(req, chain);
+    const btn = this.approvalButtonState(d, req, chain);
     const criteriaLabel = this.describeShortlistCriteria(l);
     const sdCandidateRows = l.candidateIds.map((id) => {
       const c = d.candidates.find((x) => x.id === id && x.programmeId === l.programmeId && x.academicYearId === l.academicYearId && x.cycleId === l.cycleId);
@@ -7777,14 +7421,13 @@ class Component extends DCLogic {
       sdCreatedOn: this.engine.fmtDate(l.createdOn), sdCount: l.candidateIds.length,
       sdTagCls: meta.cls, sdStatusLabel: meta.label,
       sdApprovalLevels: chain.map((lvl, i) => ({
-        name: `Level ${i + 1} Approval (${lvl.name})`,
+        name: this.approvalLevelLabel(d, lvl),
         // decidedAt is only present on approvals recorded after timestamp capture was added; older/seed
         // records fall back to the date-only value rather than fabricating a time (see approveShortlistList).
         statusLabel: l.approvals[i] ? `${l.approvals[i].status} \u00b7 ${l.approvals[i].decidedAt ? this.engine.fmtDateTime(l.approvals[i].decidedAt) : l.approvals[i].date}` : (i === l.currentLevelIndex && l.status === "pending" ? "Pending" : "\u2014")
       })),
       sdShowSend: btn.showSend && l.status !== "rejected", sdApprovalTagLabel: btn.tagLabel,
-      sdOnSendForApproval: () => this.onSendForApproval("shortlist", l.id, l.programmeId, l.academicYearId, `Shortlist ${l.id} \u2014 ${criteriaLabel}, ${l.candidateIds.length} candidate(s)`, "shortlist-detail",
-        `Criteria: ${criteriaLabel}\n\n${this.formatCandidateListForMail(d, l.candidateIds, l.programmeId, l.academicYearId, l.rankField || "Rank", (c) => (l.rankField ? c[l.rankField] : "\u2014"))}`, l.cycleId),
+      sdOnSendForApproval: () => this.onSendForApproval("shortlist", l.id, l.programmeId, l.academicYearId, l.cycleId, `Shortlist ${l.id} \u2014 ${criteriaLabel}, ${l.candidateIds.length} candidate(s)`),
       sdShowRevert: l.status === "rejected" && !l.reverted,
       sdOnRevertShortlist: () => this.onRevertShortlist(l.id),
       sdRevertedLabel: l.reverted ? "Shortlist reverted \u2014 candidates set to Draft." : "",
@@ -8226,10 +7869,10 @@ class Component extends DCLogic {
     const pid = d.activeProgrammeId;
     const ayid = d.activeAcademicYearByProgramme[pid];
     const cid = this.engine.activeCycleId(d, pid, ayid);
-    let eligible = d.candidates.filter((c) => c.programmeId === pid && c.academicYearId === ayid && c.cycleId === cid && c.shortlistStatus === "approved" && !c.allocation);
+    let eligible = d.candidates.filter((c) => c.programmeId === pid && c.academicYearId === ayid && c.cycleId === cid && c.shortlistStatus === "shortlist-approved" && !c.allocation);
     if (this.state.caFilterCategory !== "ALL") eligible = eligible.filter((c) => c.category === this.state.caFilterCategory);
     const eligibleIds = eligible.map((c) => c.id);
-    const relevant = d.candidates.filter((c) => c.programmeId === pid && c.academicYearId === ayid && c.cycleId === cid && (c.shortlistStatus === "approved" || c.allocation));
+    const relevant = d.candidates.filter((c) => c.programmeId === pid && c.academicYearId === ayid && c.cycleId === cid && (c.shortlistStatus === "shortlist-approved" || c.allocation));
     const sessions = d.sessions.filter((s) => s.programmeId === pid && s.cycleId === cid);
     const selectedSession = sessions.find((s) => s.id === this.state.caSessionId);
     const selCount = this.state.caSelectedIds.length;
@@ -8813,19 +8456,41 @@ class Component extends DCLogic {
     return base;
   }
 
-  onCvOpenModal(candidateId, docType) { this.setState({ cvModalCandidateId: candidateId, cvModalDocType: docType, cvModalChecked: false, cvModalStatus: "" }); }
-  onCvCloseModal() { this.setState({ cvModalCandidateId: null, cvModalDocType: null, cvModalChecked: false, cvModalStatus: "" }); }
-  onCvSubmitStatus() {
-    const { cvModalCandidateId, cvModalDocType, cvModalStatus } = this.state;
-    if (!cvModalStatus) { this.showToast("Select a document status."); return; }
+  cvDocStatusMeta(status) {
+    if (status === "valid") return { label: "Valid", cls: "badge bg-success" };
+    if (status === "invalid") return { label: "Invalid", cls: "badge bg-danger" };
+    return { label: "Draft", cls: "badge bg-secondary" };
+  }
+  onCvOpenModal(candidateId) {
     const pid = this.state.data.activeProgrammeId, ayid = this.state.data.activeAcademicYearByProgramme[pid];
     const cid = this.engine.activeCycleId(this.state.data, pid, ayid);
-    this.mutate((ds) => this.engine.setVerification(ds, cvModalCandidateId, cvModalDocType, cvModalStatus, pid, ayid, cid), "Document status saved.");
-    this.onCvCloseModal();
+    const programme = this.state.data.programmes.find((p) => p.id === pid);
+    const docColumns = ((programme && programme.requiredDocuments) || []).slice().sort((a, b) => a.seq - b.seq);
+    const c = this.state.data.candidates.find((x) => x.id === candidateId && x.programmeId === pid && x.academicYearId === ayid && x.cycleId === cid);
+    const applicable = c ? docColumns.filter((doc) => doc.appliesToCategories.includes(c.category)) : [];
+    const firstDoc = applicable[0];
+    const remarks = (firstDoc && c.verification.documents[firstDoc.key] && c.verification.documents[firstDoc.key].remarks) || "";
+    this.setState({ cvModalCandidateId: candidateId, cvModalDocIndex: 0, cvModalRemarks: remarks });
+  }
+  onCvCloseModal() { this.setState({ cvModalCandidateId: null, cvModalDocIndex: 0, cvModalRemarks: "" }); }
+  onCvNextDoc(docColumns, candidate) {
+    const applicable = docColumns.filter((doc) => doc.appliesToCategories.includes(candidate.category));
+    const nextIndex = this.state.cvModalDocIndex + 1;
+    if (nextIndex >= applicable.length) return;
+    const nextDoc = applicable[nextIndex];
+    const remarks = (candidate.verification.documents[nextDoc.key] && candidate.verification.documents[nextDoc.key].remarks) || "";
+    this.setState({ cvModalDocIndex: nextIndex, cvModalRemarks: remarks });
+  }
+  onCvMark(docKey, status) {
+    const { cvModalCandidateId, cvModalRemarks } = this.state;
+    const pid = this.state.data.activeProgrammeId, ayid = this.state.data.activeAcademicYearByProgramme[pid];
+    const cid = this.engine.activeCycleId(this.state.data, pid, ayid);
+    this.mutate((ds) => this.engine.setVerification(ds, cvModalCandidateId, docKey, status, cvModalRemarks, pid, ayid, cid),
+      status === "valid" ? "Marked Valid." : "Marked Invalid.");
   }
   // Modeled on the institute's real Category Document Status screen: a filterable list of every candidate
-  // in the programme (not just PI-completed ones \u2014 category eligibility can be reviewed at any stage),
-  // each row's "View"/"DA Eligible" opening a document upload + Valid/InValid review modal.
+  // in the programme (not just PI-completed ones, since category eligibility can be reviewed at any
+  // stage), each row's single "View Documents" button opening a one-document-at-a-time review popup.
   buildVerification(d) {
     const pid = d.activeProgrammeId;
     const ayid = d.activeAcademicYearByProgramme[pid];
@@ -8842,57 +8507,41 @@ class Component extends DCLogic {
     let pool = d.candidates.filter((c) => c.programmeId === pid && c.academicYearId === ayid && c.cycleId === cid && applicableDocs(c).length > 0);
     if (search) pool = pool.filter((c) => c.id.toLowerCase().includes(search) || c.name.toLowerCase().includes(search));
     if (catFilter !== "ALL") pool = pool.filter((c) => c.category === catFilter);
-    if (statusFilter !== "ALL") pool = pool.filter((c) => applicableDocs(c).some((doc) => ((c.verification.documents[doc.key] || {}).status || "pending") === statusFilter));
+    if (statusFilter !== "ALL") pool = pool.filter((c) => applicableDocs(c).some((doc) => ((c.verification.documents[doc.key] || {}).status || "draft") === statusFilter));
 
-    const cvRows = pool.map((c, i) => ({
-      sno: i + 1, id: c.id, name: c.name, category: c.category,
-      finalAttLabel: !c.allocation ? "Not Allocated" : this.statusTag(c.piAttendance).statusLabel,
-      docs: docColumns.map((doc) => {
-        const applicable = doc.appliesToCategories.includes(c.category);
-        const tag = this.statusTag((c.verification.documents[doc.key] || {}).status || "pending");
-        return { applicable, notApplicable: !applicable, cls: tag.tagCls, label: tag.statusLabel, onView: () => this.onCvOpenModal(c.id, doc.key) };
-      })
+    const { pageItems: cvPageItems, pagination: cvPagination } = this.paginate(pool, "cv");
+    const cvRows = cvPageItems.map((c, i) => ({
+      sno: cvPagination.start + i + 1, id: c.id, name: c.name, category: c.category,
+      onViewDocs: () => this.onCvOpenModal(c.id)
     }));
 
     const mc = this.state.cvModalCandidateId ? d.candidates.find((x) => x.id === this.state.cvModalCandidateId && x.programmeId === pid && x.academicYearId === ayid && x.cycleId === cid) : null;
     let cvModal = null;
     if (mc) {
-      const docType = this.state.cvModalDocType;
-      const docCfg = docColumns.find((doc) => doc.key === docType);
-      const doc = mc.verification.documents[docType] || {};
-      const docStatus = doc.status || "pending";
-      const statusBadgeCls = docStatus === "valid" ? "badge bg-success" : docStatus === "invalid" ? "badge bg-danger" : "badge bg-warning text-dark";
-      const statusBadgeLabel = docStatus === "valid" ? "Valid" : docStatus === "invalid" ? "Invalid" : "Draft";
-      // Lets the reviewer step through this candidate's other applicable documents without closing
-      // and re-opening the modal from a different table cell each time.
-      const mcDocList = applicableDocs(mc);
-      const docIdx = mcDocList.findIndex((c) => c.key === docType);
+      const applicable = applicableDocs(mc);
+      const idx = Math.min(this.state.cvModalDocIndex, Math.max(0, applicable.length - 1));
+      const docCfg = applicable[idx];
+      const doc = docCfg ? (mc.verification.documents[docCfg.key] || {}) : {};
+      const meta = this.cvDocStatusMeta(doc.status);
       cvModal = {
         candidateId: mc.id, candidateName: mc.name,
         docTypeLabel: docCfg ? docCfg.label : "Document",
-        hasDoc: !!doc.fileName, noDoc: !doc.fileName, fileName: doc.fileName, dataUrl: doc.dataUrl,
-        statusBadgeCls, statusBadgeLabel,
-        showDocNav: mcDocList.length > 1,
-        docPositionLabel: `Document ${docIdx + 1} of ${mcDocList.length}`,
-        prevDisabled: docIdx <= 0, nextDisabled: docIdx < 0 || docIdx >= mcDocList.length - 1,
-        onPrev: () => this.onCvOpenModal(mc.id, mcDocList[docIdx - 1].key),
-        onNext: () => this.onCvOpenModal(mc.id, mcDocList[docIdx + 1].key),
-        checked: this.state.cvModalChecked, onCheckToggle: () => this.setState({ cvModalChecked: !this.state.cvModalChecked }),
-        status: this.state.cvModalStatus,
-        onMarkValid: () => this.setState({ cvModalStatus: "valid" }), onMarkInvalid: () => this.setState({ cvModalStatus: "invalid" }),
-        validActiveCls: this.state.cvModalStatus === "valid" ? "is-active" : "", invalidActiveCls: this.state.cvModalStatus === "invalid" ? "is-active" : "",
-        showSubmit: this.state.cvModalChecked, onSubmit: () => this.onCvSubmitStatus(),
+        docProgressLabel: applicable.length ? `Document ${idx + 1} of ${applicable.length}` : "",
+        hasDoc: !!docCfg && !!doc.dataUrl, noDoc: !docCfg || !doc.dataUrl, dataUrl: doc.dataUrl,
+        statusLabel: meta.label, statusCls: meta.cls,
+        remarks: this.state.cvModalRemarks, onRemarksChange: (e) => this.setState({ cvModalRemarks: e.target.value }),
+        onMarkValid: () => this.onCvMark(docCfg.key, "valid"), onMarkInvalid: () => this.onCvMark(docCfg.key, "invalid"),
+        canNext: idx < applicable.length - 1, onNext: () => this.onCvNextDoc(docColumns, mc),
         onClose: () => this.onCvCloseModal()
       };
     }
 
     return {
-      cvDocColumns: docColumns.map((doc) => ({ key: doc.key, label: doc.label })),
       cvCategoryOptions: d.categories.filter((cat) => cat.id !== "OPEN"),
       cvSearch: this.state.cvSearch, onCvSearch: (e) => this.setState({ cvSearch: e.target.value }),
       cvCategoryFilter: catFilter, onCvCategoryFilter: (e) => this.setState({ cvCategoryFilter: e.target.value }),
       cvInstituteStatusFilter: statusFilter, onCvInstituteStatusFilter: (e) => this.setState({ cvInstituteStatusFilter: e.target.value }),
-      cvRows, cvResultCount: cvRows.length, cvNoResults: cvRows.length === 0,
+      cvRows, cvResultCount: pool.length, cvNoResults: pool.length === 0, cvPagination,
       cvModal, cvModalOpen: !!cvModal
     };
   }
@@ -8958,8 +8607,13 @@ class Component extends DCLogic {
       mpWaitingRange: waitRows.length ? `${waitRows[waitRows.length - 1].finalScore.final} \u2013 ${waitRows[0].finalScore.final}` : "\u2014",
       mpRejectedRange: rejRows.length ? `${rejRows[rejRows.length - 1].finalScore.final} \u2013 ${rejRows[0].finalScore.final}` : "\u2014",
       mpPendingCount: pending.length,
-      mpRows: pending.map(row),
-      mpDecidedRows: decided.map(row)
+      ...(() => {
+        // Rank must reflect position in the full sorted list, so map->row happens before pagination
+        // slices the array for display — a later page must not restart ranks at 1.
+        const { pageItems: mpPageItems, pagination: mpPagination } = this.paginate(pending.map(row), "mp");
+        const { pageItems: mpDecidedPageItems, pagination: mpDecidedPagination } = this.paginate(decided.map(row), "mpDecided");
+        return { mpRows: mpPageItems, mpPagination, mpDecidedRows: mpDecidedPageItems, mpDecidedPagination };
+      })()
     };
   }
 
@@ -8970,11 +8624,13 @@ class Component extends DCLogic {
     const chain = this.engine.effectiveApprovalChain(d.programmes.find((p) => p.id === pid));
     let batches = d.meritBatches.filter((b) => b.programmeId === pid && b.academicYearId === ayid && b.cycleId === cid);
     if (this.state.maCategory !== "ALL") batches = batches.filter((b) => b.category === this.state.maCategory);
+    const { pageItems: maPageItems, pagination: maPagination } = this.paginate(batches.slice().reverse(), "ma");
     return {
       categories: d.categories, maCategory: this.state.maCategory, onMaCategory: (e) => this.setState({ maCategory: e.target.value }),
-      maRows: batches.slice().reverse().map((b) => {
+      maPagination,
+      maRows: maPageItems.map((b) => {
         const req = this.findApprovalRequest(d, "merit", b.id);
-        const btn = this.approvalButtonState(req, chain);
+        const btn = this.approvalButtonState(d, req, chain);
         // Same reasoning as shortlists: a rejected merit batch can never be re-approved (approveMeritBatch
         // refuses to touch a non-"pending-*" batch) — merit processing makes a fresh batch instead.
         const canResend = b.status !== "rejected";
@@ -8982,8 +8638,7 @@ class Component extends DCLogic {
           id: b.id, category: b.category, count: b.candidateIds.length, createdOn: this.engine.fmtDate(b.createdOn),
           approvalTagCls: btn.tagCls, approvalTagLabel: btn.tagLabel, showSend: btn.showSend && canResend,
           onView: () => this.viewMeritBatch(b.id),
-          onSendForApproval: () => this.onSendForApproval("merit", b.id, b.programmeId, b.academicYearId, `Merit List ${b.id} \u2014 ${b.category}, ${b.candidateIds.length} candidate(s)`, "merit-approval",
-            this.formatCandidateListForMail(d, b.candidateIds, b.programmeId, b.academicYearId, "Final Score", (c) => c.finalScore ? c.finalScore.final : "\u2014"), b.cycleId)
+          onSendForApproval: () => this.onSendForApproval("merit", b.id, b.programmeId, b.academicYearId, b.cycleId, `Merit List ${b.id} \u2014 ${b.category}, ${b.candidateIds.length} candidate(s)`)
         };
       })
     };
@@ -8994,18 +8649,17 @@ class Component extends DCLogic {
     const meta = this.shortlistStatusMeta(b.status);
     const req = this.findApprovalRequest(d, "merit", b.id);
     const chain = this.engine.effectiveApprovalChain(d.programmes.find((p) => p.id === b.programmeId));
-    const btn = this.approvalButtonState(req, chain);
+    const btn = this.approvalButtonState(d, req, chain);
     return {
       mbFound: true, mbNotFound: false, onBackToMeritApproval: () => this.goTo("merit-approval"),
       mbId: b.id, mbCategory: b.category, mbCreatedOn: this.engine.fmtDate(b.createdOn), mbCount: b.candidateIds.length,
       mbTagCls: meta.cls, mbStatusLabel: meta.label,
       mbApprovalLevels: chain.map((lvl, i) => ({
-        name: lvl.name,
+        name: this.approvalLevelLabel(d, lvl),
         statusLabel: b.approvals[i] ? `${b.approvals[i].status} \u00b7 ${b.approvals[i].decidedAt ? this.engine.fmtDateTime(b.approvals[i].decidedAt) : b.approvals[i].date}` : (i === b.currentLevelIndex && b.status === "pending" ? "Pending" : "\u2014")
       })),
       mbShowSend: btn.showSend && b.status !== "rejected", mbApprovalTagLabel: btn.tagLabel,
-      mbOnSendForApproval: () => this.onSendForApproval("merit", b.id, b.programmeId, b.academicYearId, `Merit List ${b.id} \u2014 ${b.category}, ${b.candidateIds.length} candidate(s)`, "merit-batch-detail",
-        this.formatCandidateListForMail(d, b.candidateIds, b.programmeId, b.academicYearId, "Final Score", (c) => c.finalScore ? c.finalScore.final : "\u2014"), b.cycleId),
+      mbOnSendForApproval: () => this.onSendForApproval("merit", b.id, b.programmeId, b.academicYearId, b.cycleId, `Merit List ${b.id} \u2014 ${b.category}, ${b.candidateIds.length} candidate(s)`),
       mbCandidateRows: b.candidateIds.map((id) => {
         const c = d.candidates.find((x) => x.id === id && x.programmeId === b.programmeId && x.academicYearId === b.academicYearId && x.cycleId === b.cycleId);
         return c ? { id: c.id, name: c.name, category: c.category, final: c.finalScore ? c.finalScore.final : "\u2014", onView: () => this.viewCandidate(c.id) } : null;
@@ -9013,34 +8667,21 @@ class Component extends DCLogic {
     };
   }
 
-  buildMailCompose(d) {
-    const req = d.approvalRequests.find((r) => r.id === this.state.mcRequestId);
-    if (!req) return { mcFound: false };
-    const chain = this.engine.effectiveApprovalChain(d.programmes.find((p) => p.id === req.programmeId));
-    const levelName = (chain[req.levelIndex] || {}).name || `Level ${req.levelIndex + 1}`;
-    return {
-      mcFound: true, mcSummary: req.summary, mcLevelLabel: `${levelName} Approval`,
-      mcTo: this.state.mcTo, onMcToChange: (e) => this.setState({ mcTo: e.target.value }),
-      mcSubject: this.state.mcSubject, onMcSubjectChange: (e) => this.setState({ mcSubject: e.target.value }),
-      mcBody: this.state.mcBody, onMcBodyChange: (e) => this.setState({ mcBody: e.target.value }),
-      onMcSend: () => this.onMcSend(), onMcCancel: () => this.onMcCancel()
-    };
-  }
   buildSentMail(d) {
     return {
       smRows: d.sentMails.slice().reverse().map((m) => {
-        const req = d.approvalRequests.find((r) => r.id === m.approvalRequestId);
         const tagCls = m.status === "approved" || m.status === "delivered" ? "tag tag-accent" : m.status === "rejected" ? "tag tag-neutral" : "tag tag-outline";
         return {
-          id: m.id, summary: m.summary || (req ? req.summary : "—"), level: m.levelLabel,
+          id: m.id, summary: m.summary || "—",
           to: m.to, subject: m.subject, sentOn: this.engine.fmtDate(m.sentOn),
-          statusLabel: m.status.charAt(0).toUpperCase() + m.status.slice(1), tagCls,
-          showLink: m.status === "pending", onOpenLink: () => this.onOpenApprovalLink(m.token)
+          statusLabel: m.status.charAt(0).toUpperCase() + m.status.slice(1), tagCls
         };
       })
     };
   }
 
+  // Not scoped to the active programme — same choice Sent Mail makes, since an admin wants to see
+  // every outstanding approval across programmes from one place, not just the one currently selected.
   // Not scoped to the active programme — same choice Sent Mail makes, since an admin wants to see
   // every outstanding approval across programmes from one place, not just the one currently selected.
   buildPendingApprovals(d) {
@@ -9049,26 +8690,38 @@ class Component extends DCLogic {
       merit: { label: "Merit List", page: "merit-approval" },
       "assessment-params": { label: "Assessment Parameters", page: "assessment-parameter" }
     };
-    const rows = d.approvalRequests.filter((r) => r.status === "pending");
+    const auth = this.state.auth;
+    const staffId = auth && auth.role === "institute-staff" ? auth.staffId : null;
+    const rows = d.approvalRequests.filter((r) => r.status === "pending" && (!staffId || r.currentApproverStaffId === staffId));
     return {
+      paIsMine: !!staffId, paIsAll: !staffId,
       paResultCount: rows.length, paNoResults: rows.length === 0,
       paRows: rows.slice().reverse().map((r) => {
         const meta = subjectMeta[r.subjectType] || { label: r.subjectType, page: "dashboard" };
-        const mailId = r.mailIds[r.levelIndex];
-        const mail = mailId ? d.sentMails.find((m) => m.id === mailId) : null;
         const chain = this.engine.effectiveApprovalChain(d.programmes.find((p) => p.id === r.programmeId));
-        const levelName = (chain[r.levelIndex] || {}).name || `Level ${r.levelIndex + 1}`;
+        const levelName = this.approvalLevelLabel(d, chain[r.levelIndex]) || `Level ${r.levelIndex + 1}`;
+        const approver = d.staff.find((s) => s.id === r.currentApproverStaffId);
         return {
           id: r.id, type: meta.label, summary: r.summary, level: levelName,
           createdOn: this.engine.fmtDate(r.createdOn),
-          mailStatus: mail ? (mail.status === "pending" ? `Awaiting response — ${mail.to}` : mail.status) : "Not yet sent",
-          showLink: !!(mail && mail.status === "pending"), onOpenLink: mail ? () => this.onOpenApprovalLink(mail.token) : () => {},
+          approverName: approver ? approver.name : "Not yet assigned",
+          canDecide: !!(staffId && r.currentApproverStaffId === staffId),
+          remarks: this.state.paRemarks[r.id] || "",
+          onRemarksChange: (e) => this.setState({ paRemarks: { ...this.state.paRemarks, [r.id]: e.target.value } }),
+          onApprove: () => this.onDecideApproval(r.id, "approved"),
+          onReject: () => this.onDecideApproval(r.id, "rejected"),
           // Assessment Parameter's rubric is per-programme+tab now, so a plain goTo(meta.page) could land on
           // an unrelated programme/tab — deep-link to the one this request is actually for.
           onView: () => this.goTo(meta.page, r.subjectType === "assessment-params" ? { apProgrammeId: r.programmeId, apTab: r.subjectId.split(":")[1], apBannerDismissed: false } : null)
         };
       })
     };
+  }
+  onDecideApproval(requestId, decision) {
+    const staffId = this.state.auth.staffId;
+    const comments = this.state.paRemarks[requestId] || "";
+    this.mutate((ds) => this.engine.decideApproval(ds, requestId, staffId, decision, comments),
+      (r) => (r && r.error) ? r.error : (decision === "approved" ? "Approved." : "Denied."));
   }
 
   onMrDateChange(batchId, field, value) {
@@ -9135,7 +8788,13 @@ class Component extends DCLogic {
       mrWlNextDate: this.state.mrWlNextDate, onMrWlNextDate: (e) => { if (e.target.value) this.setState({ mrWlNextDate: e.target.value }); },
       onReleaseWaitingList: () => this.onReleaseWaitingList(),
 
-      mrRows: d.meritListReleases.filter((r) => r.programmeId === pid && r.cycleId === cid).map((r) => ({ id: r.id, category: r.category, source: r.source, method: r.method, count: r.count, lastFeeDate: this.engine.fmtDate(r.lastFeeDate), nextDate: this.engine.fmtDate(r.nextReleaseDate) }))
+      ...(() => {
+        const { pageItems, pagination } = this.paginate(d.meritListReleases.filter((r) => r.programmeId === pid && r.cycleId === cid), "mr");
+        return {
+          mrRows: pageItems.map((r) => ({ id: r.id, category: r.category, source: r.source, method: r.method, count: r.count, lastFeeDate: this.engine.fmtDate(r.lastFeeDate), nextDate: this.engine.fmtDate(r.nextReleaseDate) })),
+          mrPagination: pagination
+        };
+      })()
     };
   }
 
@@ -9146,9 +8805,11 @@ class Component extends DCLogic {
     let pool = d.candidates.filter((c) => c.programmeId === pid && c.academicYearId === ayid && c.cycleId === cid && c.meritCategory === "waiting");
     if (this.state.wlCategory !== "ALL") pool = pool.filter((c) => c.category === this.state.wlCategory);
     pool.sort((a, b) => (a.waitingListNumber > b.waitingListNumber ? 1 : -1));
+    const { pageItems, pagination } = this.paginate(pool, "wl");
     return {
       categories: d.categories, wlCategory: this.state.wlCategory, onWlCategory: (e) => this.setState({ wlCategory: e.target.value }),
-      wlRows: pool.map((c) => ({ wlNumber: c.waitingListNumber, id: c.id, name: c.name, category: c.category, final: c.finalScore.final, ...this.statusTag("waiting") }))
+      wlPagination: pagination,
+      wlRows: pageItems.map((c) => ({ wlNumber: c.waitingListNumber, id: c.id, name: c.name, category: c.category, final: c.finalScore.final, ...this.statusTag("waiting") }))
     };
   }
 
@@ -9287,15 +8948,18 @@ class Component extends DCLogic {
     const hasFeeConfig = !!(prog && prog.feeConfig);
     const candidates = d.candidates.filter((c) => c.programmeId === pid && c.academicYearId === ayid && c.cycleId === cid && c.meritListReleaseId);
     const candidateIds = candidates.map((c) => c.id);
+    // Pagination only limits what's displayed — "Select All"/"Print All" still act on every matching
+    // candidate, not just the current page.
+    const { pageItems, pagination } = this.paginate(candidates, "pl");
     return {
       plNoFeeConfig: !hasFeeConfig, onPlGoToFees: () => this.openProgrammeFees(pid),
       plAllSelected: candidateIds.length > 0 && candidateIds.every((id) => this.state.plSelectedIds.includes(id)),
       onPlToggleSelectAll: () => this.onPlToggleSelectAll(candidateIds),
-      plResultCount: candidates.length, plNoResults: candidates.length === 0,
-      plRows: candidates.map((c, i) => {
+      plResultCount: candidates.length, plNoResults: candidates.length === 0, plPagination: pagination,
+      plRows: pageItems.map((c, i) => {
         const rel = d.meritListReleases.find((r) => r.id === c.meritListReleaseId);
         return {
-          sno: i + 1, id: c.id, name: c.name, category: c.category, piId: c.piId || "—",
+          sno: pagination.start + i + 1, id: c.id, name: c.name, category: c.category, piId: c.piId || "—",
           feeDueDate: rel ? this.engine.fmtDate(rel.lastFeeDate) : "—",
           checked: this.state.plSelectedIds.includes(c.id), onToggle: () => this.onPlToggleSelect(c.id)
         };
@@ -9312,9 +8976,11 @@ class Component extends DCLogic {
     const cid = this.engine.activeCycleId(d, pid, ayid);
     let pool = d.candidates.filter((c) => c.programmeId === pid && c.academicYearId === ayid && c.cycleId === cid);
     if (this.state.rcCategory !== "ALL") pool = pool.filter((c) => c.category === this.state.rcCategory);
+    const { pageItems, pagination } = this.paginate(pool, "rc");
     return {
       categories: d.categories, rcCategory: this.state.rcCategory, onRcCategory: (e) => this.setState({ rcCategory: e.target.value }),
-      rcRows: pool.map((c) => ({ id: c.id, name: c.name, category: c.category, slat: c.slatScore, pi: c.piTotal != null ? c.piTotal : "\u2014", outcome: c.meritCategory ? c.meritCategory[0].toUpperCase() + c.meritCategory.slice(1) : (c.outcome === "ineligible" ? "Ineligible" : "In Progress") }))
+      rcPagination: pagination,
+      rcRows: pageItems.map((c) => ({ id: c.id, name: c.name, category: c.category, slat: c.slatScore, pi: c.piTotal != null ? c.piTotal : "\u2014", outcome: c.meritCategory ? c.meritCategory[0].toUpperCase() + c.meritCategory.slice(1) : (c.outcome === "ineligible" ? "Ineligible" : "In Progress") }))
     };
   }
   buildReportsSessions(d) {
@@ -9399,12 +9065,12 @@ class Component extends DCLogic {
     const iid = this.state.auth.instituteId;
     const progs = d.programmes.filter((p) => p.instituteId === iid);
     return {
+      npShowForm: !!this.state.npShowForm, onNpOpen: () => this.onNpOpen(), onNpCancel: () => this.onNpCancel(),
       npName: this.state.npName, onNpName: (e) => this.setState({ npName: e.target.value }),
-      npCode: this.state.npCode, onNpCode: (e) => this.setState({ npCode: e.target.value }),
       npDescription: this.state.npDescription, onNpDescription: (e) => this.setState({ npDescription: e.target.value }),
       onCreateProgramme: () => this.onCreateProgramme(),
       programmeRows: progs.map((p) => ({
-        id: p.id, name: p.name, code: p.code, description: p.description, statusLabel: p.status, tagCls: "tag tag-accent",
+        id: p.id, name: p.name, description: p.description, statusLabel: p.status, tagCls: "tag tag-accent",
         academicYears: d.academicYears.filter((y) => y.programmeId === p.id).map((y) => y.label).join(", "),
         onSelect: () => this.goTo("academic-year", null, () => this.mutate((ds) => { ds.activeProgrammeId = p.id; })),
         onFees: () => this.openProgrammeFees(p.id),
@@ -9506,17 +9172,17 @@ class Component extends DCLogic {
 
 
   openApprovalChain(programmeId) {
-    this.goTo("programme-approval-chain", { acProgrammeId: programmeId, acEditId: null, acName: "", acSeq: "", acApproverEmail: "" });
+    this.goTo("programme-approval-chain", { acProgrammeId: programmeId, acEditId: null, acRoleId: "", acSeq: "" });
   }
-  resetAcForm() { this.setState({ acEditId: null, acName: "", acSeq: "", acApproverEmail: "" }); }
-  onAcEdit(row) { this.setState({ acEditId: row.id, acName: row.name, acSeq: String(row.seq), acApproverEmail: row.approverEmail || "" }); }
+  resetAcForm() { this.setState({ acEditId: null, acRoleId: "", acSeq: "" }); }
+  onAcEdit(row) { this.setState({ acEditId: row.id, acRoleId: row.roleId || "", acSeq: String(row.seq) }); }
   onAcDelete(id) {
     const res = this.mutate((ds) => this.engine.deleteApprovalLevel(ds, this.state.acProgrammeId, id), (r) => (r && r.error) ? r.error : "Approval level removed.");
     return res;
   }
   onAcAdd() {
     const s = this.state;
-    const form = { name: s.acName, seq: s.acSeq, approverEmail: s.acApproverEmail };
+    const form = { roleId: s.acRoleId, seq: s.acSeq };
     const wasEdit = !!s.acEditId;
     const res = this.mutate((ds) => this.engine.saveApprovalLevel(ds, s.acProgrammeId, s.acEditId, form), (r) => (r && r.error) ? r.error : (wasEdit ? "Approval level updated." : "Approval level added."));
     if (res && res.ok) this.resetAcForm();
@@ -9525,14 +9191,15 @@ class Component extends DCLogic {
     const p = d.programmes.find((x) => x.id === this.state.acProgrammeId);
     if (!p) return { acFound: false, acNotFound: true, onAcBack: () => this.goTo("programmes") };
     const levels = this.engine.effectiveApprovalChain(p);
+    const instRoles = d.roles.filter((r) => r.instituteId === p.instituteId);
     return {
       acFound: true, acNotFound: false, acProgrammeName: p.name, onAcBack: () => this.goTo("programmes"),
-      acName: this.state.acName || "", onAcNameChange: (e) => this.setState({ acName: e.target.value }),
+      acRoleId: this.state.acRoleId || "", onAcRoleIdChange: (e) => this.setState({ acRoleId: e.target.value }),
+      acRoleOptions: instRoles.map((r) => ({ id: r.id, name: r.name })),
       acSeq: this.state.acSeq || "", onAcSeqChange: (e) => this.setState({ acSeq: e.target.value }),
-      acApproverEmail: this.state.acApproverEmail || "", onAcApproverEmailChange: (e) => this.setState({ acApproverEmail: e.target.value }),
       acSubmitLabel: this.state.acEditId ? "Update" : "Add", onAcAdd: () => this.onAcAdd(), onAcClear: () => this.resetAcForm(),
       acRows: levels.map((lvl, i) => ({
-        sno: i + 1, name: lvl.name, approverEmail: lvl.approverEmail || "—",
+        sno: i + 1, roleName: this.approvalLevelLabel(d, lvl) || "—",
         onEdit: () => this.onAcEdit(lvl), onDelete: () => this.onAcDelete(lvl.id)
       }))
     };

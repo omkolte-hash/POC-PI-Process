@@ -147,3 +147,61 @@ export async function gotoPageDirect(page, pageName) {
 export function fieldByLabel(page, labelText) {
   return page.locator('.field').filter({ has: page.locator('label', { hasText: labelText }) });
 }
+
+/**
+ * Adds a staff member via Settings > User Memberships and returns their issued login credentials.
+ * Assumes the current page is already logged in as the institute admin.
+ */
+export async function createStaffMember(page, name, roleLabel) {
+  await gotoNav(page, 'Settings', 'User Memberships');
+  await page.locator('button:has-text("Add User")').click();
+  await page.waitForTimeout(300);
+  const form = page.locator('.card').filter({ hasText: 'Add User' });
+  const uniqueEmail = `${name.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}@test.edu`;
+  await form.locator('input[placeholder="Full name"]').fill(name);
+  await form.locator('input[type="email"]').fill(uniqueEmail);
+  await form.locator('select').first().selectOption({ label: roleLabel });
+  await form.locator('button:has-text("Add User")').click();
+  await page.waitForTimeout(500);
+  const toastText = await page.locator('.toast-pop').innerText();
+  const match = toastText.match(/Login:\s*(\S+)\s*\/\s*(\S+)/);
+  if (!match) throw new Error(`expected issued-credentials toast, got: "${toastText}"`);
+  const [, loginId, password] = match;
+  return { name, email: loginId, password };
+}
+
+/**
+ * Drives the direct-approve "Send for Approval" flow through both chain levels (Director, then
+ * SIU) from whatever page currently shows a "Send for Approval" button: opens the popup and
+ * explicitly picks the given staff member by name (never relies on whichever option the popup
+ * defaults to — another staff member holding the same role, seeded or added by someone else, can
+ * easily be first in that list), sends it, logs in as that staff member to approve from
+ * Approvals > Pending Approvals, then logs back in as the institute admin.
+ * `reselectProgramme`, if given, runs after each admin re-login — a fresh login resets the active
+ * programme to the institute's default, so a test working against a non-default programme needs to
+ * switch back to it (see `returnToOrigin`, which needs the same reselection before it navigates).
+ */
+export async function approveTwice(page, { returnToOrigin, directorCreds, siuCreds, reselectProgramme }) {
+  const levelCreds = [directorCreds, siuCreds];
+  for (let level = 0; level < 2; level++) {
+    await returnToOrigin();
+    await page.locator('button:has-text("Send for Approval")').first().click();
+    const dialog = page.locator('.dialog', { hasText: 'Send for Approval' });
+    await expect(dialog).toBeVisible();
+    await dialog.locator('select').selectOption({ label: levelCreds[level].name });
+    await dialog.locator('button:has-text("Send")').click();
+    await page.waitForTimeout(300);
+
+    await page.locator('button:has-text("Log Out")').click();
+    await page.waitForTimeout(400);
+    await loginInstitute(page, levelCreds[level]);
+    await gotoNav(page, 'Approvals', 'Pending Approvals');
+    await page.locator('table tbody tr').first().locator('button:has-text("Approve")').click();
+    await page.waitForTimeout(400);
+
+    await page.locator('button:has-text("Log Out")').click();
+    await page.waitForTimeout(400);
+    await loginInstitute(page);
+    if (reselectProgramme) await reselectProgramme();
+  }
+}
