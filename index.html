@@ -1066,78 +1066,9 @@ a:hover{color:var(--color-accent);text-decoration:underline}
           </sc-for>
         </div></sc-if>
         <sc-if value="{{ pageIsPanelists }}"><div>
-          <div style="display:flex;justify-content:flex-end;margin-bottom:var(--space-3)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-3)">
+            <button type="button" class="btn btn-primary" onClick="{{ onOpenPanelistDialog }}">Create Panelist</button>
             <button type="button" class="btn btn-ghost" onClick="{{ onOpenPanelistApprovalChain }}">Configure Approval Levels</button>
-          </div>
-          <div class="card elev-sm" style="padding:var(--space-4);margin-bottom:var(--space-4)">
-            <div class="card-title" style="margin-bottom:var(--space-3)">Panelist Creation</div>
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-4)">
-              <div class="field" style="margin:0"><label>Salutation *</label><select class="input" value="{{ pfSalutation }}" onChange="{{ onPfSalutation }}">
-                <option value="">-----Select-----</option>
-                <option value="Mr.">Mr.</option><option value="Ms.">Ms.</option><option value="Mrs.">Mrs.</option>
-                <option value="Dr.">Dr.</option><option value="Prof.">Prof.</option>
-              </select></div>
-              <div class="field" style="margin:0"><label>Name *</label><input class="input" value="{{ pfName }}" onChange="{{ onPfName }}" /></div>
-              <div class="field" style="margin:0"><label>Email ID *</label><input class="input" type="email" value="{{ pfEmail }}" onChange="{{ onPfEmail }}" /></div>
-
-              <div class="field" style="margin:0"><label>Panelist Type *</label>
-                <div style="display:flex;gap:var(--space-4);margin-top:8px">
-                  <label class="radio"><input type="radio" name="pftype" checked="{{ pfIsInternal }}" onChange="{{ onPfInternal }}" /><span class="dot"></span>Internal</label>
-                  <label class="radio"><input type="radio" name="pftype" checked="{{ pfIsExternal }}" onChange="{{ onPfExternal }}" /><span class="dot"></span>External</label>
-                </div>
-              </div>
-              <div class="field" style="margin:0"><label>Mobile Number *</label><input class="input" value="{{ pfMobile }}" onChange="{{ onPfMobile }}" /></div>
-              <div class="field" style="margin:0"><label>LinkedIn *</label><input class="input" value="{{ pfLinkedIn }}" onChange="{{ onPfLinkedIn }}" /></div>
-
-              <div class="field" style="margin:0"><label>Panelist *</label>
-                <div style="display:flex;gap:var(--space-4);margin-top:8px">
-                  <label class="radio"><input type="radio" name="pfmode" checked="{{ pfModeIsNew }}" onChange="{{ onPfModeNew }}" /><span class="dot"></span>New</label>
-                  <label class="radio"><input type="radio" name="pfmode" checked="{{ pfModeIsExisting }}" onChange="{{ onPfModeExisting }}" /><span class="dot"></span>Existing</label>
-                </div>
-              </div>
-              <div class="field" style="margin:0"><label>Qualifications *</label><input class="input" value="{{ pfQualifications }}" onChange="{{ onPfQualifications }}" /></div>
-              <div class="field" style="margin:0"><label>Organization (Present) *</label><input class="input" value="{{ pfOrganization }}" onChange="{{ onPfOrganization }}" /></div>
-
-              <div class="field" style="margin:0"><label>Designation (Present) *</label><input class="input" value="{{ pfDesignation }}" onChange="{{ onPfDesignation }}" /></div>
-              <div class="field" style="margin:0"><label>Industry (Number of Years) *</label><input class="input" type="number" value="{{ pfIndustryYears }}" onChange="{{ onPfIndustryYears }}" /></div>
-              <div class="field" style="margin:0"><label>Academic (Number of Years) *</label><input class="input" type="number" value="{{ pfAcademicYears }}" onChange="{{ onPfAcademicYears }}" /></div>
-            </div>
-
-            <sc-if value="{{ pfModeIsExisting }}"><div class="field" style="margin:var(--space-4) 0 0;max-width:360px">
-              <label>Select Existing Panelist *</label>
-              <select class="input" value="{{ pfExistingId }}" onChange="{{ onPfExistingSelect }}">
-                <option value="">-----Select-----</option>
-                <sc-for list="{{ pfExistingOptions }}" as="ep" hint-placeholder-count="4"><option value="{{ ep.id }}">{{ ep.label }}</option></sc-for>
-              </select>
-            </div></sc-if>
-
-            <div style="margin-top:var(--space-4)">
-              <label style="font-weight:600;font-size:13px">Programme *</label>
-              <div style="margin-top:6px">
-                <sc-for list="{{ pfProgrammeOptions }}" as="po" hint-placeholder-count="3">
-                  <label style="display:flex;align-items:center;gap:6px;font-size:13px;padding:2px 0;cursor:pointer">
-                    <input type="checkbox" checked="{{ po.checked }}" onChange="{{ po.onToggle }}" />{{ po.name }}
-                  </label>
-                </sc-for>
-              </div>
-            </div>
-
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);margin-top:var(--space-4)">
-              <div class="field" style="margin:0">
-                <label>Image Upload</label>
-                <sc-if value="{{ pfHasImage }}"><div style="margin:6px 0"><img src="{{ pfImageDataUrl }}" style="max-width:120px;max-height:120px;border-radius:var(--radius-md);display:block" /></div></sc-if>
-                <input type="file" accept="image/*" onChange="{{ onPfImageChange }}" />
-                <sc-if value="{{ pfHasImage }}"><button type="button" class="btn btn-ghost" onClick="{{ onPfImageClear }}" style="margin-top:4px;display:block">Remove image</button></sc-if>
-              </div>
-              <div class="field" style="margin:0"><label>Remarks *</label><textarea class="input" rows="3" value="{{ pfRemarks }}" onChange="{{ onPfRemarks }}" placeholder="N/A"></textarea></div>
-            </div>
-
-            <p style="font-size:12px;color:var(--color-accent-700);margin:var(--space-4) 0 0">All panelists, both internal and external, for undergraduate programmes must have a minimum of 5 years of experience (industry + academic combined). If a panelist has less than 5 years of experience, please provide a justification. If the panellist has 5 years or more, indicate 'N/A'.</p>
-
-            <div style="display:flex;gap:var(--space-2);margin-top:var(--space-4)">
-              <button type="button" class="btn btn-primary" onClick="{{ onAddPanelist }}">{{ pfSubmitLabel }}</button>
-              <button type="button" class="btn btn-secondary" onClick="{{ onPfClear }}">Clear</button>
-            </div>
           </div>
           <table class="table"><thead><tr><th>Panelist ID</th><th>Name</th><th>Type</th><th style="text-align:right">Experience</th><sc-for list="{{ panelistLevelColumns }}" as="col" hint-placeholder-count="2"><th>{{ col.name }}</th></sc-for><th></th></tr></thead><tbody>
             <sc-for list="{{ panelistRows }}" as="p" hint-placeholder-count="8">
@@ -1153,6 +1084,72 @@ a:hover{color:var(--color-accent);text-decoration:underline}
               </tr>
             </sc-for>
           </tbody></table>
+          <sc-if value="{{ panelistsEmpty }}"><p style="font-size:13px;opacity:0.6">No panelists yet.</p></sc-if>
+
+          <sc-if value="{{ pfDialogOpen }}"><div class="dialog-backdrop">
+            <div class="dialog" style="width:min(760px,100%);max-height:90vh;overflow-y:auto">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div class="dialog-title">{{ pfDialogTitle }}</div>
+                <button type="button" class="btn btn-icon btn-ghost" onClick="{{ onPfDialogClose }}"><i data-lucide="x" style="width:16px;height:16px"></i></button>
+              </div>
+              <div class="dialog-body">
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-4)">
+                  <div class="field" style="margin:0"><label>Salutation *</label><select class="input" value="{{ pfSalutation }}" onChange="{{ onPfSalutation }}">
+                    <option value="">-----Select-----</option>
+                    <option value="Mr.">Mr.</option><option value="Ms.">Ms.</option><option value="Mrs.">Mrs.</option>
+                    <option value="Dr.">Dr.</option><option value="Prof.">Prof.</option>
+                  </select></div>
+                  <div class="field" style="margin:0"><label>Name *</label><input class="input" value="{{ pfName }}" onChange="{{ onPfName }}" /></div>
+                  <div class="field" style="margin:0"><label>Email ID *</label><input class="input" type="email" value="{{ pfEmail }}" onChange="{{ onPfEmail }}" /></div>
+
+                  <div class="field" style="margin:0"><label>Panelist Type *</label>
+                    <div style="display:flex;gap:var(--space-4);margin-top:8px">
+                      <label class="radio"><input type="radio" name="pftype" checked="{{ pfIsInternal }}" onChange="{{ onPfInternal }}" /><span class="dot"></span>Internal</label>
+                      <label class="radio"><input type="radio" name="pftype" checked="{{ pfIsExternal }}" onChange="{{ onPfExternal }}" /><span class="dot"></span>External</label>
+                    </div>
+                  </div>
+                  <div class="field" style="margin:0"><label>Mobile Number *</label><input class="input" value="{{ pfMobile }}" onChange="{{ onPfMobile }}" /></div>
+                  <div class="field" style="margin:0"><label>LinkedIn *</label><input class="input" value="{{ pfLinkedIn }}" onChange="{{ onPfLinkedIn }}" /></div>
+
+                  <div class="field" style="margin:0"><label>Qualifications *</label><input class="input" value="{{ pfQualifications }}" onChange="{{ onPfQualifications }}" /></div>
+                  <div class="field" style="margin:0"><label>Organization (Present) *</label><input class="input" value="{{ pfOrganization }}" onChange="{{ onPfOrganization }}" /></div>
+                  <div class="field" style="margin:0"><label>Designation (Present) *</label><input class="input" value="{{ pfDesignation }}" onChange="{{ onPfDesignation }}" /></div>
+
+                  <div class="field" style="margin:0"><label>Industry (Number of Years) *</label><input class="input" type="number" value="{{ pfIndustryYears }}" onChange="{{ onPfIndustryYears }}" /></div>
+                  <div class="field" style="margin:0"><label>Academic (Number of Years) *</label><input class="input" type="number" value="{{ pfAcademicYears }}" onChange="{{ onPfAcademicYears }}" /></div>
+                </div>
+
+                <div style="margin-top:var(--space-4)">
+                  <label style="font-weight:600;font-size:13px">Programme(s)</label>
+                  <p style="font-size:12px;opacity:0.6;margin:2px 0 6px">Leave all unchecked to make this panelist available to every programme in the institute.</p>
+                  <div style="margin-top:6px">
+                    <sc-for list="{{ pfProgrammeOptions }}" as="po" hint-placeholder-count="3">
+                      <label style="display:flex;align-items:center;gap:6px;font-size:13px;padding:2px 0;cursor:pointer">
+                        <input type="checkbox" checked="{{ po.checked }}" onChange="{{ po.onToggle }}" />{{ po.name }}
+                      </label>
+                    </sc-for>
+                  </div>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);margin-top:var(--space-4)">
+                  <div class="field" style="margin:0">
+                    <label>Image Upload</label>
+                    <sc-if value="{{ pfHasImage }}"><div style="margin:6px 0"><img src="{{ pfImageDataUrl }}" style="max-width:120px;max-height:120px;border-radius:var(--radius-md);display:block" /></div></sc-if>
+                    <input type="file" accept="image/*" onChange="{{ onPfImageChange }}" />
+                    <sc-if value="{{ pfHasImage }}"><button type="button" class="btn btn-ghost" onClick="{{ onPfImageClear }}" style="margin-top:4px;display:block">Remove image</button></sc-if>
+                  </div>
+                  <div class="field" style="margin:0"><label>Remarks *</label><textarea class="input" rows="3" value="{{ pfRemarks }}" onChange="{{ onPfRemarks }}" placeholder="N/A"></textarea></div>
+                </div>
+
+                <p style="font-size:12px;color:var(--color-accent-700);margin:var(--space-4) 0 0">All panelists, both internal and external, for undergraduate programmes must have a minimum of 5 years of experience (industry + academic combined). If a panelist has less than 5 years of experience, please provide a justification. If the panellist has 5 years or more, indicate 'N/A'.</p>
+
+                <div style="display:flex;gap:var(--space-2);margin-top:var(--space-4)">
+                  <button type="button" class="btn btn-primary" onClick="{{ onAddPanelist }}">{{ pfSubmitLabel }}</button>
+                  <button type="button" class="btn btn-secondary" onClick="{{ onPfDialogClose }}">Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div></sc-if>
         </div></sc-if>
         <sc-if value="{{ pageIsPanelistDetail }}"><div>
           <button type="button" class="btn btn-ghost" style="margin-bottom:var(--space-4)" onClick="{{ onBackToPanelists }}"><i data-lucide="arrow-left" style="width:14px;height:14px"></i>Back to Panelists</button>
@@ -4596,7 +4593,7 @@ class Component extends DCLogic {
     caFilterCategory: "ALL", caSelectedIds: [], caGroupSelectedIds: [],
     aaMode: false, aaPreview: null, dragCandidateIds: [],
     pickMap: {}, paSessionId: "",
-    pfMode: "new", pfExistingId: "",
+    pfDialogOpen: false, pfEditId: null,
     pfSalutation: "", pfName: "", pfEmail: "", pfMobile: "", pfLinkedIn: "", pfType: "Internal",
     pfQualifications: "", pfOrganization: "", pfDesignation: "", pfIndustryYears: "", pfAcademicYears: "",
     pfProgrammeIds: [], pfImageDataUrl: "", pfRemarks: "N/A",
@@ -4919,7 +4916,16 @@ class Component extends DCLogic {
   viewMeritBatch(id) { this.goTo("merit-batch-detail", { selectedMeritBatchId: id }); }
   viewPanelist(id) { this.goTo("panelist-detail", { selectedPanelistId: id }); }
   editPanelist(id) {
-    this.goTo("panelists", { pfMode: "existing" }, () => this.onPfExistingSelect({ target: { value: id } }));
+    const p = this.state.data.panelists.find((x) => x.id === id);
+    if (!p) return;
+    this.goTo("panelists", {
+      pfDialogOpen: true, pfEditId: id,
+      pfSalutation: p.salutation || "", pfName: p.name || "", pfEmail: p.email || "",
+      pfMobile: p.mobile || "", pfLinkedIn: p.linkedin || "", pfType: p.type || "Internal",
+      pfQualifications: p.qualifications || "", pfOrganization: p.organization || "", pfDesignation: p.designation || "",
+      pfIndustryYears: String(p.industryYears || 0), pfAcademicYears: String(p.academicYears || 0),
+      pfProgrammeIds: [...(p.programmeIds || [])], pfImageDataUrl: p.imageDataUrl || "", pfRemarks: p.remarks || "N/A"
+    });
   }
   findApprovalRequest(d, subjectType, subjectId) {
     const matches = d.approvalRequests.filter((r) => r.subjectType === subjectType && r.subjectId === subjectId);
@@ -8719,27 +8725,15 @@ class Component extends DCLogic {
   }
   resetPanelistForm() {
     this.setState({
-      pfMode: "new", pfExistingId: "",
+      pfDialogOpen: false, pfEditId: null,
       pfSalutation: "", pfName: "", pfEmail: "", pfMobile: "", pfLinkedIn: "", pfType: "Internal",
       pfQualifications: "", pfOrganization: "", pfDesignation: "", pfIndustryYears: "", pfAcademicYears: "",
       pfProgrammeIds: [], pfImageDataUrl: "", pfRemarks: "N/A"
     });
   }
-  onPfMode(mode) {
-    if (mode === "new") this.resetPanelistForm();
-    else this.setState({ pfMode: "existing", pfExistingId: "" });
-  }
-  onPfExistingSelect(e) {
-    const id = e.target.value;
-    const p = this.state.data.panelists.find((x) => x.id === id);
-    if (!p) { this.setState({ pfExistingId: "" }); return; }
-    this.setState({
-      pfExistingId: id, pfSalutation: p.salutation || "", pfName: p.name || "", pfEmail: p.email || "",
-      pfMobile: p.mobile || "", pfLinkedIn: p.linkedin || "", pfType: p.type || "Internal",
-      pfQualifications: p.qualifications || "", pfOrganization: p.organization || "", pfDesignation: p.designation || "",
-      pfIndustryYears: String(p.industryYears || 0), pfAcademicYears: String(p.academicYears || 0),
-      pfProgrammeIds: [...(p.programmeIds || [])], pfImageDataUrl: p.imageDataUrl || "", pfRemarks: p.remarks || "N/A"
-    });
+  onOpenPanelistDialog() {
+    this.resetPanelistForm();
+    this.setState({ pfDialogOpen: true });
   }
   onPfProgrammeToggle(id) {
     const ids = this.state.pfProgrammeIds;
@@ -8758,7 +8752,6 @@ class Component extends DCLogic {
   onPfImageClear() { this.setState({ pfImageDataUrl: "" }); }
   onAddPanelist() {
     const f = this.state;
-    if (f.pfMode === "existing" && !f.pfExistingId) { this.showToast("Select an existing panelist."); return; }
     if (!f.pfSalutation) { this.showToast("Select a salutation."); return; }
     if (!f.pfName.trim()) { this.showToast("Enter a panelist name."); return; }
     if (!f.pfEmail.trim()) { this.showToast("Enter an email ID."); return; }
@@ -8769,7 +8762,6 @@ class Component extends DCLogic {
     if (!f.pfDesignation.trim()) { this.showToast("Enter present designation."); return; }
     if (f.pfIndustryYears === "" || Number(f.pfIndustryYears) < 0) { this.showToast("Enter industry years (0 or more)."); return; }
     if (f.pfAcademicYears === "" || Number(f.pfAcademicYears) < 0) { this.showToast("Enter academic years (0 or more)."); return; }
-    if (!f.pfProgrammeIds.length) { this.showToast("Select at least one programme."); return; }
     if (!f.pfRemarks.trim()) { this.showToast("Enter remarks (or 'N/A')."); return; }
     const totalExp = Number(f.pfIndustryYears) + Number(f.pfAcademicYears);
     if (totalExp < 5 && f.pfRemarks.trim().toUpperCase() === "N/A") {
@@ -8780,9 +8772,9 @@ class Component extends DCLogic {
       salutation: f.pfSalutation, name: f.pfName.trim(), email: f.pfEmail.trim(), mobile: f.pfMobile.trim(), linkedin: f.pfLinkedIn.trim(),
       type: f.pfType, qualifications: f.pfQualifications.trim(), organization: f.pfOrganization.trim(), designation: f.pfDesignation.trim(),
       industryYears: f.pfIndustryYears, academicYears: f.pfAcademicYears, programmeIds: f.pfProgrammeIds,
-      imageDataUrl: f.pfImageDataUrl, remarks: f.pfRemarks.trim()
+      instituteId: f.auth && f.auth.instituteId, imageDataUrl: f.pfImageDataUrl, remarks: f.pfRemarks.trim()
     };
-    const existingId = f.pfMode === "existing" ? f.pfExistingId : null;
+    const existingId = f.pfEditId;
     const res = this.mutate((ds) => this.engine.savePanelist(ds, form, existingId),
       (r) => r.error ? r.error : (existingId ? "Panelist updated." : "Panelist registered \u2014 pending Director approval."));
     if (res && res.ok) this.resetPanelistForm();
@@ -8792,18 +8784,17 @@ class Component extends DCLogic {
     const instId = this.state.auth && this.state.auth.instituteId;
     const instProgrammes = instId ? d.programmes.filter((p) => p.instituteId === instId) : d.programmes;
     const programmeOptions = instProgrammes.map((p) => ({ id: p.id, name: p.name, checked: s.pfProgrammeIds.includes(p.id) }));
-    // A panelist "belongs" to whichever institute(s) their assigned programmes belong to \u2014 scope every
-    // panelist list/lookup on this page the same way, so one institute can never see/edit/approve another's.
-    const instProgIds = new Set(instProgrammes.map((p) => p.id));
-    const scopedPanelists = d.panelists.filter((p) => (p.programmeIds || []).some((progId) => instProgIds.has(progId)));
+    // Panelists are institute-global by default: scope the list by instituteId (falling back to a
+    // programme-derived institute for older records \u2014 see engine.panelistInstituteId), not by
+    // programmeIds overlap, so a panelist with no programmes selected still shows up here.
+    const scopedPanelists = instId ? d.panelists.filter((p) => this.engine.panelistInstituteId(d, p) === instId) : d.panelists;
     const chain = this.engine.effectivePanelistApprovalChain(d);
     return {
       onOpenPanelistApprovalChain: () => this.openPanelistApprovalChain(),
       panelistLevelColumns: chain.map((lvl) => ({ name: lvl.name })),
-      pfModeIsNew: s.pfMode === "new", pfModeIsExisting: s.pfMode === "existing",
-      onPfModeNew: () => this.onPfMode("new"), onPfModeExisting: () => this.onPfMode("existing"),
-      pfExistingId: s.pfExistingId, onPfExistingSelect: (e) => this.onPfExistingSelect(e),
-      pfExistingOptions: scopedPanelists.map((p) => ({ id: p.id, label: `${p.name} \u2014 ${p.id}` })),
+      onOpenPanelistDialog: () => this.onOpenPanelistDialog(),
+      pfDialogOpen: s.pfDialogOpen, onPfDialogClose: () => this.resetPanelistForm(),
+      pfDialogTitle: s.pfEditId ? "Edit Panelist" : "Create Panelist",
       pfSalutation: s.pfSalutation, onPfSalutation: (e) => this.setState({ pfSalutation: e.target.value }),
       pfName: s.pfName, onPfName: (e) => this.setState({ pfName: e.target.value }),
       pfEmail: s.pfEmail, onPfEmail: (e) => this.setState({ pfEmail: e.target.value }),
@@ -8820,7 +8811,8 @@ class Component extends DCLogic {
       pfImageDataUrl: s.pfImageDataUrl, pfHasImage: !!s.pfImageDataUrl,
       onPfImageChange: (e) => this.onPfImageChange(e), onPfImageClear: () => this.onPfImageClear(),
       pfRemarks: s.pfRemarks, onPfRemarks: (e) => this.setState({ pfRemarks: e.target.value }),
-      pfSubmitLabel: s.pfMode === "existing" ? "Update" : "Add", onAddPanelist: () => this.onAddPanelist(), onPfClear: () => this.resetPanelistForm(),
+      pfSubmitLabel: s.pfEditId ? "Update" : "Add", onAddPanelist: () => this.onAddPanelist(),
+      panelistsEmpty: scopedPanelists.length === 0,
       panelistRows: scopedPanelists.map((p) => ({
         id: p.id, name: p.name, type: p.type, experienceYears: (p.industryYears || 0) + (p.academicYears || 0),
         levels: this.panelistApprovalLevels(chain, p),
@@ -8838,7 +8830,7 @@ class Component extends DCLogic {
       pdId: p.id, pdSalutation: p.salutation || "—", pdName: p.name, pdEmail: p.email || "—", pdMobile: p.mobile || "—", pdLinkedIn: p.linkedin || "—",
       pdType: p.type || "—", pdQualifications: p.qualifications || "—", pdOrganization: p.organization || "—", pdDesignation: p.designation || "—",
       pdIndustryYears: p.industryYears || 0, pdAcademicYears: p.academicYears || 0, pdTotalYears: (p.industryYears || 0) + (p.academicYears || 0),
-      pdProgrammeNames: programmeNames.length ? programmeNames.join(", ") : "—",
+      pdProgrammeNames: programmeNames.length ? programmeNames.join(", ") : "All programmes (institute-global)",
       pdRemarks: p.remarks || "N/A", pdHasImage: !!p.imageDataUrl, pdImageDataUrl: p.imageDataUrl || "",
       pdLevels: this.panelistApprovalLevels(chain, p),
       pdOnEdit: () => this.editPanelist(p.id),
@@ -8856,7 +8848,7 @@ class Component extends DCLogic {
     const sid = this.state.paSessionId || (sessions[0] && sessions[0].id) || "";
     const session = sessions.find((s) => s.id === sid);
     const chain = this.engine.effectivePanelistApprovalChain(d);
-    const approved = d.panelists.filter((p) => p.approval && p.approval.length === chain.length && p.approval.every((a) => a === "approved") && (p.programmeIds || []).includes(pid));
+    const approved = d.panelists.filter((p) => p.approval && p.approval.length === chain.length && p.approval.every((a) => a === "approved") && this.engine.panelistServesProgramme(d, p, pid));
     return {
       paSessionId: sid, onPaSession: (e) => this.setState({ paSessionId: e.target.value }),
       paSessions: sessions.map((s, i) => ({ id: s.id, label: `Session ${String(i + 1).padStart(2, "0")} \u2014 ${this.engine.fmtDate(s.date)}` })),

@@ -8,7 +8,7 @@ import {
   generateMailOtp, verifyMailOtp, createAdmissionCycle, activeCycleId, cyclesForScope,
   setActiveCycle, deleteAdmissionCycle, buildCandidateDocuments, approveShortlistList, revertShortlist,
   runMeritProcessing, approveMeritBatch, savePanelist, approvePanelist, fmtDateTime,
-  unassignPanelist
+  unassignPanelist, panelistInstituteId, panelistServesProgramme
 } from "./admission-engine.js";
 
 function makeReadyCandidate(ds, programmeId, academicYearId, overrides) {
@@ -365,4 +365,66 @@ test("unassignPanelist errors when the panelist isn't assigned to the group", ()
 
   const res = unassignPanelist(ds, "S1", "G1", "PAN1");
   assert.ok(res.error);
+});
+
+function makePanelistForm(overrides) {
+  return {
+    salutation: "Dr.", name: "Test Panelist", email: "tp@test.local", mobile: "9800000000", linkedin: "",
+    type: "Internal", qualifications: "PhD", organization: "Org", designation: "Professor",
+    industryYears: 3, academicYears: 3, programmeIds: [], imageDataUrl: null, remarks: "N/A",
+    ...overrides
+  };
+}
+
+// FB-PANELISTS-01: panelist creation no longer offers a New/Existing choice or a required programme
+// pick — a panelist is institute-global by default, so an empty programmeIds selection must be valid.
+test("savePanelist records instituteId and allows an empty programmeIds (institute-global panelist)", () => {
+  const ds = generateDataset();
+  const inst = createInstitute(ds, { name: "Test Institute", code: "TI" });
+
+  const res = savePanelist(ds, makePanelistForm({ instituteId: inst.id }));
+  assert.ok(res.ok);
+  const p = ds.panelists.find((x) => x.id === res.id);
+  assert.equal(p.instituteId, inst.id);
+  assert.deepEqual(p.programmeIds, []);
+});
+
+test("savePanelist on an existing panelist replaces programmeIds outright rather than merging", () => {
+  const ds = generateDataset();
+  const inst = createInstitute(ds, { name: "Test Institute", code: "TI" });
+  const prog1 = createProgramme(ds, { instituteId: inst.id, name: "Programme 1", code: "P1" });
+  const prog2 = createProgramme(ds, { instituteId: inst.id, name: "Programme 2", code: "P2" });
+
+  const created = savePanelist(ds, makePanelistForm({ instituteId: inst.id, programmeIds: [prog1.id] }));
+  savePanelist(ds, makePanelistForm({ programmeIds: [prog2.id] }), created.id);
+  const p = ds.panelists.find((x) => x.id === created.id);
+  assert.deepEqual(p.programmeIds, [prog2.id], "edit replaces the selection, it doesn't union with the old one");
+});
+
+// A panelist with no programmes selected is available to every programme of their own institute,
+// but not to another institute's programme.
+test("panelistServesProgramme treats a global (no-programmeIds) panelist as available institute-wide only", () => {
+  const ds = generateDataset();
+  const instA = createInstitute(ds, { name: "Institute A", code: "IA" });
+  const instB = createInstitute(ds, { name: "Institute B", code: "IB" });
+  const progA = createProgramme(ds, { instituteId: instA.id, name: "Programme A", code: "PA" });
+  const progB = createProgramme(ds, { instituteId: instB.id, name: "Programme B", code: "PB" });
+
+  const res = savePanelist(ds, makePanelistForm({ instituteId: instA.id, programmeIds: [] }));
+  const p = ds.panelists.find((x) => x.id === res.id);
+
+  assert.ok(panelistServesProgramme(ds, p, progA.id), "global panelist covers every programme in their own institute");
+  assert.ok(!panelistServesProgramme(ds, p, progB.id), "global panelist does not leak into another institute's programme");
+});
+
+// Sample-data panelists predate the instituteId field and only ever carried programmeIds — their
+// institute must still be derivable without a data migration.
+test("panelistInstituteId falls back to a linked programme's institute when instituteId is absent", () => {
+  const ds = generateDataset();
+  const inst = createInstitute(ds, { name: "Test Institute", code: "TI" });
+  const prog = createProgramme(ds, { instituteId: inst.id, name: "Test Programme", code: "TP" });
+  ds.panelists.push({ id: "P-legacy", name: "Legacy Panelist", programmeIds: [prog.id] });
+
+  const p = ds.panelists.find((x) => x.id === "P-legacy");
+  assert.equal(panelistInstituteId(ds, p), inst.id);
 });
