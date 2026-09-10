@@ -622,7 +622,7 @@ export function createSession(ds, form, groupInputs) {
   if (bad) return { error: "Every group needs a name and a capacity greater than 0." };
   const totalGroupCapacity = groupInputs.reduce((sum, g) => sum + Number(g.capacity), 0);
   if (totalGroupCapacity > form.capacity) {
-    return { error: `Group capacities total ${totalGroupCapacity}, which exceeds the session capacity of ${form.capacity}.` };
+    return { error: `Group capacities total ${totalGroupCapacity}, which exceeds the total session capacity of ${form.capacity}.` };
   }
   const seq = String(ds.sessions.filter((s) => s.programmeId === form.programmeId).length + 1).padStart(2, "0");
   const groups = groupInputs.map((g, i) => {

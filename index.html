@@ -870,7 +870,7 @@ a:hover{color:var(--color-accent);text-decoration:underline}
                 <p style="font-size:11px;opacity:0.6;margin:4px 0 0">Specify minutes in numbers &mdash; e.g. 30, which will be calculated from "Session From" time (Session From 9:00 AM &rarr; Reporting Time 8:30 AM).</p>
               </div>
               <div class="field" style="margin:0"><label>No. of Groups *</label><input class="input" type="number" value="{{ sfGroups }}" onChange="{{ onSfGroups }}" /></div>
-              <div class="field" style="margin:0"><label>Session Capacity *</label><input class="input" type="number" value="{{ sfCapacity }}" onChange="{{ onSfCapacity }}" /></div>
+              <div class="field" style="margin:0"><label>Total Session Capacity *</label><input class="input" type="number" value="{{ sfCapacity }}" onChange="{{ onSfCapacity }}" /></div>
             </div>
             <button type="button" class="btn btn-primary" style="margin-top:var(--space-4)" onClick="{{ onSfSubmit }}">Submit</button>
           </div></sc-if>
@@ -890,7 +890,7 @@ a:hover{color:var(--color-accent);text-decoration:underline}
             </tbody></table>
             <p style="{{ sfGroupCapacityStyle }}">
               Total group capacity: {{ sfGroupCapacityTotal }} / {{ sfCapacity }}
-              <sc-if value="{{ sfGroupCapacityExceeded }}"> &mdash; exceeds session capacity</sc-if>
+              <sc-if value="{{ sfGroupCapacityExceeded }}"> &mdash; exceeds total session capacity</sc-if>
             </p>
             <div style="display:flex;gap:var(--space-2);margin-top:var(--space-4)">
               <button type="button" class="btn btn-primary" onClick="{{ onSfSaveGroups }}">Save</button>
@@ -8247,7 +8247,7 @@ class Component extends DCLogic {
     const dur = this.engine.validateSessionDuration(startTime, endTime);
     if (!dur.valid) { this.showToast(dur.message); return; }
     const capacity = Number(f.sfCapacity), numGroups = Number(f.sfGroups);
-    if (!capacity || capacity < 1) { this.showToast("Enter a session capacity greater than 0."); return; }
+    if (!capacity || capacity < 1) { this.showToast("Enter a total session capacity greater than 0."); return; }
     if (!numGroups || numGroups < 1) { this.showToast("Enter at least 1 group."); return; }
     if (!f.sfReportingMinutes || Number(f.sfReportingMinutes) < 0) { this.showToast("Enter reporting time in minutes."); return; }
     this.setState({ sfStep: "groups", sfGroupDrafts: Array.from({ length: numGroups }, () => ({ name: "", capacity: "" })) });
