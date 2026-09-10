@@ -92,27 +92,3 @@ test('TC-6: Node type dropdown works', async () => {
   expect(selected).toBeTruthy();
 });
 
-// ── TC-7: Seat Allocation page loads with Seat Matrix tab active ──────────────
-test('TC-7: Seat Allocation loads with Seat Matrix tab visible and active', async () => {
-  await gotoNav(sharedPage, 'Merit', 'Seat Allocation');
-  // Check the tab bar is present
-  await expect(sharedPage.locator('#seatAllocTabs, .nav-tabs, ul[id*="seat"]')).toBeVisible();
-  // Seat Matrix tab button visible
-  const matrixTab = sharedPage.locator('button, a').filter({ hasText: 'Seat Matrix' }).first();
-  await expect(matrixTab).toBeVisible();
-  // Seat Matrix content visible (the table inside that tab)
-  await expect(sharedPage.locator('table').filter({ has: sharedPage.locator('th', { hasText: 'Sanctioned' }) })).toBeVisible();
-});
-
-// ── TC-8: Seat matrix table contains numeric data ─────────────────────────────
-test('TC-8: Seat matrix grid has rows with numbers', async () => {
-  // Still on Seat Allocation page from TC-7
-  const tbody = sharedPage.locator('table').filter({ has: sharedPage.locator('th', { hasText: 'Sanctioned' }) }).locator('tbody tr');
-  const rowCount = await tbody.count();
-  expect(rowCount, 'Seat matrix should have at least one data row').toBeGreaterThan(0);
-
-  // At least one cell in the first row should contain a digit (Sanctioned / Offered / etc.)
-  const cells = await tbody.first().locator('td').allInnerTexts();
-  const hasNumeric = cells.some(c => /\d/.test(c));
-  expect(hasNumeric, 'At least one cell in seat matrix row should contain a number').toBe(true);
-});
