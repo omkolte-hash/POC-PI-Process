@@ -232,7 +232,7 @@ test('full admission lifecycle: programme creation through provisional letters',
 
     await fieldByLabel(page, 'Reporting Time in Minutes').locator('input').fill('30');
     await fieldByLabel(page, 'No. of Groups').locator('input').fill('1');
-    await fieldByLabel(page, 'Session Capacity').locator('input').fill('6');
+    await fieldByLabel(page, 'Total Session Capacity').locator('input').fill('6');
     await page.locator('button:has-text("Submit")').click();
 
     await expect(page.locator('text=Name the Groups')).toBeVisible();

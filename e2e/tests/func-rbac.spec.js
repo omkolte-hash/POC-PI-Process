@@ -186,7 +186,7 @@ async function setupProgrammeWithAllocatedCandidate(page, context, programmeName
   await toPopover.locator('button', { hasText: '13:00' }).click();
   await fieldByLabel(page, 'Reporting Time in Minutes').locator('input').fill('30');
   await fieldByLabel(page, 'No. of Groups').locator('input').fill('1');
-  await fieldByLabel(page, 'Session Capacity').locator('input').fill('8');
+  await fieldByLabel(page, 'Total Session Capacity').locator('input').fill('8');
   await page.locator('button:has-text("Submit")').click();
   await expect(page.locator('text=Name the Groups')).toBeVisible();
   await page.locator('label:has-text("Auto-generate group names") input[type="checkbox"]').check();
