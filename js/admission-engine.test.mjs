@@ -9,7 +9,7 @@ import {
   setActiveCycle, deleteAdmissionCycle, buildCandidateDocuments, approveShortlistList, revertShortlist,
   runMeritProcessing, approveMeritBatch, savePanelist, approvePanelist, fmtDateTime,
   unassignPanelist, panelistInstituteId, panelistServesProgramme,
-  sendGroupMeetingNotification, placeholderCandidateEmail
+  sendGroupMeetingNotification, placeholderCandidateEmail, markAttendance
 } from "./admission-engine.js";
 
 function makeReadyCandidate(ds, programmeId, academicYearId, overrides) {
@@ -137,6 +137,53 @@ test("moveCandidatesAllocation rejects a move that would exceed the target group
   const [g1, g2] = ds.sessions[0].groups;
   assert.deepEqual(g1.candidateIds, ["C12"]);
   assert.deepEqual(g2.candidateIds, ["C13", "C14"]);
+});
+
+// PI Attendance page's confirm-and-mark flow (see index.html buildAttendance) passes lock=true —
+// once locked, markAttendance must refuse further changes until a re-allocation clears the lock.
+test("markAttendance locks the candidate when marked with lock=true, and a locked candidate can't be changed again", () => {
+  const ds = generateDataset();
+  const inst = createInstitute(ds, { name: "Test Institute", code: "TI" });
+  const prog = createProgramme(ds, { instituteId: inst.id, name: "Test Programme", code: "TP" });
+  const ay = ds.activeAcademicYearByProgramme[prog.id];
+  const c = makeReadyCandidate(ds, prog.id, ay, { id: "C20" });
+
+  const res = markAttendance(ds, "C20", "pi", "absent", prog.id, ay, undefined, true);
+  assert.equal(res, undefined, "a successful mark returns no error");
+  assert.equal(c.piAttendance, "absent");
+  assert.equal(c.piAttendanceLocked, true);
+
+  const res2 = markAttendance(ds, "C20", "pi", "present", prog.id, ay, undefined);
+  assert.ok(res2 && res2.error, "a locked candidate's PI attendance must be refused");
+  assert.equal(c.piAttendance, "absent", "attendance must stay whatever it was locked at");
+});
+
+// moveCandidatesAllocation already clears piAttendance back to "pending" for a re-allocated
+// candidate (a stale score/lock belongs to the old panel) — the lock must go with it, or the new
+// panel/coordinator would never be able to mark the re-allocated candidate again.
+test("moveCandidatesAllocation clears the attendance lock so a re-allocated candidate can be marked again", () => {
+  const ds = generateDataset();
+  const inst = createInstitute(ds, { name: "Test Institute", code: "TI" });
+  const prog = createProgramme(ds, { instituteId: inst.id, name: "Test Programme", code: "TP" });
+  const ay = ds.activeAcademicYearByProgramme[prog.id];
+
+  ds.sessions.push(
+    { id: "S1", programmeId: prog.id, academicYearId: ay, date: "2026-01-01", startTime: "10:00 AM", endTime: "11:00 AM", groups: [{ id: "G1", name: "Group 1", capacity: 5, candidateIds: ["C21"], zoomRoom: { id: "ZR1", link: "", panelistIds: [] } }] },
+    { id: "S2", programmeId: prog.id, academicYearId: ay, date: "2026-01-01", startTime: "12:00 PM", endTime: "1:00 PM", groups: [{ id: "G2", name: "Group 2", capacity: 5, candidateIds: [], zoomRoom: { id: "ZR2", link: "", panelistIds: [] } }] }
+  );
+  const c = makeReadyCandidate(ds, prog.id, ay, { id: "C21" });
+  c.allocation = { sessionId: "S1", groupId: "G1" };
+  markAttendance(ds, "C21", "pi", "present", prog.id, ay, undefined, true);
+  assert.equal(c.piAttendanceLocked, true);
+
+  const res = moveCandidatesAllocation(ds, ["C21"], "S2", "G2");
+  assert.ok(res.ok);
+  assert.equal(c.piAttendance, "pending");
+  assert.equal(c.piAttendanceLocked, false, "the lock must not survive a re-allocation");
+
+  const res2 = markAttendance(ds, "C21", "pi", "present", prog.id, ay, undefined);
+  assert.equal(res2, undefined, "the re-allocated candidate can be marked again");
+  assert.equal(c.piAttendance, "present");
 });
 
 // BUG-APPROVAL-01: an admin shortening a programme's approval chain mid-flight used to desync the
