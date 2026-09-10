@@ -1530,13 +1530,17 @@ a:hover{color:var(--color-accent);text-decoration:underline}
           </div></sc-if>
         </div></sc-if>
         <sc-if value="{{ pageIsMeritReleases }}"><div>
-          <div class="card elev-sm" style="padding:var(--space-4);margin-bottom:var(--space-4)">
+          <ul class="nav nav-tabs mb-4">
+            <li class="nav-item"><button class="nav-link" onclick="{{ onMrTabRelease }}" style="{{ mrTabReleaseStyle }}">Release Merit List</button></li>
+            <li class="nav-item"><button class="nav-link" onclick="{{ onMrTabWaitlist }}" style="{{ mrTabWaitlistStyle }}">Promote from Waiting List</button></li>
+          </ul>
+          <sc-if value="{{ mrTabIsRelease }}"><div class="card elev-sm" style="padding:var(--space-4);margin-bottom:var(--space-4)">
             <div class="card-title" style="margin-bottom:var(--space-3)">Approved Merit Lists Ready to Release</div>
             <div class="field" style="margin:0 0 var(--space-3);max-width:280px"><label>Category</label><select class="input" value="{{ mrCategory }}" onChange="{{ onMrCategory }}">
               <option value="ALL">All Categories</option>
               <sc-for list="{{ categories }}" as="cat" hint-placeholder-count="5"><option value="{{ cat.id }}">{{ cat.label }}</option></sc-for>
             </select></div>
-            <p style="font-size:12px;opacity:0.55;margin-top:0">Each approved merit list releases in full &mdash; set the two dates and click Release. Waiting List candidates are promoted separately, below, once a category's merit list has gone out.</p>
+            <p style="font-size:12px;opacity:0.55;margin-top:0">Each approved merit list releases in full &mdash; set the two dates and click Release. Waiting List candidates are promoted separately, from the Promote from Waiting List tab, once a category's merit list has gone out.</p>
             <sc-if value="{{ mrNoReleasable }}"><p style="font-size:13px;opacity:0.6">No approved merit lists are waiting to be released for this filter.</p></sc-if>
             <table class="table"><thead><tr><th>Merit Batch</th><th>Category</th><th style="text-align:right">Candidates</th><th>Last Date to Pay Fees</th><th>Next Merit List Release Date</th><th></th></tr></thead><tbody>
               <sc-for list="{{ mrReleasableRows }}" as="r" hint-placeholder-count="3">
@@ -1547,8 +1551,8 @@ a:hover{color:var(--color-accent);text-decoration:underline}
                 </tr>
               </sc-for>
             </tbody></table>
-          </div>
-          <div class="card elev-sm" style="padding:var(--space-4);margin-bottom:var(--space-4)">
+          </div></sc-if>
+          <sc-if value="{{ mrTabIsWaitlist }}"><div class="card elev-sm" style="padding:var(--space-4);margin-bottom:var(--space-4)">
             <div class="card-title" style="margin-bottom:var(--space-3)">Promote from Waiting List</div>
             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-3);align-items:end">
               <div class="field" style="margin:0"><label>Category</label><select class="input" value="{{ mrWlCategory }}" onChange="{{ onMrWlCategory }}">
@@ -1560,7 +1564,7 @@ a:hover{color:var(--color-accent);text-decoration:underline}
             </div>
             <sc-if value="{{ mrWlDisabledHint }}"><p style="font-size:12px;color:var(--color-accent-700)">{{ mrWlDisabledHint }}</p></sc-if>
             <button type="button" class="btn btn-primary" style="margin-top:var(--space-3)" onClick="{{ onReleaseWaitingList }}" disabled="{{ mrWlDisabled }}">Release from Waiting List</button>
-          </div>
+          </div></sc-if>
           <table class="table"><thead><tr><th>Release</th><th>Category</th><th>Source</th><th>Method</th><th style="text-align:right">Candidates</th><th>Last Fee Date</th><th>Next Release</th></tr></thead><tbody>
             <sc-for list="{{ mrRows }}" as="r" hint-placeholder-count="4">
               <tr><td>{{ r.id }}</td><td>{{ r.category }}</td><td>{{ r.source }}</td><td>{{ r.method }}</td><td style="text-align:right">{{ r.count }}</td><td>{{ r.lastFeeDate }}</td><td>{{ r.nextDate }}</td></tr>
@@ -9499,6 +9503,9 @@ class Component extends DCLogic {
       (r) => r.error ? r.error : `Release ${r.release.id} created with ${r.release.count} candidate(s).`);
   }
   buildMeritReleases(d) {
+    const activeTabStyle = 'color:var(--color-accent-700);border-bottom:2px solid var(--color-accent-700);font-weight:600;background:none;border-top:none;border-left:none;border-right:none;padding:8px 16px;cursor:pointer';
+    const inactiveTabStyle = 'color:var(--color-text);border:none;background:none;padding:8px 16px;cursor:pointer';
+    const mrTab = this.state.mrTab || 'release';
     const pid = d.activeProgrammeId, ayid = d.activeAcademicYearByProgramme[pid], cid = this.engine.activeCycleId(d, pid, ayid), cat = this.state.mrCategory;
     let approvedBatches = d.meritBatches.filter((b) => b.programmeId === pid && b.academicYearId === ayid && b.cycleId === cid && b.status === "approved");
     if (cat !== "ALL") approvedBatches = approvedBatches.filter((b) => b.category === cat);
@@ -9511,6 +9518,12 @@ class Component extends DCLogic {
     const mrWlEnabled = d.meritListReleases.some((r) => r.programmeId === pid && r.cycleId === cid && r.category === wlCat && r.source === "Direct");
 
     return {
+      mrTabIsRelease: mrTab === 'release', mrTabIsWaitlist: mrTab === 'waitlist',
+      mrTabReleaseStyle: mrTab === 'release' ? activeTabStyle : inactiveTabStyle,
+      mrTabWaitlistStyle: mrTab === 'waitlist' ? activeTabStyle : inactiveTabStyle,
+      onMrTabRelease: () => this.setState({ mrTab: 'release' }),
+      onMrTabWaitlist: () => this.setState({ mrTab: 'waitlist' }),
+
       categories: d.categories, mrCategory: cat, onMrCategory: (e) => this.setState({ mrCategory: e.target.value }),
       mrReleasableRows: releasableRows.map(({ batch: b, pendingCount }) => ({
         id: b.id, category: b.category, pendingCount,
