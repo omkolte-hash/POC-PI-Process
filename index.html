@@ -901,22 +901,32 @@ a:hover{color:var(--color-accent);text-decoration:underline}
             <sc-for list="{{ sessionRows }}" as="s" hint-placeholder-count="5">
               <tr><td>{{ s.label }}</td><td>{{ s.date }}</td><td>{{ s.time }}</td><td style="text-align:right">{{ s.capacity }}</td><td style="text-align:right">{{ s.numGroups }}</td><td style="text-align:right">{{ s.allocated }}</td><td style="text-align:right">{{ s.available }}</td>
                 <td><button type="button" class="btn btn-ghost" onClick="{{ s.onToggle }}">{{ s.toggleLabel }}</button></td></tr>
-              <sc-if value="{{ s.expanded }}"><tr><td colspan="8" style="background:var(--color-neutral-100)">
-                <div style="display:flex;gap:var(--space-3);flex-wrap:wrap;padding:var(--space-3) 0">
-                  <sc-for list="{{ s.groups }}" as="g" hint-placeholder-count="3">
-                    <div class="card" style="padding:var(--space-3);min-width:220px">
-                      <div style="display:flex;justify-content:space-between;align-items:center"><strong>{{ g.name }}</strong><button type="button" class="btn btn-ghost" onClick="{{ g.onToggle }}">{{ g.toggleLabel }}</button></div>
-                      <div style="font-size:12px;opacity:0.65">Capacity {{ g.capacity }} &middot; Allocated {{ g.allocated }} &middot; Available {{ g.available }}</div>
-                      <sc-if value="{{ g.expanded }}"><div style="margin-top:var(--space-2);border-top:1px solid var(--color-divider);padding-top:var(--space-2)">
-                        <sc-for list="{{ g.candidates }}" as="gc" hint-placeholder-count="3"><div style="font-size:13px;padding:2px 0">{{ gc.id }} &middot; {{ gc.name }} &middot; {{ gc.category }}</div></sc-for>
-                        <sc-if value="{{ g.noCandidates }}"><div style="font-size:12px;opacity:0.5">No candidates allocated yet.</div></sc-if>
-                      </div></sc-if>
-                    </div>
-                  </sc-for>
-                </div>
-              </td></tr></sc-if>
             </sc-for>
           </tbody></table>
+          <sc-if value="{{ groupsDrawerOpen }}">
+            <div class="dialog-backdrop">
+              <div class="dialog" style="justify-self:end;align-self:stretch;max-width:420px;width:100%;border-radius:0;overflow-y:auto">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <div class="dialog-title">{{ groupsDrawerTitle }}</div>
+                  <button type="button" class="btn btn-icon btn-ghost" onClick="{{ onGroupsDrawerClose }}"><i data-lucide="x" style="width:16px;height:16px"></i></button>
+                </div>
+                <div style="display:flex;border-bottom:1px solid var(--color-divider);overflow-x:auto">
+                  <sc-for list="{{ groupsDrawerTabs }}" as="gt" hint-placeholder-count="3">
+                    <div style="{{ gt.style }}" onClick="{{ gt.onClick }}">{{ gt.label }}</div>
+                  </sc-for>
+                </div>
+                <div class="dialog-body">
+                  <div style="font-size:12px;opacity:0.65;margin-bottom:var(--space-3)">{{ groupsDrawerActiveGroupMeta }}</div>
+                  <table class="table table-sm"><thead><tr><th>Applicant ID</th><th>Name</th><th>Category</th></tr></thead><tbody>
+                    <sc-for list="{{ groupsDrawerCandidates }}" as="gc" hint-placeholder-count="5">
+                      <tr><td>{{ gc.id }}</td><td>{{ gc.name }}</td><td>{{ gc.category }}</td></tr>
+                    </sc-for>
+                  </tbody></table>
+                  <sc-if value="{{ groupsDrawerNoCandidates }}"><div style="font-size:12px;opacity:0.5">No candidates allocated yet.</div></sc-if>
+                </div>
+              </div>
+            </div>
+          </sc-if>
         </div></sc-if>
         <sc-if value="{{ pageIsCandidateAllocation }}"><div>
           <div class="card elev-sm" style="padding:var(--space-4);margin-bottom:var(--space-4)">
@@ -4548,7 +4558,7 @@ class Component extends DCLogic {
     sfFromDate: "", sfFromTime: "", sfFromPickerOpen: false, sfFromViewMonth: "",
     sfToDate: "", sfToTime: "", sfToPickerOpen: false, sfToViewMonth: "",
     sfReportingMinutes: "", sfCapacity: "", sfGroups: "", sfGroupDrafts: [], sfAutoGroupNames: false,
-    expandedSessionId: null, expandedGroupId: null,
+    groupsDrawerSessionId: null, groupsDrawerActiveGroupId: null,
     caSessionId: "", caGroupId: "",
     caFilterCategory: "ALL", caSelectedIds: [], caGroupSelectedIds: [],
     aaMode: false, aaPreview: null, dragCandidateIds: [],
@@ -8333,24 +8343,37 @@ class Component extends DCLogic {
       sfGroupCapacityTotal: groupCapacityTotal, sfGroupCapacityExceeded: groupCapacityExceeded,
       sfGroupCapacityStyle: `font-size:13px;margin:var(--space-3) 0 0;${groupCapacityExceeded ? "color:var(--color-accent-700)" : "opacity:0.65"}`,
       onSfBackToForm: () => this.onSfBackToForm(), onSfSaveGroups: () => this.onSfSaveGroups(),
-      sessionRows: sessions.map((s, i) => {
-        const allocated = s.groups.reduce((a, g) => a + g.candidateIds.length, 0);
+      sessionRows: sessions.map((sess, i) => {
+        const allocated = sess.groups.reduce((a, g) => a + g.candidateIds.length, 0);
         return {
-          id: s.id, label: `Session ${String(i + 1).padStart(2, "0")}`, date: this.engine.fmtDate(s.date), time: `${s.startTime} \u2013 ${s.endTime}`,
-          capacity: s.capacity, numGroups: s.groups.length, allocated, available: s.capacity - allocated,
-          expanded: this.state.expandedSessionId === s.id, toggleLabel: this.state.expandedSessionId === s.id ? "Hide Groups" : "View Groups",
-          onToggle: () => this.setState({ expandedSessionId: this.state.expandedSessionId === s.id ? null : s.id }),
-          groups: s.groups.map((g) => {
-            const cands = d.candidates.filter((c) => c.allocation && c.allocation.sessionId === s.id && c.allocation.groupId === g.id);
-            return {
-              id: g.id, name: g.name, capacity: g.capacity, allocated: g.candidateIds.length, available: g.capacity - g.candidateIds.length,
-              expanded: this.state.expandedGroupId === g.id, toggleLabel: this.state.expandedGroupId === g.id ? "Hide" : "View Candidates",
-              onToggle: () => this.setState({ expandedGroupId: this.state.expandedGroupId === g.id ? null : g.id }),
-              candidates: cands.map((c) => ({ id: c.id, name: c.name, category: c.category })), noCandidates: cands.length === 0
-            };
-          })
+          id: sess.id, label: `Session ${String(i + 1).padStart(2, "0")}`, date: this.engine.fmtDate(sess.date), time: `${sess.startTime} \u2013 ${sess.endTime}`,
+          capacity: sess.capacity, numGroups: sess.groups.length, allocated, available: sess.capacity - allocated,
+          toggleLabel: "View Groups",
+          onToggle: () => this.setState({ groupsDrawerSessionId: sess.id, groupsDrawerActiveGroupId: sess.groups[0] ? sess.groups[0].id : null })
         };
-      })
+      }),
+      ...this.buildGroupsDrawer(d, sessions)
+    };
+  }
+  buildGroupsDrawer(d, sessions) {
+    const activeTabStyle = 'color:var(--color-accent-700);border-bottom:2px solid var(--color-accent-700);font-weight:600;background:none;border-top:none;border-left:none;border-right:none;padding:8px 16px;cursor:pointer';
+    const inactiveTabStyle = 'color:var(--color-text);border:none;background:none;padding:8px 16px;cursor:pointer';
+    const session = sessions.find((sess) => sess.id === this.state.groupsDrawerSessionId);
+    if (!session) return { groupsDrawerOpen: false, groupsDrawerTabs: [], groupsDrawerCandidates: [], groupsDrawerNoCandidates: true };
+    const activeGroupId = this.state.groupsDrawerActiveGroupId || (session.groups[0] && session.groups[0].id);
+    const activeGroup = session.groups.find((g) => g.id === activeGroupId);
+    const cands = activeGroup ? d.candidates.filter((c) => c.allocation && c.allocation.sessionId === session.id && c.allocation.groupId === activeGroup.id) : [];
+    return {
+      groupsDrawerOpen: true,
+      groupsDrawerTitle: `Groups \u2013 Session ${this.engine.fmtDate(session.date)}`,
+      onGroupsDrawerClose: () => this.setState({ groupsDrawerSessionId: null, groupsDrawerActiveGroupId: null }),
+      groupsDrawerTabs: session.groups.map((g) => ({
+        id: g.id, label: g.name, style: g.id === activeGroupId ? activeTabStyle : inactiveTabStyle,
+        onClick: () => this.setState({ groupsDrawerActiveGroupId: g.id })
+      })),
+      groupsDrawerActiveGroupMeta: activeGroup ? `Capacity ${activeGroup.capacity} \u00b7 Allocated ${activeGroup.candidateIds.length} \u00b7 Available ${activeGroup.capacity - activeGroup.candidateIds.length}` : "",
+      groupsDrawerCandidates: cands.map((c) => ({ id: c.id, name: c.name, category: c.category })),
+      groupsDrawerNoCandidates: cands.length === 0
     };
   }
 
