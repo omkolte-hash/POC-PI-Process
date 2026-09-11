@@ -1158,14 +1158,20 @@ a:hover{color:var(--color-accent);text-decoration:underline}
           </select></div>
           <sc-for list="{{ paGroups }}" as="g" hint-placeholder-count="3">
             <div class="card elev-sm" style="padding:var(--space-4);margin-bottom:var(--space-3)">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-2)">
-                <div><strong>{{ g.name }}</strong> <span style="opacity:0.6;font-size:13px">&middot; Zoom Room: {{ g.link }}</span></div>
-                <div style="display:flex;gap:6px">
-                  <select class="input" value="{{ g.pickPanelist }}" onChange="{{ g.onPickChange }}">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:var(--space-3);flex-wrap:wrap;padding-bottom:var(--space-3);margin-bottom:var(--space-3);border-bottom:1px solid var(--color-divider)">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div style="width:32px;height:32px;border-radius:var(--radius-md);background:var(--color-accent-100);color:var(--color-accent-700);display:flex;align-items:center;justify-content:center;flex:none"><i data-lucide="users" style="width:16px;height:16px"></i></div>
+                  <div>
+                    <div style="font-weight:600">{{ g.name }}</div>
+                    <div style="font-size:12px;opacity:0.6;display:flex;align-items:center;gap:4px"><i data-lucide="video" style="width:11px;height:11px"></i>{{ g.link }}</div>
+                  </div>
+                </div>
+                <div style="display:flex">
+                  <select class="input" value="{{ g.pickPanelist }}" onChange="{{ g.onPickChange }}" style="border-top-right-radius:0;border-bottom-right-radius:0;border-right:none">
                     <option value="">Add panelist&hellip;</option>
                     <sc-for list="{{ g.availablePanelists }}" as="p" hint-placeholder-count="4"><option value="{{ p.id }}">{{ p.name }} ({{ p.type }})</option></sc-for>
                   </select>
-                  <button type="button" class="btn btn-ghost" onClick="{{ g.onAssign }}">Assign</button>
+                  <button type="button" class="btn btn-primary" style="border-top-left-radius:0;border-bottom-left-radius:0" onClick="{{ g.onAssign }}">Assign</button>
                 </div>
               </div>
               <div style="display:flex;gap:6px;flex-wrap:wrap">
