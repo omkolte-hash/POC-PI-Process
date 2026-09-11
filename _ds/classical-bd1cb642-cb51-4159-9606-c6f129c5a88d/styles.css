@@ -310,6 +310,9 @@ textarea.input { min-height: 90px; resize: vertical; }
 
 /* — header filter cluster (academic year / programme / cycle selectors) — grouped into
    one bordered pill with icons, instead of three separate boxy dropdowns. */
+.pa-chevron-wrap { transition: transform .15s ease; }
+.pa-chevron-collapsed { transform: rotate(-90deg); }
+
 .header-filters { display: inline-flex; align-items: stretch; border: 1px solid var(--color-divider); border-radius: var(--radius-md); overflow: hidden; background: var(--color-surface); }
 .header-filters .header-filter { display: flex; align-items: center; gap: 6px; padding: 0 10px; }
 .header-filters .header-filter + .header-filter { border-left: 1px solid var(--color-divider); }

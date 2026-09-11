@@ -1158,8 +1158,9 @@ a:hover{color:var(--color-accent);text-decoration:underline}
           </select></div>
           <sc-for list="{{ paGroups }}" as="g" hint-placeholder-count="3">
             <div class="card elev-sm" style="padding:var(--space-4);margin-bottom:var(--space-3)">
-              <div style="display:flex;justify-content:space-between;align-items:center;gap:var(--space-3);flex-wrap:wrap;padding-bottom:var(--space-3);margin-bottom:var(--space-3);border-bottom:1px solid var(--color-divider)">
-                <div style="display:flex;align-items:center;gap:10px">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:var(--space-3);flex-wrap:wrap">
+                <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onClick="{{ g.onToggleCollapse }}">
+                  <span class="{{ g.chevronWrapClass }}" style="display:inline-flex"><i data-lucide="chevron-down" style="width:16px;height:16px;opacity:0.5;flex:none"></i></span>
                   <div style="width:32px;height:32px;border-radius:var(--radius-md);background:var(--color-accent-100);color:var(--color-accent-700);display:flex;align-items:center;justify-content:center;flex:none"><i data-lucide="users" style="width:16px;height:16px"></i></div>
                   <div>
                     <div style="font-weight:600">{{ g.name }}</div>
@@ -1174,11 +1175,11 @@ a:hover{color:var(--color-accent);text-decoration:underline}
                   <button type="button" class="btn btn-primary" style="border-top-left-radius:0;border-bottom-left-radius:0" onClick="{{ g.onAssign }}">Assign</button>
                 </div>
               </div>
-              <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <sc-if value="{{ g.expanded }}"><div style="padding-top:var(--space-3);margin-top:var(--space-3);border-top:1px solid var(--color-divider);display:flex;gap:6px;flex-wrap:wrap">
                 <sc-for list="{{ g.panelistChips }}" as="pc" hint-placeholder-count="2">
-                  <span class="tag tag-outline" style="display:inline-flex;align-items:center;gap:4px">{{ pc.label }}<button type="button" class="btn btn-icon btn-ghost btn-sm" onClick="{{ pc.onUnassign }}" title="Unassign panelist"><i data-lucide="x" style="width:12px;height:12px"></i></button></span>
+                  <span class="tag tag-outline" style="display:inline-flex;align-items:center;gap:4px">{{ pc.label }}<button type="button" class="btn btn-icon btn-ghost btn-sm" onClick="{{ pc.onUnassign }}" title="Unassign panelist"><i data-lucide="trash-2" style="width:12px;height:12px"></i></button></span>
                 </sc-for>
-              </div>
+              </div></sc-if>
             </div>
           </sc-for>
         </div></sc-if>
@@ -4267,7 +4268,7 @@ class Component extends DCLogic {
     caSessionId: "", caGroupId: "",
     caFilterCategory: "ALL", caSelectedIds: [], caGroupSelectedIds: [],
     aaMode: false, aaPreview: null, dragCandidateIds: [],
-    pickMap: {}, paSessionId: "",
+    pickMap: {}, paSessionId: "", paCollapsed: {},
     pfDialogOpen: false, pfEditId: null,
     pfSalutation: "", pfName: "", pfEmail: "", pfMobile: "", pfLinkedIn: "", pfType: "Internal",
     pfQualifications: "", pfOrganization: "", pfDesignation: "", pfIndustryYears: "", pfAcademicYears: "",
@@ -8177,8 +8178,11 @@ class Component extends DCLogic {
       paSessions: sessions.map((s, i) => ({ id: s.id, label: `Session ${String(i + 1).padStart(2, "0")} \u2014 ${this.engine.fmtDate(s.date)}` })),
       paGroups: session ? session.groups.map((g) => {
         const assignedIds = g.zoomRoom.panelistIds;
+        const collapsed = !!this.state.paCollapsed[g.id];
         return {
-          id: g.id, name: g.name, link: g.zoomRoom.link,
+          id: g.id, name: g.name, link: g.zoomRoom.link, expanded: !collapsed,
+          chevronWrapClass: collapsed ? "pa-chevron-wrap pa-chevron-collapsed" : "pa-chevron-wrap",
+          onToggleCollapse: () => this.setState({ paCollapsed: { ...this.state.paCollapsed, [g.id]: !collapsed } }),
           panelistChips: assignedIds.map((pid2) => {
             const p = d.panelists.find((x) => x.id === pid2);
             return p && { label: p.name, onUnassign: () => this.onUnassignPanelist(session.id, g.id, pid2) };
