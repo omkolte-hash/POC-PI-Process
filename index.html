@@ -781,28 +781,36 @@ a:hover{color:var(--color-accent);text-decoration:underline}
                   <button type="button" class="btn btn-primary btn-icon" onClick="{{ onSfFromClear }}"><i data-lucide="x" style="width:14px;height:14px"></i></button>
                 </div>
                 <sc-if value="{{ sfFromPickerOpen }}"><div class="card elev-lg" style="position:absolute;top:100%;left:0;z-index:20;padding:var(--space-3);width:300px;margin-top:4px;background:var(--color-bg)">
-                  <div style="display:flex;gap:6px;margin-bottom:var(--space-2)">
-                    <select class="input" style="font-size:12px;padding:4px" value="{{ sfFromViewMonth }}" onChange="{{ onSfFromMonthChange }}">
-                      <sc-for list="{{ sfFromMonthOptions }}" as="mo" hint-placeholder-count="12"><option value="{{ mo.value }}" selected="{{ mo.selected }}">{{ mo.label }}</option></sc-for>
-                    </select>
-                    <select class="input" style="font-size:12px;padding:4px;max-width:90px" value="{{ sfFromViewMonth }}" onChange="{{ onSfFromYearChange }}">
-                      <sc-for list="{{ sfFromYearOptions }}" as="yo" hint-placeholder-count="8"><option value="{{ yo.value }}" selected="{{ yo.selected }}">{{ yo.value }}</option></sc-for>
-                    </select>
-                  </div>
-                  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;font-size:10px;opacity:0.55;text-align:center;margin-bottom:2px">
-                    <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
-                  </div>
-                  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:var(--space-3)">
-                    <sc-for list="{{ sfFromDays }}" as="c" hint-placeholder-count="35">
-                      <button type="button" class="btn btn-ghost" style="{{ c.style }}" onClick="{{ c.onClick }}" disabled="{{ c.disabled }}">{{ c.dayLabel }}</button>
-                    </sc-for>
-                  </div>
-                  <div style="font-size:11px;opacity:0.6;margin-bottom:4px">Time</div>
-                  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;max-height:160px;overflow-y:auto">
-                    <sc-for list="{{ sfFromTimeSlots }}" as="t" hint-placeholder-count="24">
-                      <button type="button" class="btn btn-secondary" style="{{ t.style }}" onClick="{{ t.onClick }}">{{ t.value }}</button>
-                    </sc-for>
-                  </div>
+                  <sc-if value="{{ sfFromShowCalendar }}"><div>
+                    <div style="display:flex;gap:6px;margin-bottom:var(--space-2)">
+                      <select class="input" style="font-size:12px;padding:4px" value="{{ sfFromViewMonth }}" onChange="{{ onSfFromMonthChange }}">
+                        <sc-for list="{{ sfFromMonthOptions }}" as="mo" hint-placeholder-count="12"><option value="{{ mo.value }}" selected="{{ mo.selected }}">{{ mo.label }}</option></sc-for>
+                      </select>
+                      <select class="input" style="font-size:12px;padding:4px;max-width:90px" value="{{ sfFromViewMonth }}" onChange="{{ onSfFromYearChange }}">
+                        <sc-for list="{{ sfFromYearOptions }}" as="yo" hint-placeholder-count="8"><option value="{{ yo.value }}" selected="{{ yo.selected }}">{{ yo.value }}</option></sc-for>
+                      </select>
+                    </div>
+                    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;font-size:10px;opacity:0.55;text-align:center;margin-bottom:2px">
+                      <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">
+                      <sc-for list="{{ sfFromDays }}" as="c" hint-placeholder-count="35">
+                        <button type="button" class="btn btn-ghost" style="{{ c.style }}" onClick="{{ c.onClick }}" disabled="{{ c.disabled }}">{{ c.dayLabel }}</button>
+                      </sc-for>
+                    </div>
+                  </div></sc-if>
+                  <sc-if value="{{ sfFromShowTime }}"><div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-2)">
+                      <div style="font-size:12px;font-weight:600">{{ sfFromSelectedDateLabel }}</div>
+                      <button type="button" class="btn btn-ghost" style="font-size:11px;padding:2px 6px" onClick="{{ onSfFromBackToCalendar }}"><i data-lucide="chevron-left" style="width:12px;height:12px"></i> Change date</button>
+                    </div>
+                    <div style="font-size:11px;opacity:0.6;margin-bottom:4px">Select a time</div>
+                    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;max-height:200px;overflow-y:auto">
+                      <sc-for list="{{ sfFromTimeSlots }}" as="t" hint-placeholder-count="24">
+                        <button type="button" class="btn btn-secondary" style="{{ t.style }}" onClick="{{ t.onClick }}">{{ t.value }}</button>
+                      </sc-for>
+                    </div>
+                  </div></sc-if>
                 </div></sc-if>
               </div>
               <div class="field" style="margin:0;position:relative">
@@ -812,28 +820,36 @@ a:hover{color:var(--color-accent);text-decoration:underline}
                   <button type="button" class="btn btn-primary btn-icon" onClick="{{ onSfToClear }}"><i data-lucide="x" style="width:14px;height:14px"></i></button>
                 </div>
                 <sc-if value="{{ sfToPickerOpen }}"><div class="card elev-lg" style="position:absolute;top:100%;left:0;z-index:20;padding:var(--space-3);width:300px;margin-top:4px;background:var(--color-bg)">
-                  <div style="display:flex;gap:6px;margin-bottom:var(--space-2)">
-                    <select class="input" style="font-size:12px;padding:4px" value="{{ sfToViewMonth }}" onChange="{{ onSfToMonthChange }}">
-                      <sc-for list="{{ sfToMonthOptions }}" as="mo" hint-placeholder-count="12"><option value="{{ mo.value }}" selected="{{ mo.selected }}">{{ mo.label }}</option></sc-for>
-                    </select>
-                    <select class="input" style="font-size:12px;padding:4px;max-width:90px" value="{{ sfToViewMonth }}" onChange="{{ onSfToYearChange }}">
-                      <sc-for list="{{ sfToYearOptions }}" as="yo" hint-placeholder-count="8"><option value="{{ yo.value }}" selected="{{ yo.selected }}">{{ yo.value }}</option></sc-for>
-                    </select>
-                  </div>
-                  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;font-size:10px;opacity:0.55;text-align:center;margin-bottom:2px">
-                    <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
-                  </div>
-                  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:var(--space-3)">
-                    <sc-for list="{{ sfToDays }}" as="c" hint-placeholder-count="35">
-                      <button type="button" class="btn btn-ghost" style="{{ c.style }}" onClick="{{ c.onClick }}" disabled="{{ c.disabled }}">{{ c.dayLabel }}</button>
-                    </sc-for>
-                  </div>
-                  <div style="font-size:11px;opacity:0.6;margin-bottom:4px">Time</div>
-                  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;max-height:160px;overflow-y:auto">
-                    <sc-for list="{{ sfToTimeSlots }}" as="t" hint-placeholder-count="24">
-                      <button type="button" class="btn btn-secondary" style="{{ t.style }}" onClick="{{ t.onClick }}">{{ t.value }}</button>
-                    </sc-for>
-                  </div>
+                  <sc-if value="{{ sfToShowCalendar }}"><div>
+                    <div style="display:flex;gap:6px;margin-bottom:var(--space-2)">
+                      <select class="input" style="font-size:12px;padding:4px" value="{{ sfToViewMonth }}" onChange="{{ onSfToMonthChange }}">
+                        <sc-for list="{{ sfToMonthOptions }}" as="mo" hint-placeholder-count="12"><option value="{{ mo.value }}" selected="{{ mo.selected }}">{{ mo.label }}</option></sc-for>
+                      </select>
+                      <select class="input" style="font-size:12px;padding:4px;max-width:90px" value="{{ sfToViewMonth }}" onChange="{{ onSfToYearChange }}">
+                        <sc-for list="{{ sfToYearOptions }}" as="yo" hint-placeholder-count="8"><option value="{{ yo.value }}" selected="{{ yo.selected }}">{{ yo.value }}</option></sc-for>
+                      </select>
+                    </div>
+                    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;font-size:10px;opacity:0.55;text-align:center;margin-bottom:2px">
+                      <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">
+                      <sc-for list="{{ sfToDays }}" as="c" hint-placeholder-count="35">
+                        <button type="button" class="btn btn-ghost" style="{{ c.style }}" onClick="{{ c.onClick }}" disabled="{{ c.disabled }}">{{ c.dayLabel }}</button>
+                      </sc-for>
+                    </div>
+                  </div></sc-if>
+                  <sc-if value="{{ sfToShowTime }}"><div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-2)">
+                      <div style="font-size:12px;font-weight:600">{{ sfToSelectedDateLabel }}</div>
+                      <button type="button" class="btn btn-ghost" style="font-size:11px;padding:2px 6px" onClick="{{ onSfToBackToCalendar }}"><i data-lucide="chevron-left" style="width:12px;height:12px"></i> Change date</button>
+                    </div>
+                    <div style="font-size:11px;opacity:0.6;margin-bottom:4px">Select a time</div>
+                    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;max-height:200px;overflow-y:auto">
+                      <sc-for list="{{ sfToTimeSlots }}" as="t" hint-placeholder-count="24">
+                        <button type="button" class="btn btn-secondary" style="{{ t.style }}" onClick="{{ t.onClick }}">{{ t.value }}</button>
+                      </sc-for>
+                    </div>
+                  </div></sc-if>
                 </div></sc-if>
               </div>
               <div class="field" style="margin:0">
@@ -4287,8 +4303,8 @@ class Component extends DCLogic {
     plSelectedIds: [],
     rcCategory: "ALL",
     sfStep: "form", sfWizardOpen: false, sfAssessmentId: "",
-    sfFromDate: "", sfFromTime: "", sfFromPickerOpen: false, sfFromViewMonth: "",
-    sfToDate: "", sfToTime: "", sfToPickerOpen: false, sfToViewMonth: "",
+    sfFromDate: "", sfFromTime: "", sfFromPickerOpen: false, sfFromViewMonth: "", sfFromDatePicked: false,
+    sfToDate: "", sfToTime: "", sfToPickerOpen: false, sfToViewMonth: "", sfToDatePicked: false,
     sfReportingMinutes: "", sfCapacity: "", sfGroups: "", sfGroupDrafts: [], sfAutoGroupNames: false,
     groupsDrawerSessionId: null, groupsDrawerActiveGroupId: null,
     gcgStep: null, gcgSelectedIds: [], gcgTargetGroupId: null, gcgTargetSessionId: null,
@@ -7747,12 +7763,12 @@ class Component extends DCLogic {
   onSfFromToggle() {
     const open = !this.state.sfFromPickerOpen;
     const base = this.state.sfFromDate || this.todayStr();
-    this.setState({ sfFromPickerOpen: open, sfToPickerOpen: false, sfFromDate: base, sfFromViewMonth: this.state.sfFromViewMonth || this.monthKey(base) });
+    this.setState({ sfFromPickerOpen: open, sfToPickerOpen: false, sfFromDate: base, sfFromViewMonth: this.state.sfFromViewMonth || this.monthKey(base), sfFromDatePicked: false });
   }
   onSfToToggle() {
     const open = !this.state.sfToPickerOpen;
     const base = this.state.sfToDate || this.state.sfFromDate || this.todayStr();
-    this.setState({ sfToPickerOpen: open, sfFromPickerOpen: false, sfToDate: base, sfToViewMonth: this.state.sfToViewMonth || this.monthKey(base) });
+    this.setState({ sfToPickerOpen: open, sfFromPickerOpen: false, sfToDate: base, sfToViewMonth: this.state.sfToViewMonth || this.monthKey(base), sfToDatePicked: false });
   }
   clampToFutureMonth(year) {
     const now = new Date();
@@ -7771,12 +7787,14 @@ class Component extends DCLogic {
     const minM = this.clampToFutureMonth(y);
     this.setState({ sfToViewMonth: `${y}-${m < minM ? minM : m}` });
   }
-  onSfFromPickDay(dateStr) { this.setState({ sfFromDate: dateStr }); }
-  onSfToPickDay(dateStr) { this.setState({ sfToDate: dateStr }); }
+  onSfFromPickDay(dateStr) { this.setState({ sfFromDate: dateStr, sfFromDatePicked: true }); }
+  onSfToPickDay(dateStr) { this.setState({ sfToDate: dateStr, sfToDatePicked: true }); }
   onSfFromSelectTime(v) { this.setState({ sfFromTime: v, sfFromPickerOpen: false }); }
   onSfToSelectTime(v) { this.setState({ sfToTime: v, sfToPickerOpen: false }); }
-  onSfFromClear() { this.setState({ sfFromDate: "", sfFromTime: "", sfFromViewMonth: "", sfFromPickerOpen: false }); }
-  onSfToClear() { this.setState({ sfToDate: "", sfToTime: "", sfToViewMonth: "", sfToPickerOpen: false }); }
+  onSfFromClear() { this.setState({ sfFromDate: "", sfFromTime: "", sfFromViewMonth: "", sfFromPickerOpen: false, sfFromDatePicked: false }); }
+  onSfToClear() { this.setState({ sfToDate: "", sfToTime: "", sfToViewMonth: "", sfToPickerOpen: false, sfToDatePicked: false }); }
+  onSfFromBackToCalendar() { this.setState({ sfFromDatePicked: false }); }
+  onSfToBackToCalendar() { this.setState({ sfToDatePicked: false }); }
   to12Hour(hhmm) {
     const [h, m] = hhmm.split(":").map(Number);
     const ap = h >= 12 ? "PM" : "AM";
@@ -7856,6 +7874,8 @@ class Component extends DCLogic {
       sfAssessmentId: s.sfAssessmentId, onSfAssessmentId: (e) => this.setState({ sfAssessmentId: e.target.value }),
       sfAssessmentOptions: d.assessments.filter((a) => a.programmeId === pid).map((a) => ({ value: a.id, label: `${a.name} (${a.shortName})`, selected: a.id === s.sfAssessmentId })),
       sfFromValue: fromVal, onSfFromToggle: () => this.onSfFromToggle(), sfFromPickerOpen: s.sfFromPickerOpen,
+      sfFromShowCalendar: !s.sfFromDatePicked, sfFromShowTime: !!s.sfFromDatePicked, onSfFromBackToCalendar: () => this.onSfFromBackToCalendar(),
+      sfFromSelectedDateLabel: s.sfFromDate ? this.formatDateShort(s.sfFromDate) : "",
       sfFromViewMonth: s.sfFromViewMonth || this.monthKey(this.todayStr()),
       sfFromMonthOptions: this.monthOptions(s.sfFromViewMonth || this.monthKey(this.todayStr())),
       sfFromYearOptions: this.yearOptions(s.sfFromViewMonth || this.monthKey(this.todayStr())),
@@ -7865,6 +7885,8 @@ class Component extends DCLogic {
       sfFromTimeSlots: this.buildTimeSlots(s.sfFromTime, s.sfFromDate).map((t) => ({ ...t, onClick: () => this.onSfFromSelectTime(t.value) })),
       onSfFromClear: () => this.onSfFromClear(),
       sfToValue: toVal, onSfToToggle: () => this.onSfToToggle(), sfToPickerOpen: s.sfToPickerOpen,
+      sfToShowCalendar: !s.sfToDatePicked, sfToShowTime: !!s.sfToDatePicked, onSfToBackToCalendar: () => this.onSfToBackToCalendar(),
+      sfToSelectedDateLabel: s.sfToDate ? this.formatDateShort(s.sfToDate) : "",
       sfToViewMonth: s.sfToViewMonth || this.monthKey(s.sfFromDate || this.todayStr()),
       sfToMonthOptions: this.monthOptions(s.sfToViewMonth || this.monthKey(s.sfFromDate || this.todayStr())),
       sfToYearOptions: this.yearOptions(s.sfToViewMonth || this.monthKey(s.sfFromDate || this.todayStr())),
