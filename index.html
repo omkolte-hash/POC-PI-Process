@@ -1765,12 +1765,11 @@ a:hover{color:var(--color-accent);text-decoration:underline}
           <table class="table"><thead><tr><th>Programme</th><th>Academic Years</th><th>Status</th><th></th></tr></thead><tbody>
             <sc-for list="{{ programmeRows }}" as="p" hint-placeholder-count="3">
               <tr><td>{{ p.name }}</td><td>{{ p.academicYears }}</td><td><span class="{{ p.tagCls }}">{{ p.statusLabel }}</span></td>
-                <td style="white-space:nowrap"><div class="btn-group btn-group-sm" role="group">
-                  <button type="button" class="btn btn-outline-secondary" onClick="{{ p.onSelect }}"><i data-lucide="calendar-range" style="width:13px;height:13px"></i> Open Academic Years</button>
-                  <button type="button" class="btn btn-outline-secondary" onClick="{{ p.onFees }}"><i data-lucide="wallet" style="width:13px;height:13px"></i> Fee Structure</button>
-                  <button type="button" class="btn btn-outline-secondary" onClick="{{ p.onDocs }}"><i data-lucide="file-check-2" style="width:13px;height:13px"></i> Document Requirements</button>
-                  <button type="button" class="btn btn-outline-secondary" onClick="{{ p.onApprovalChain }}"><i data-lucide="shield-check" style="width:13px;height:13px"></i> Approval Chain</button>
-                </div></td></tr>
+                <td style="white-space:nowrap;display:flex;gap:6px">
+                  <button type="button" class="btn btn-outline-secondary btn-sm" onClick="{{ p.onFees }}"><i data-lucide="wallet" style="width:13px;height:13px"></i> Fee Structure</button>
+                  <button type="button" class="btn btn-outline-secondary btn-sm" onClick="{{ p.onDocs }}"><i data-lucide="file-check-2" style="width:13px;height:13px"></i> Document Requirements</button>
+                  <button type="button" class="btn btn-outline-secondary btn-sm" onClick="{{ p.onApprovalChain }}"><i data-lucide="shield-check" style="width:13px;height:13px"></i> Approval Chain</button>
+                </td></tr>
             </sc-for>
           </tbody></table>
 
