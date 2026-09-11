@@ -1338,11 +1338,12 @@ a:hover{color:var(--color-accent);text-decoration:underline}
           <p style="font-size:12px;opacity:0.6;margin-top:0">Candidates with no applicable document under this programme's Document Requirements aren't listed here. Marking a document Valid/Invalid only happens from the View Documents panel.</p>
           <div style="font-size:13px;opacity:0.6;margin-bottom:var(--space-3)">{{ cvResultCount }} candidate(s)</div>
           <table class="table"><thead><tr>
-            <th>S.No</th><th>Student ID</th><th>Name</th><th>Category</th><th>Documents</th>
+            <th>S.No</th><th>Student ID</th><th>Name</th><th>Category</th><th>Verification Status</th><th>Documents</th>
           </tr></thead><tbody>
             <sc-for list="{{ cvRows }}" as="r" hint-placeholder-count="10">
               <tr>
                 <td>{{ r.sno }}</td><td>{{ r.id }}</td><td>{{ r.name }}</td><td>{{ r.category }}</td>
+                <td><span class="{{ r.docStatusCls }}">{{ r.docStatus }}</span></td>
                 <td><button type="button" class="btn btn-primary" onClick="{{ r.onViewDocs }}">View Documents</button></td>
               </tr>
             </sc-for>
@@ -1381,8 +1382,9 @@ a:hover{color:var(--color-accent);text-decoration:underline}
                 </div>
 
                 <div style="display:flex;gap:var(--space-2);margin-bottom:var(--space-4)">
-                  <button type="button" class="btn btn-success" onClick="{{ cvModal.onMarkValid }}">Mark as Valid</button>
-                  <button type="button" class="btn btn-danger" onClick="{{ cvModal.onMarkInvalid }}">Mark as Invalid</button>
+                  <sc-if value="{{ cvModal.showMarkButtons }}"><button type="button" class="btn btn-success" onClick="{{ cvModal.onMarkValid }}">Mark as Valid</button></sc-if>
+                  <sc-if value="{{ cvModal.showMarkButtons }}"><button type="button" class="btn btn-danger" onClick="{{ cvModal.onMarkInvalid }}">Mark as Invalid</button></sc-if>
+                  <sc-if value="{{ cvModal.showEditButton }}"><button type="button" class="btn btn-outline-secondary" onClick="{{ cvModal.onStartEdit }}"><i data-lucide="pencil" style="width:14px;height:14px"></i> Edit</button></sc-if>
                   <sc-if value="{{ cvModal.canNext }}"><button type="button" class="btn btn-outline-secondary" onClick="{{ cvModal.onNext }}">Next</button></sc-if>
                 </div>
               </div>
@@ -4268,7 +4270,7 @@ class Component extends DCLogic {
     atSearch: "", atStatusFilter: "ALL", atConfirm: null,
     vCandidateId: "", fsCategory: "ALL", mpCategory: "OPEN", mpCriteria: "count", mpCount: "", mpCutoff: "", mpWaitingSize: "",
     cvSearch: "", cvCategoryFilter: "ALL", cvInstituteStatusFilter: "ALL",
-    cvModalCandidateId: null, cvModalDocIndex: 0, cvModalRemarks: "",
+    cvModalCandidateId: null, cvModalDocIndex: 0, cvModalRemarks: "", cvModalEditing: false,
     maCategory: "ALL", mrCategory: "ALL", mrDates: {}, mrWlCategory: "OPEN", mrWlCount: "", mrWlLastFeeDate: "", mrWlNextDate: "", wlCategory: "ALL",
     pgFeeProgrammeId: null, pgFeeDraft: null,
     plSelectedIds: [],
@@ -8751,25 +8753,29 @@ class Component extends DCLogic {
     const applicable = c ? docColumns.filter((doc) => doc.appliesToCategories.includes(c.category)) : [];
     const firstDoc = applicable[0];
     const remarks = (firstDoc && c.verification.documents[firstDoc.key] && c.verification.documents[firstDoc.key].remarks) || "";
-    this.setState({ cvModalCandidateId: candidateId, cvModalDocIndex: 0, cvModalRemarks: remarks });
+    this.setState({ cvModalCandidateId: candidateId, cvModalDocIndex: 0, cvModalRemarks: remarks, cvModalEditing: false });
   }
-  onCvCloseModal() { this.setState({ cvModalCandidateId: null, cvModalDocIndex: 0, cvModalRemarks: "" }); }
+  onCvCloseModal() { this.setState({ cvModalCandidateId: null, cvModalDocIndex: 0, cvModalRemarks: "", cvModalEditing: false }); }
   onCvNextDoc(docColumns, candidate) {
     const applicable = docColumns.filter((doc) => doc.appliesToCategories.includes(candidate.category));
     const nextIndex = this.state.cvModalDocIndex + 1;
     if (nextIndex >= applicable.length) return;
     const nextDoc = applicable[nextIndex];
     const remarks = (candidate.verification.documents[nextDoc.key] && candidate.verification.documents[nextDoc.key].remarks) || "";
-    this.setState({ cvModalDocIndex: nextIndex, cvModalRemarks: remarks });
+    this.setState({ cvModalDocIndex: nextIndex, cvModalRemarks: remarks, cvModalEditing: false });
   }
+  onCvStartEdit() { this.setState({ cvModalEditing: true }); }
   onCvMark(docKey, status) {
     const { cvModalCandidateId, cvModalRemarks } = this.state;
     const pid = this.state.data.activeProgrammeId, ayid = this.state.data.activeAcademicYearByProgramme[pid];
     const cid = this.engine.activeCycleId(this.state.data, pid, ayid);
     this.confirmAction({
       title: status === "valid" ? "Mark Document Valid?" : "Mark Document Invalid?", message: `Mark this document as ${status === "valid" ? "Valid" : "Invalid"}?`, confirmLabel: "Confirm",
-      onConfirm: () => this.mutate((ds) => this.engine.setVerification(ds, cvModalCandidateId, docKey, status, cvModalRemarks, pid, ayid, cid),
-        status === "valid" ? "Marked Valid." : "Marked Invalid.")
+      onConfirm: () => {
+        this.mutate((ds) => this.engine.setVerification(ds, cvModalCandidateId, docKey, status, cvModalRemarks, pid, ayid, cid),
+          status === "valid" ? "Marked Valid." : "Marked Invalid.");
+        this.setState({ cvModalEditing: false });
+      }
     });
   }
   // Modeled on the institute's real Category Document Status screen: a filterable list of every candidate
@@ -8794,10 +8800,22 @@ class Component extends DCLogic {
     if (statusFilter !== "ALL") pool = pool.filter((c) => applicableDocs(c).some((doc) => ((c.verification.documents[doc.key] || {}).status || "draft") === statusFilter));
 
     const { pageItems: cvPageItems, pagination: cvPagination } = this.paginate(pool, "cv");
-    const cvRows = cvPageItems.map((c, i) => ({
-      sno: cvPagination.start + i + 1, id: c.id, name: c.name, category: c.category,
-      onViewDocs: () => this.onCvOpenModal(c.id)
-    }));
+    const cvRows = cvPageItems.map((c, i) => {
+      const docs = applicableDocs(c);
+      const total = docs.length;
+      const validCount = docs.filter((doc) => (c.verification.documents[doc.key] || {}).status === "valid").length;
+      const invalidCount = docs.filter((doc) => (c.verification.documents[doc.key] || {}).status === "invalid").length;
+      const pendingCount = total - validCount - invalidCount;
+      const docStatus = validCount === total
+        ? `${total}/${total} Valid`
+        : [validCount && `${validCount} Valid`, invalidCount && `${invalidCount} Invalid`, pendingCount && `${pendingCount} Pending`].filter(Boolean).join(", ");
+      const docStatusCls = invalidCount ? "tag tag-danger" : validCount === total ? "tag tag-success" : "tag tag-warning";
+      return {
+        sno: cvPagination.start + i + 1, id: c.id, name: c.name, category: c.category,
+        docStatus, docStatusCls,
+        onViewDocs: () => this.onCvOpenModal(c.id)
+      };
+    });
 
     const mc = this.state.cvModalCandidateId ? d.candidates.find((x) => x.id === this.state.cvModalCandidateId && x.programmeId === pid && x.academicYearId === ayid && x.cycleId === cid) : null;
     let cvModal = null;
@@ -8807,6 +8825,7 @@ class Component extends DCLogic {
       const docCfg = applicable[idx];
       const doc = docCfg ? (mc.verification.documents[docCfg.key] || {}) : {};
       const meta = this.cvDocStatusMeta(doc.status);
+      const isDecided = doc.status === "valid" || doc.status === "invalid";
       cvModal = {
         candidateId: mc.id, candidateName: mc.name,
         docTypeLabel: docCfg ? docCfg.label : "Document",
@@ -8814,6 +8833,9 @@ class Component extends DCLogic {
         hasDoc: !!docCfg && !!doc.dataUrl, noDoc: !docCfg || !doc.dataUrl, dataUrl: doc.dataUrl,
         statusLabel: meta.label, statusCls: meta.cls,
         remarks: this.state.cvModalRemarks, onRemarksChange: (e) => this.setState({ cvModalRemarks: e.target.value }),
+        showMarkButtons: !isDecided || this.state.cvModalEditing,
+        showEditButton: isDecided && !this.state.cvModalEditing,
+        onStartEdit: () => this.onCvStartEdit(),
         onMarkValid: () => this.onCvMark(docCfg.key, "valid"), onMarkInvalid: () => this.onCvMark(docCfg.key, "invalid"),
         canNext: idx < applicable.length - 1, onNext: () => this.onCvNextDoc(docColumns, mc),
         onClose: () => this.onCvCloseModal()
