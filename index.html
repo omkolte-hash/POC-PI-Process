@@ -3683,7 +3683,7 @@ a:hover{color:var(--color-accent);text-decoration:underline}
       <sc-if value="{{ notLoaded }}"><div style="opacity:0.6;padding:var(--space-6)">Loading admission cycle data&hellip;</div></sc-if>
     </main>
     <sc-if value="{{ cdDrawerOpen }}"><div class="dialog-backdrop" style="display:flex;justify-content:flex-end;align-items:stretch;padding:0">
-      <div class="dialog" style="width:min(480px,100%);height:100vh;max-height:100vh;border-radius:0;margin:0;animation:slide-in-right .18s ease-out both;overflow-y:auto">
+      <div class="dialog" style="width:min(50vw,100%);height:100vh;max-height:100vh;border-radius:0;margin:0;animation:slide-in-right .18s ease-out both;overflow-y:auto">
         <sc-if value="{{ profileNotFound }}"><div class="dialog-body">
           <p>No candidate found in the active programme/academic year.</p>
           <div class="dialog-actions"><button type="button" class="btn btn-ghost" onClick="{{ onCloseCandidateDrawer }}">Close</button></div>
