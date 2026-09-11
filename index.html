@@ -3859,6 +3859,16 @@ a:hover{color:var(--color-accent);text-decoration:underline}
     </main>
   </div></sc-if>
   <sc-if value="{{ toast }}"><div class="toast-pop" style="position:fixed;bottom:24px;right:24px;background:var(--color-neutral-900);color:var(--color-bg);padding:var(--space-3) var(--space-4);border-radius:var(--radius-md);box-shadow:var(--shadow-lg);font-size:14px;max-width:360px">{{ toast }}</div></sc-if>
+  <sc-if value="{{ confirmDialog }}"><div class="dialog-backdrop" style="z-index:20">
+    <div class="dialog">
+      <div class="dialog-title">{{ confirmDialog.title }}</div>
+      <div class="dialog-body">{{ confirmDialog.message }}</div>
+      <div class="dialog-actions">
+        <button type="button" class="btn btn-secondary" onClick="{{ confirmDialog.onCancel }}">Cancel</button>
+        <button type="button" class="btn btn-primary" onClick="{{ confirmDialog.onConfirm }}">{{ confirmDialog.confirmLabel }}</button>
+      </div>
+    </div>
+  </div></sc-if>
 </div>
 
 </x-dc>
@@ -4241,7 +4251,7 @@ class WorkflowBuilder {
 
 class Component extends DCLogic {
   state = {
-    page: "dashboard", loaded: false, data: null, toast: null, openNavGroup: null, wfDraft: null,
+    page: "dashboard", loaded: false, data: null, toast: null, confirmDialog: null, openNavGroup: null, wfDraft: null,
     needsFileConnect: false, needsFileReconnect: false, reconnectFileName: "", fileName: "",
     ij: null, ijStep: "sources", ijNewName: "", ijPasteText: "", ijDatasetFileName: "", ijSourceError: "",
     ijConfigIssues: [], ijMappingError: "", ijSaveConfigName: "", ijCommittedSummary: null,
@@ -4483,6 +4493,17 @@ class Component extends DCLogic {
     } catch (err) {
       this.showToast(`Couldn't save to ${this.fileHandle.name} — this change was NOT written to disk (${err && err.message ? err.message : "unknown error"}).`);
     }
+  }
+  // Generic "are you sure?" gate — reused across the app instead of a one-off confirm
+  // state per feature. Call with a title/message and the function to run once confirmed.
+  confirmAction({ title, message, confirmLabel = "Confirm", onConfirm }) {
+    this.setState({
+      confirmDialog: {
+        title, message, confirmLabel,
+        onConfirm: () => { this.setState({ confirmDialog: null }); onConfirm(); },
+        onCancel: () => this.setState({ confirmDialog: null })
+      }
+    });
   }
   mutate(fn, msg) {
     const ds = this.engine.clone(this.state.data);
@@ -5201,7 +5222,7 @@ class Component extends DCLogic {
     const base = {
       authed: true, notAuthed: false, roleIsSuperAdmin, roleIsInstitute, roleIsInstituteAdmin, onLogout: () => this.onLogout(),
       loaded: this.state.loaded, notLoaded: !this.state.loaded, notFileConnected: !this.state.fileName,
-      toast: this.state.toast,
+      toast: this.state.toast, confirmDialog: this.state.confirmDialog,
       navGroups, breadcrumbGroup: titles[0], pageTitle: titles[1],
       dashboardLinkStyle: linkStyle(page === "dashboard" || page === "super-admin-dashboard"),
       goDashboard: () => this.goTo(roleIsSuperAdmin ? "super-admin-dashboard" : "dashboard"),
@@ -7319,8 +7340,15 @@ class Component extends DCLogic {
     out.onApvChange = (e) => this.setState({ apvDraftId: c.id, apvDraft: e.target.value });
     out.onApvSave = () => {
       const value = this.state.apvDraftId === c.id ? this.state.apvDraft : c.apvScore;
-      this.mutate((ds) => this.engine.setApvScore(ds, c.id, value, c.programmeId, c.academicYearId, c.cycleId), "APV score saved.");
-      this.setState({ apvDraftId: null, apvDraft: "" });
+      this.confirmAction({
+        title: "Save APV Score?",
+        message: `Save an APV score of ${value} for ${c.name}? This feeds into their Final Score.`,
+        confirmLabel: "Save Score",
+        onConfirm: () => {
+          this.mutate((ds) => this.engine.setApvScore(ds, c.id, value, c.programmeId, c.academicYearId, c.cycleId), "APV score saved.");
+          this.setState({ apvDraftId: null, apvDraft: "" });
+        }
+      });
     };
     return out;
   }
