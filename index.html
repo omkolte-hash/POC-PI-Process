@@ -1697,7 +1697,7 @@ a:hover{color:var(--color-accent);text-decoration:underline}
               <div class="field" style="margin:0"><label>Admin Mobile</label><input class="input" value="{{ ciAdminMobile }}" onChange="{{ onCiAdminMobile }}" /></div>
               <button type="button" class="btn btn-primary" onClick="{{ onCreateInstitute }}">Create Institute</button>
             </div>
-            <p style="font-size:12px;opacity:0.55;margin-bottom:0">A login is generated automatically when the institute is created \u2014 see Institute Users for the login email and password.</p>
+            <p style="font-size:12px;opacity:0.55;margin-bottom:0">A login is generated automatically when the institute is created &mdash; see Institute Users for the login email and password.</p>
           </div>
           <table class="table"><thead><tr><th>Institute</th><th style="text-align:right">Programmes</th><th style="text-align:right">Active Academic Years</th><th style="text-align:right">Sessions</th><th>Status</th><th></th></tr></thead><tbody>
             <sc-for list="{{ instituteRows }}" as="r" hint-placeholder-count="3">
@@ -1712,7 +1712,7 @@ a:hover{color:var(--color-accent);text-decoration:underline}
           </tbody></table>
         </div></sc-if>
         <sc-if value="{{ pageIsSystemSettings }}"><div class="card elev-sm" style="padding:var(--space-4)">
-          <p style="margin-top:0">Platform-wide configuration (branding, notification templates, integrations) is out of scope for this prototype \u2014 shown here as a placeholder screen in the Super Admin navigation.</p>
+          <p style="margin-top:0">Platform-wide configuration (branding, notification templates, integrations) is out of scope for this prototype &mdash; shown here as a placeholder screen in the Super Admin navigation.</p>
         </div></sc-if>
         <sc-if value="{{ pageIsAuditLogs }}"><div>
           <table class="table"><thead><tr><th>Date</th><th>Actor</th><th>Action</th></tr></thead><tbody>
