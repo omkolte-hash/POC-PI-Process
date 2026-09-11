@@ -755,9 +755,18 @@ a:hover{color:var(--color-accent);text-decoration:underline}
           </div></sc-if>
         </div></sc-if>
         <sc-if value="{{ pageIsSessions }}"><div>
-          <sc-if value="{{ sfStepIsForm }}"><div class="card elev-sm" style="padding:var(--space-4);margin-bottom:var(--space-4)">
-            <div class="card-title" style="margin-bottom:var(--space-3)">Create PI Session</div>
-            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-4);max-width:900px">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h4 class="mb-0">PI Sessions</h4>
+            <button type="button" class="btn btn-primary btn-sm" onClick="{{ onSfOpenWizard }}"><i data-lucide="calendar-plus" style="width:14px;height:14px"></i> Create PI Session</button>
+          </div>
+          <sc-if value="{{ sfWizardOpen }}"><div class="dialog-backdrop">
+            <div class="dialog" style="width:min(960px,95vw);max-height:90vh;overflow-y:auto">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-3)">
+                <div class="dialog-title" style="margin:0">Create PI Session</div>
+                <button type="button" class="btn btn-icon btn-ghost" onClick="{{ onSfCloseWizard }}"><i data-lucide="x" style="width:16px;height:16px"></i></button>
+              </div>
+          <sc-if value="{{ sfStepIsForm }}"><div>
+            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-4)">
               <div class="field" style="margin:0"><label>Programme *</label><input class="input" value="{{ activeProgrammeName }}" disabled="{{ true }}" /></div>
               <div class="field" style="margin:0"><label>Assessment *</label><select class="input" value="{{ sfAssessmentId }}" onChange="{{ onSfAssessmentId }}">
                 <option value="">-----Select-----</option>
@@ -837,7 +846,7 @@ a:hover{color:var(--color-accent);text-decoration:underline}
             </div>
             <button type="button" class="btn btn-primary" style="margin-top:var(--space-4)" onClick="{{ onSfSubmit }}">Submit</button>
           </div></sc-if>
-          <sc-if value="{{ sfStepIsGroups }}"><div class="card elev-sm" style="padding:var(--space-4);margin-bottom:var(--space-4)">
+          <sc-if value="{{ sfStepIsGroups }}"><div>
             <div class="card-title" style="margin-bottom:var(--space-3)">Name the Groups</div>
             <label style="display:flex;align-items:center;gap:6px;font-size:13px;margin-bottom:var(--space-3);cursor:pointer">
               <input type="checkbox" checked="{{ sfAutoGroupNames }}" onChange="{{ onSfAutoGroupNamesToggle }}" />
@@ -858,6 +867,8 @@ a:hover{color:var(--color-accent);text-decoration:underline}
             <div style="display:flex;gap:var(--space-2);margin-top:var(--space-4)">
               <button type="button" class="btn btn-primary" onClick="{{ onSfSaveGroups }}">Save</button>
               <button type="button" class="btn btn-ghost" onClick="{{ onSfBackToForm }}">Back</button>
+            </div>
+          </div></sc-if>
             </div>
           </div></sc-if>
           <table class="table"><thead><tr><th>Session</th><th>Date</th><th>Time</th><th style="text-align:right">Capacity</th><th style="text-align:right">Groups</th><th style="text-align:right">Allocated</th><th style="text-align:right">Available</th><th></th></tr></thead><tbody>
@@ -4275,7 +4286,7 @@ class Component extends DCLogic {
     pgFeeProgrammeId: null, pgFeeDraft: null,
     plSelectedIds: [],
     rcCategory: "ALL",
-    sfStep: "form", sfAssessmentId: "",
+    sfStep: "form", sfWizardOpen: false, sfAssessmentId: "",
     sfFromDate: "", sfFromTime: "", sfFromPickerOpen: false, sfFromViewMonth: "",
     sfToDate: "", sfToTime: "", sfToPickerOpen: false, sfToViewMonth: "",
     sfReportingMinutes: "", sfCapacity: "", sfGroups: "", sfGroupDrafts: [], sfAutoGroupNames: false,
@@ -7803,6 +7814,8 @@ class Component extends DCLogic {
     this.setState({ sfAutoGroupNames: checked, sfGroupDrafts: drafts });
   }
   onSfBackToForm() { this.setState({ sfStep: "form" }); }
+  onSfOpenWizard() { this.setState({ sfWizardOpen: true, sfStep: "form" }); }
+  onSfCloseWizard() { this.setState({ sfWizardOpen: false }); }
   onSfSaveGroups() {
     const f = this.state;
     const startTime = this.to12Hour(f.sfFromTime), endTime = this.to12Hour(f.sfToTime);
@@ -7818,7 +7831,7 @@ class Component extends DCLogic {
         const res = this.mutate((ds) => this.engine.createSession(ds, form, f.sfGroupDrafts), (r) => r.error ? r.error : "Session created.");
         if (res && res.ok) {
           this.setState({
-            sfStep: "form", sfFromDate: "", sfFromTime: "", sfToDate: "", sfToTime: "",
+            sfStep: "form", sfWizardOpen: false, sfFromDate: "", sfFromTime: "", sfToDate: "", sfToTime: "",
             sfReportingMinutes: "", sfCapacity: "", sfGroups: "", sfGroupDrafts: [], sfAutoGroupNames: false, sfAssessmentId: ""
           });
         }
@@ -7837,6 +7850,7 @@ class Component extends DCLogic {
     const groupCapacityTotal = s.sfGroupDrafts.reduce((sum, g) => sum + (Number(g.capacity) || 0), 0);
     const groupCapacityExceeded = groupCapacityTotal > Number(s.sfCapacity);
     return {
+      sfWizardOpen: s.sfWizardOpen, onSfOpenWizard: () => this.onSfOpenWizard(), onSfCloseWizard: () => this.onSfCloseWizard(),
       sfStepIsForm: s.sfStep === "form", sfStepIsGroups: s.sfStep === "groups",
       sfCityCentre: `${programme.city} / ${programme.centre}`, sfCity: programme.city, sfCentre: programme.centre,
       sfAssessmentId: s.sfAssessmentId, onSfAssessmentId: (e) => this.setState({ sfAssessmentId: e.target.value }),
