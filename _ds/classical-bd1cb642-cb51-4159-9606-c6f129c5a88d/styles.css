@@ -78,6 +78,39 @@
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.1);
 }
 
+/* Retint Bootstrap's own CSS variables (5.3+ exposes these at :root) to this theme's
+   palette and font, instead of a Sass rebuild. Every Bootstrap component (.btn, .badge,
+   .form-select, .nav-tabs, .card, utility classes, ...) reads these natively — this is
+   what makes real Bootstrap markup already in the app (badge bg-success, d-flex, etc.)
+   render correctly and on-palette without a matching custom rule for each one. */
+:root {
+  --bs-font-sans-serif: "Inter", system-ui, sans-serif;
+  --bs-body-font-family: var(--bs-font-sans-serif);
+  --bs-body-bg: var(--color-bg);
+  --bs-body-color: var(--color-text);
+  --bs-border-color: var(--color-divider);
+  --bs-border-radius: var(--radius-md);
+  --bs-border-radius-sm: var(--radius-sm);
+  --bs-border-radius-lg: var(--radius-lg);
+  --bs-primary: #2563eb;
+  --bs-primary-rgb: 37, 99, 235;
+  --bs-secondary: var(--color-neutral-500);
+  --bs-secondary-rgb: 148, 163, 184;
+  --bs-success: #0d9f88;
+  --bs-success-rgb: 13, 159, 136;
+  --bs-warning: #e58e0b;
+  --bs-warning-rgb: 229, 142, 11;
+  --bs-danger: #e14468;
+  --bs-danger-rgb: 225, 68, 104;
+  --bs-info: #3b82f6;
+  --bs-info-rgb: 59, 130, 246;
+  --bs-light: var(--color-neutral-100);
+  --bs-light-rgb: 248, 250, 252;
+  --bs-link-color: var(--color-accent-700);
+  --bs-link-color-rgb: 29, 78, 216;
+  --bs-link-hover-color: var(--color-accent);
+}
+
 body {
   background: var(--color-bg);
   color: var(--color-text);
@@ -252,27 +285,6 @@ textarea.input { min-height: 90px; resize: vertical; }
 .tag-warning { background: var(--color-warning-100); color: var(--color-warning-700); }
 .tag-danger { background: var(--color-danger-100); color: var(--color-danger-700); }
 
-/* — badge utility aliases — the app markup already writes Bootstrap-style
-   `badge bg-success`/`bg-warning`/etc. class strings in ~30 places; no Bootstrap CSS is
-   loaded, so without this they render as unstyled text. Backed by the same tokens as
-   everything else instead of pulling in all of Bootstrap for a handful of classes. */
-.badge {
-  display: inline-block; padding: 0.3em 0.65em; font-size: 11px; font-weight: 700;
-  line-height: 1.4; color: #fff; text-align: center; white-space: nowrap; vertical-align: baseline;
-  border-radius: var(--radius-sm);
-}
-.bg-primary { background-color: var(--color-accent-600) !important; }
-.bg-success { background-color: var(--color-success-600) !important; }
-.bg-danger { background-color: var(--color-danger-600) !important; }
-.bg-warning { background-color: var(--color-warning-600) !important; }
-.bg-info { background-color: var(--color-accent-300) !important; }
-.bg-secondary { background-color: var(--color-neutral-500) !important; }
-.bg-light { background-color: var(--color-neutral-100) !important; }
-.text-dark { color: var(--color-text) !important; }
-.rounded-pill { border-radius: 9999px !important; }
-.border { border: 1px solid var(--color-divider) !important; }
-.me-1 { margin-right: 4px; } .ms-2 { margin-left: 8px; } .mb-1 { margin-bottom: 4px; }
-
 /* — gradient stat cards — the one deliberately bold surface in the theme. Reserve
    these for the handful of headline KPIs on a page; everything else stays a plain .card. */
 .stat-card { border: none; color: #fff; overflow: hidden; }
@@ -319,11 +331,6 @@ textarea.input { min-height: 90px; resize: vertical; }
 }
 .nav a { color: inherit; text-decoration: none; font-size: 14px; }
 .nav a:hover, .nav a[aria-current='page'] { color: var(--color-accent); }
-/* `<ul class="nav nav-tabs">`/`<li class="nav-item">` tab strips (Offer Management, Email
-   Templates, Print Templates, Assessment Parameters) — reset the default list styling;
-   active/inactive look is already set inline per tab. */
-.nav-tabs { list-style: none; margin: 0; }
-.nav-item { display: inline-flex; }
 
 /* — tables — */
 .table { width: 100%; border-collapse: collapse; font-size: 14px; }
