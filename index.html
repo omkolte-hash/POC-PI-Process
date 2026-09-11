@@ -4648,11 +4648,19 @@ class Component extends DCLogic {
   onCreateYear() {
     const label = this.state.newYearLabel.trim();
     if (!label) return;
-    this.mutate((ds) => this.engine.createAcademicYear(ds, { programmeId: ds.activeProgrammeId, label, status: "Upcoming", actor: this.currentActor() }), "Academic Year created.");
-    this.setState({ newYearLabel: "" });
+    this.confirmAction({
+      title: "Create Academic Year?", message: `Create academic year "${label}"?`, confirmLabel: "Create",
+      onConfirm: () => {
+        this.mutate((ds) => this.engine.createAcademicYear(ds, { programmeId: ds.activeProgrammeId, label, status: "Upcoming", actor: this.currentActor() }), "Academic Year created.");
+        this.setState({ newYearLabel: "" });
+      }
+    });
   }
-  activateYear(id) {
-    this.mutate((ds) => this.engine.setActiveAcademicYear(ds, ds.activeProgrammeId, id), "Academic Year set to Active.");
+  activateYear(id, label) {
+    this.confirmAction({
+      title: "Set Active Academic Year?", message: `Set "${label}" as the active academic year? This changes which year every other page operates on.`, confirmLabel: "Set Active",
+      onConfirm: () => this.mutate((ds) => this.engine.setActiveAcademicYear(ds, ds.activeProgrammeId, id), "Academic Year set to Active.")
+    });
   }
   resetAssessmentForm() {
     this.setState({
@@ -4669,7 +4677,10 @@ class Component extends DCLogic {
     });
   }
   onAfDelete(id) {
-    this.mutate((ds) => this.engine.deleteAssessment(ds, id), "Assessment removed.");
+    this.confirmAction({
+      title: "Delete Assessment?", message: "This can't be undone.", confirmLabel: "Delete",
+      onConfirm: () => this.mutate((ds) => this.engine.deleteAssessment(ds, id), "Assessment removed.")
+    });
   }
   onAfAdd() {
     const s = this.state;
@@ -4681,8 +4692,13 @@ class Component extends DCLogic {
       totalMarksScaling: s.afTotalMarksScaling
     };
     const wasEdit = !!s.afEditId;
-    const res = this.mutate((ds) => this.engine.saveAssessment(ds, s.afEditId, form), (r) => (r && r.error) ? r.error : (wasEdit ? "Assessment updated." : "Assessment added."));
-    if (res && res.ok) this.resetAssessmentForm();
+    this.confirmAction({
+      title: wasEdit ? "Update Assessment?" : "Add Assessment?", message: `${form.name || "This assessment"} — ${wasEdit ? "save changes" : "add it"}?`, confirmLabel: wasEdit ? "Update" : "Add",
+      onConfirm: () => {
+        const res = this.mutate((ds) => this.engine.saveAssessment(ds, s.afEditId, form), (r) => (r && r.error) ? r.error : (wasEdit ? "Assessment updated." : "Assessment added."));
+        if (res && res.ok) this.resetAssessmentForm();
+      }
+    });
   }
   onApTab(type) { this.setState({ apTab: type, apBannerDismissed: false }); }
   resetApForm() {
@@ -4697,7 +4713,10 @@ class Component extends DCLogic {
   onApDelete(id) {
     const pid = this.state.apProgrammeId || this.state.data.activeProgrammeId;
     const type = this.state.apTab;
-    this.mutate((ds) => this.engine.deleteAssessmentParam(ds, pid, type, id), "Parameter removed.");
+    this.confirmAction({
+      title: "Delete Parameter?", message: "This can't be undone.", confirmLabel: "Delete",
+      onConfirm: () => this.mutate((ds) => this.engine.deleteAssessmentParam(ds, pid, type, id), "Parameter removed.")
+    });
   }
   onApAdd() {
     const s = this.state;
@@ -4705,8 +4724,13 @@ class Component extends DCLogic {
     const type = s.apTab;
     const form = { name: s.apName, sequenceNo: s.apSequenceNo, max: s.apMaxWeightage, allowZero: s.apAllowZero, allowDecimal: s.apAllowDecimal };
     const wasEdit = !!s.apEditId;
-    const res = this.mutate((ds) => this.engine.saveAssessmentParam(ds, pid, type, s.apEditId, form), (r) => (r && r.error) ? r.error : (wasEdit ? "Parameter updated." : "Parameter added."));
-    if (res && res.ok) this.resetApForm();
+    this.confirmAction({
+      title: wasEdit ? "Update Parameter?" : "Add Parameter?", message: `${form.name || "This parameter"} — ${wasEdit ? "save changes" : "add it"}?`, confirmLabel: wasEdit ? "Update" : "Add",
+      onConfirm: () => {
+        const res = this.mutate((ds) => this.engine.saveAssessmentParam(ds, pid, type, s.apEditId, form), (r) => (r && r.error) ? r.error : (wasEdit ? "Parameter updated." : "Parameter added."));
+        if (res && res.ok) this.resetApForm();
+      }
+    });
   }
   currentActor() {
     const auth = this.state.auth;
@@ -4724,19 +4748,34 @@ class Component extends DCLogic {
   onCreateProgramme() {
     const f = this.state;
     if (!f.npName.trim()) { this.showToast("Programme name is required."); return; }
-    this.mutate((ds) => {
-      const programme = this.engine.createProgramme(ds, { instituteId: this.state.auth.instituteId, name: f.npName, description: f.npDescription, actor: this.currentActor() });
-      if (!ds.activeProgrammeId) ds.activeProgrammeId = programme.id;
-    }, "Programme created.");
-    this.setState({ npShowForm: false, npName: "", npDescription: "" });
+    this.confirmAction({
+      title: "Create Programme?", message: `Create programme "${f.npName}"?`, confirmLabel: "Create",
+      onConfirm: () => {
+        this.mutate((ds) => {
+          const programme = this.engine.createProgramme(ds, { instituteId: this.state.auth.instituteId, name: f.npName, description: f.npDescription, actor: this.currentActor() });
+          if (!ds.activeProgrammeId) ds.activeProgrammeId = programme.id;
+        }, "Programme created.");
+        this.setState({ npShowForm: false, npName: "", npDescription: "" });
+      }
+    });
   }
   onCreateInstitute() {
     const f = this.state;
     if (!f.ciName.trim() || !f.ciAdminEmail.trim()) { this.showToast("Institute name and admin email are required."); return; }
-    this.mutate((ds) => this.engine.createInstitute(ds, { name: f.ciName, code: f.ciCode, adminName: f.ciAdminName, adminEmail: f.ciAdminEmail, adminMobile: f.ciAdminMobile }), "Institute created.");
-    this.setState({ ciName: "", ciCode: "", ciAdminName: "", ciAdminEmail: "", ciAdminMobile: "" });
+    this.confirmAction({
+      title: "Create Institute?", message: `Create institute "${f.ciName}"? A login will be generated for ${f.ciAdminEmail}.`, confirmLabel: "Create",
+      onConfirm: () => {
+        this.mutate((ds) => this.engine.createInstitute(ds, { name: f.ciName, code: f.ciCode, adminName: f.ciAdminName, adminEmail: f.ciAdminEmail, adminMobile: f.ciAdminMobile }), "Institute created.");
+        this.setState({ ciName: "", ciCode: "", ciAdminName: "", ciAdminEmail: "", ciAdminMobile: "" });
+      }
+    });
   }
-  toggleInstituteStatus(id, status) { this.mutate((ds) => this.engine.setInstituteStatus(ds, id, status), `Institute set to ${status}.`); }
+  toggleInstituteStatus(id, status, name) {
+    this.confirmAction({
+      title: `Set Institute ${status}?`, message: `Set "${name}" to ${status}?`, confirmLabel: "Confirm",
+      onConfirm: () => this.mutate((ds) => this.engine.setInstituteStatus(ds, id, status), `Institute set to ${status}.`)
+    });
+  }
   // ---------- Import Jobs / Wizard ----------
   newImportDraftJob() {
     const pid = this.state.data.activeProgrammeId;
@@ -4940,16 +4979,26 @@ class Component extends DCLogic {
   onIjSaveConfig() {
     const ij = this.state.ij;
     if (!this.state.ijSaveConfigName.trim()) return;
-    this.mutate((ds) => this.importEngine.saveImportConfig(ds, { existingConfigId: ij.configId, name: this.state.ijSaveConfigName.trim(), instituteId: ij.instituteId, programmeId: ij.programmeId, job: ij, createdBy: this.currentActor() }), "Configuration saved.");
-    this.setState({ ijSaveConfigName: "" });
+    this.confirmAction({
+      title: "Save Configuration?", message: `Save this import configuration as "${this.state.ijSaveConfigName.trim()}"?`, confirmLabel: "Save",
+      onConfirm: () => {
+        this.mutate((ds) => this.importEngine.saveImportConfig(ds, { existingConfigId: ij.configId, name: this.state.ijSaveConfigName.trim(), instituteId: ij.instituteId, programmeId: ij.programmeId, job: ij, createdBy: this.currentActor() }), "Configuration saved.");
+        this.setState({ ijSaveConfigName: "" });
+      }
+    });
   }
   onIjCommit() {
     const ij = this.state.ij;
-    const res = this.mutate(
-      (ds) => this.importEngine.commitImportJob(ds, ij),
-      (r) => `${r.added} new candidate${r.added === 1 ? "" : "s"} imported${r.existingSkipped ? `, ${r.existingSkipped} already in this programme + academic year (skipped)` : ""}.`
-    );
-    this.setState({ ijStep: "done", ijCommittedSummary: res });
+    this.confirmAction({
+      title: "Import Candidates?", message: "This will commit the mapped rows as candidates in the active programme and academic year.", confirmLabel: "Import",
+      onConfirm: () => {
+        const res = this.mutate(
+          (ds) => this.importEngine.commitImportJob(ds, ij),
+          (r) => `${r.added} new candidate${r.added === 1 ? "" : "s"} imported${r.existingSkipped ? `, ${r.existingSkipped} already in this programme + academic year (skipped)` : ""}.`
+        );
+        this.setState({ ijStep: "done", ijCommittedSummary: res });
+      }
+    });
   }
 
   // Shared field-option helpers
@@ -5367,18 +5416,41 @@ class Component extends DCLogic {
     const name = (this.state.acNewName || '').trim();
     if (!name) { this.showToast('Cycle name is required.'); return; }
     const pid = d.activeProgrammeId, ayid = d.activeAcademicYearByProgramme[pid];
-    const res = this.mutate((ds) => this.engine.createAdmissionCycle(ds, { programmeId: pid, academicYearId: ayid, name }),
-      (r) => (r && r.error) ? r.error : 'Admission cycle created.');
-    if (res && res.ok) this.setState({ acShowCreate: false, acNewName: '' });
+    this.confirmAction({
+      title: "Create Admission Cycle?", message: `Create cycle "${name}"?`, confirmLabel: "Create",
+      onConfirm: () => {
+        const res = this.mutate((ds) => this.engine.createAdmissionCycle(ds, { programmeId: pid, academicYearId: ayid, name }),
+          (r) => (r && r.error) ? r.error : 'Admission cycle created.');
+        if (res && res.ok) this.setState({ acShowCreate: false, acNewName: '' });
+      }
+    });
   }
-  onActivateCycle(id) { this.mutate((ds) => this.engine.setCycleStatus(ds, id, 'Active'), 'Cycle activated.'); }
-  onCloseCycle(id) { this.mutate((ds) => this.engine.setCycleStatus(ds, id, 'Closed'), 'Cycle closed.'); }
-  onSelectActiveCycle(id) {
+  onActivateCycle(id, name) {
+    this.confirmAction({
+      title: "Activate Cycle?", message: `Activate "${name}"?`, confirmLabel: "Activate",
+      onConfirm: () => this.mutate((ds) => this.engine.setCycleStatus(ds, id, 'Active'), 'Cycle activated.')
+    });
+  }
+  onCloseCycle(id, name) {
+    this.confirmAction({
+      title: "Close Cycle?", message: `Close "${name}"? It can't accept further changes once closed.`, confirmLabel: "Close",
+      onConfirm: () => this.mutate((ds) => this.engine.setCycleStatus(ds, id, 'Closed'), 'Cycle closed.')
+    });
+  }
+  onSelectActiveCycle(id, name) {
     const d = this.state.data;
     const pid = d.activeProgrammeId, ayid = d.activeAcademicYearByProgramme[pid];
-    this.mutate((ds) => this.engine.setActiveCycle(ds, pid, ayid, id), 'Switched active cycle.');
+    this.confirmAction({
+      title: "Switch Active Cycle?", message: `Switch to "${name}"? This changes which cycle every other page operates on.`, confirmLabel: "Switch",
+      onConfirm: () => this.mutate((ds) => this.engine.setActiveCycle(ds, pid, ayid, id), 'Switched active cycle.')
+    });
   }
-  onDeleteCycle(id) { this.mutate((ds) => this.engine.deleteAdmissionCycle(ds, id), (r) => (r && r.error) ? r.error : 'Cycle deleted.'); }
+  onDeleteCycle(id, name) {
+    this.confirmAction({
+      title: "Delete Cycle?", message: `Delete "${name}"? This can't be undone.`, confirmLabel: "Delete",
+      onConfirm: () => this.mutate((ds) => this.engine.deleteAdmissionCycle(ds, id), (r) => (r && r.error) ? r.error : 'Cycle deleted.')
+    });
+  }
   // Cycles for the header's currently active programme+year — see engine's cyclesForScope/
   // activeCycleId, the same lookup CYCLE_GATED_PAGES uses to decide whether to show the gate.
   buildAdmissionCycles(d) {
@@ -5401,10 +5473,10 @@ class Component extends DCLogic {
         isActiveStatus: c.status === 'Active', isDraft: c.status === 'Draft', isClosed: c.status === 'Closed',
         canActivate: c.status === 'Draft', canClose: c.status === 'Active',
         isCurrentlySelected: c.id === activeCycle, canSelect: c.id !== activeCycle,
-        onActivate: () => this.onActivateCycle(c.id),
-        onClose: () => this.onCloseCycle(c.id),
-        onSelectActive: () => this.onSelectActiveCycle(c.id),
-        onDelete: () => this.onDeleteCycle(c.id)
+        onActivate: () => this.onActivateCycle(c.id, c.name),
+        onClose: () => this.onCloseCycle(c.id, c.name),
+        onSelectActive: () => this.onSelectActiveCycle(c.id, c.name),
+        onDelete: () => this.onDeleteCycle(c.id, c.name)
       }))
     };
   }
@@ -5959,9 +6031,14 @@ class Component extends DCLogic {
         if (!name) { this.showToast("Role name is required."); return; }
         const pages = this.state.rmFormPages || [];
         const editingId = this.state.rmEditId;
-        const res = this.mutate((ds) => this.engine.saveRole(ds, instituteId, editingId, { name, pages }),
-          (r) => (r && r.error) ? r.error : (editingId ? "Role updated." : "Role added."));
-        if (res && res.ok) this.setState(resetForm);
+        this.confirmAction({
+          title: editingId ? "Update Role?" : "Add Role?", message: `${name} — ${editingId ? "save changes" : "add it"}?`, confirmLabel: editingId ? "Update" : "Add",
+          onConfirm: () => {
+            const res = this.mutate((ds) => this.engine.saveRole(ds, instituteId, editingId, { name, pages }),
+              (r) => (r && r.error) ? r.error : (editingId ? "Role updated." : "Role added."));
+            if (res && res.ok) this.setState(resetForm);
+          }
+        });
       },
       rmPermGroups: navGroups.map((grp) => ({
         label: grp.title,
@@ -5978,7 +6055,10 @@ class Component extends DCLogic {
         permCount: (r.pages || []).length,
         userCount: staff.filter((m) => m.roleId === r.id).length,
         onEdit: () => this.setState({ rmShowForm: true, rmEditId: r.id, rmFormName: r.name, rmFormPages: [...(r.pages || [])] }),
-        onDelete: () => this.mutate((ds) => this.engine.deleteRole(ds, instituteId, r.id), (res) => (res && res.error) ? res.error : "Role deleted.")
+        onDelete: () => this.confirmAction({
+          title: "Delete Role?", message: `Delete "${r.name}"? This can't be undone.`, confirmLabel: "Delete",
+          onConfirm: () => this.mutate((ds) => this.engine.deleteRole(ds, instituteId, r.id), (res) => (res && res.error) ? res.error : "Role deleted.")
+        })
       }))
     };
   }
@@ -6027,9 +6107,14 @@ class Component extends DCLogic {
         const status = this.state.mbFormStatus || "Active";
         const password = this.state.mbFormPassword || "";
         const editingId = this.state.mbEditId;
-        const res = this.mutate((ds) => this.engine.saveStaffMember(ds, instituteId, editingId, { name, email, roleId, status, password }),
-          (r) => (r && r.error) ? r.error : (r && r.credentials ? `User ${editingId ? "updated" : "added"}. Login: ${r.credentials.loginId} / ${r.credentials.password}` : "User updated."));
-        if (res && res.ok) this.setState(resetForm);
+        this.confirmAction({
+          title: editingId ? "Update User?" : "Add User?", message: `${name} (${email}) — ${editingId ? "save changes" : "add them"}?`, confirmLabel: editingId ? "Update" : "Add",
+          onConfirm: () => {
+            const res = this.mutate((ds) => this.engine.saveStaffMember(ds, instituteId, editingId, { name, email, roleId, status, password }),
+              (r) => (r && r.error) ? r.error : (r && r.credentials ? `User ${editingId ? "updated" : "added"}. Login: ${r.credentials.loginId} / ${r.credentials.password}` : "User updated."));
+            if (res && res.ok) this.setState(resetForm);
+          }
+        });
       },
       mbRoleOptions: roles.map((r) => ({ id: r.id, name: r.name, selected: r.id === formRoleId })),
       mbRows: staff.map((m) => ({
@@ -6040,7 +6125,10 @@ class Component extends DCLogic {
         statusCls: m.status === "Active" ? "bg-success" : "bg-secondary",
         loginId: m.credentials ? m.credentials.loginId : "— no login issued —",
         onEdit: () => this.setState({ mbShowForm: true, mbEditId: m.id, mbFormName: m.name, mbFormEmail: m.email, mbFormRoleId: m.roleId, mbFormStatus: m.status, mbFormPassword: "" }),
-        onDelete: () => this.mutate((ds) => this.engine.deleteStaffMember(ds, instituteId, m.id), "User removed.")
+        onDelete: () => this.confirmAction({
+          title: "Remove User?", message: `Remove "${m.name}"? This can't be undone.`, confirmLabel: "Remove",
+          onConfirm: () => this.mutate((ds) => this.engine.deleteStaffMember(ds, instituteId, m.id), "User removed.")
+        })
       }))
     };
   }
@@ -6302,9 +6390,14 @@ class Component extends DCLogic {
         if (!programme) { this.showToast('Select a programme first.'); return; }
         const step = cfg.steps.find((s) => s.output === cfg.finalCol);
         if (!step) { this.showToast('Pick which step is the Final Score first.'); return; }
-        save();
-        this.mutate((ds) => this.engine.setScoringFormula(ds, programme.id, step.weights));
-        this.showToast(`Formula committed for ${programme.name} — used for every merit calculation from now on.`);
+        this.confirmAction({
+          title: "Commit Formula?", message: `Commit this formula for ${programme.name}? It will be used for every merit calculation from now on.`, confirmLabel: "Commit",
+          onConfirm: () => {
+            save();
+            this.mutate((ds) => this.engine.setScoringFormula(ds, programme.id, step.weights));
+            this.showToast(`Formula committed for ${programme.name} — used for every merit calculation from now on.`);
+          }
+        });
       }
     };
   }
@@ -6425,11 +6518,16 @@ class Component extends DCLogic {
         save();
       },
       onGenerate: () => {
-        c.offerStatus = 'Generated';
-        const now = new Date().toISOString().slice(0, 10);
-        offers.push({ id: 'o' + Date.now(), name: c.name, appNo: c.appNo, programme: c.programme, offerDate: now, status: 'Generated', revokeReason: '' });
-        save();
-        this.showToast('Offer generated for ' + c.name);
+        this.confirmAction({
+          title: "Generate Offer?", message: `Generate an admission offer for ${c.name}?`, confirmLabel: "Generate",
+          onConfirm: () => {
+            c.offerStatus = 'Generated';
+            const now = new Date().toISOString().slice(0, 10);
+            offers.push({ id: 'o' + Date.now(), name: c.name, appNo: c.appNo, programme: c.programme, offerDate: now, status: 'Generated', revokeReason: '' });
+            save();
+            this.showToast('Offer generated for ' + c.name);
+          }
+        });
       }
     }));
 
@@ -6441,13 +6539,18 @@ class Component extends DCLogic {
       canRevoke:  o.status === 'Generated' || o.status === 'Released',
       isRevoked:  o.status === 'Revoked',
       onRelease: () => {
-        o.status = 'Released';
-        // Keep the Generate tab's candidate.offerStatus in sync with this same offer's lifecycle —
-        // they used to drift apart because only this offers[] record was ever updated.
-        const cand = candidates.find(x => x.appNo === o.appNo);
-        if (cand) cand.offerStatus = 'Released';
-        save();
-        this.showToast('Offer released for ' + o.name);
+        this.confirmAction({
+          title: "Release Offer?", message: `Release the offer for ${o.name}?`, confirmLabel: "Release",
+          onConfirm: () => {
+            o.status = 'Released';
+            // Keep the Generate tab's candidate.offerStatus in sync with this same offer's lifecycle —
+            // they used to drift apart because only this offers[] record was ever updated.
+            const cand = candidates.find(x => x.appNo === o.appNo);
+            if (cand) cand.offerStatus = 'Released';
+            save();
+            this.showToast('Offer released for ' + o.name);
+          }
+        });
       },
       onRevoke: () => {
         const reason = prompt('Reason for revoking offer for ' + o.name + '?');
@@ -6499,15 +6602,20 @@ class Component extends DCLogic {
       offerOnPreviewTemplate: () => { ui.previewVisible = true; save(); },
       offerOnSaveTemplate: () => {
         if (!ui.tplName.trim()) { this.showToast('Template name required'); return; }
-        if (ui.tplEditId) {
-          const t = templates.find(x => x.id === ui.tplEditId);
-          if (t) { t.name = ui.tplName; t.programme = ui.tplProg; t.subject = ui.tplSubject; t.body = ui.tplBody; t.updatedAt = new Date().toISOString().slice(0, 10); }
-        } else {
-          templates.push({ id: Date.now(), programme: ui.tplProg, name: ui.tplName, subject: ui.tplSubject, body: ui.tplBody, updatedAt: new Date().toISOString().slice(0, 10) });
-        }
-        ui.tplFormVisible = false; ui.previewVisible = false;
-        save();
-        this.showToast('Template saved');
+        this.confirmAction({
+          title: ui.tplEditId ? "Update Template?" : "Save Template?", message: `${ui.tplName} — ${ui.tplEditId ? "save changes" : "save it"}?`, confirmLabel: ui.tplEditId ? "Update" : "Save",
+          onConfirm: () => {
+            if (ui.tplEditId) {
+              const t = templates.find(x => x.id === ui.tplEditId);
+              if (t) { t.name = ui.tplName; t.programme = ui.tplProg; t.subject = ui.tplSubject; t.body = ui.tplBody; t.updatedAt = new Date().toISOString().slice(0, 10); }
+            } else {
+              templates.push({ id: Date.now(), programme: ui.tplProg, name: ui.tplName, subject: ui.tplSubject, body: ui.tplBody, updatedAt: new Date().toISOString().slice(0, 10) });
+            }
+            ui.tplFormVisible = false; ui.previewVisible = false;
+            save();
+            this.showToast('Template saved');
+          }
+        });
       },
 
       // Generate tab
@@ -6614,11 +6722,15 @@ class Component extends DCLogic {
         save();
       },
       onDelete: () => {
-        if (!confirm(`Delete template "${t.name}"?`)) return;
-        templates = templates.filter(x => x.id !== t.id);
-        if (ui.editId === t.id) ui = { ...ui, showForm: false, editId: null };
-        this.showToast('Template deleted.');
-        save();
+        this.confirmAction({
+          title: "Delete Template?", message: `Delete template "${t.name}"?`, confirmLabel: "Delete",
+          onConfirm: () => {
+            templates = templates.filter(x => x.id !== t.id);
+            if (ui.editId === t.id) ui = { ...ui, showForm: false, editId: null };
+            this.showToast('Template deleted.');
+            save();
+          }
+        });
       },
       onSendNow: () => {
         ui = { ...ui, tab: 'send', sendTemplateId: t.id, sendSuccess: false };
@@ -6629,15 +6741,20 @@ class Component extends DCLogic {
     // --- Form handlers ---
     const onEtFormSave = () => {
       if (!ui.formName.trim() || !ui.formSubject.trim()) { this.showToast('Name and Subject are required.'); return; }
-      if (ui.editId !== null) {
-        templates = templates.map(t => t.id === ui.editId ? { ...t, name: ui.formName, subject: ui.formSubject, body: ui.formBody, group: ui.formGroup, used: new Date().toISOString().slice(0, 10) } : t);
-        this.showToast('Template updated.');
-      } else {
-        templates = [...templates, { id: Date.now(), name: ui.formName, subject: ui.formSubject, body: ui.formBody, group: ui.formGroup, used: new Date().toISOString().slice(0, 10) }];
-        this.showToast('Template saved.');
-      }
-      ui = { ...ui, showForm: false, editId: null, formName: '', formSubject: '', formBody: '', formGroup: 'All Candidates', previewVisible: false };
-      save();
+      this.confirmAction({
+        title: ui.editId !== null ? "Update Template?" : "Save Template?", message: `${ui.formName} — ${ui.editId !== null ? "save changes" : "save it"}?`, confirmLabel: ui.editId !== null ? "Update" : "Save",
+        onConfirm: () => {
+          if (ui.editId !== null) {
+            templates = templates.map(t => t.id === ui.editId ? { ...t, name: ui.formName, subject: ui.formSubject, body: ui.formBody, group: ui.formGroup, used: new Date().toISOString().slice(0, 10) } : t);
+            this.showToast('Template updated.');
+          } else {
+            templates = [...templates, { id: Date.now(), name: ui.formName, subject: ui.formSubject, body: ui.formBody, group: ui.formGroup, used: new Date().toISOString().slice(0, 10) }];
+            this.showToast('Template saved.');
+          }
+          ui = { ...ui, showForm: false, editId: null, formName: '', formSubject: '', formBody: '', formGroup: 'All Candidates', previewVisible: false };
+          save();
+        }
+      });
     };
 
     // --- Send tab ---
@@ -6830,11 +6947,16 @@ class Component extends DCLogic {
 
       onSaveTemplate: () => {
         if (!ptNewName || !ptNewType) { this.showToast('Enter template name and type'); return; }
-        const updated = JSON.parse(localStorage.getItem(TPL_KEY) || '[]');
-        updated.push({ id: Date.now(), name: ptNewName, type: ptNewType, programme: ptNewProg, orientation: ptNewOrient, updated: new Date().toISOString().slice(0,10) });
-        localStorage.setItem(TPL_KEY, JSON.stringify(updated));
-        this.setState({ ptShowForm: false, ptNewName: '', ptNewType: '' });
-        this.showToast('Template saved');
+        this.confirmAction({
+          title: "Save Template?", message: `Save "${ptNewName}"?`, confirmLabel: "Save",
+          onConfirm: () => {
+            const updated = JSON.parse(localStorage.getItem(TPL_KEY) || '[]');
+            updated.push({ id: Date.now(), name: ptNewName, type: ptNewType, programme: ptNewProg, orientation: ptNewOrient, updated: new Date().toISOString().slice(0,10) });
+            localStorage.setItem(TPL_KEY, JSON.stringify(updated));
+            this.setState({ ptShowForm: false, ptNewName: '', ptNewType: '' });
+            this.showToast('Template saved');
+          }
+        });
       },
 
       ptTemplates: templates.map(t => ({
@@ -6842,10 +6964,15 @@ class Component extends DCLogic {
         orientIcon: t.orientation === 'Landscape' ? 'rectangle-horizontal' : 'rectangle-vertical',
         onPreview: () => this.showToast(`POC: Preview of "${t.name}" would open a PDF preview`),
         onDelete: () => {
-          const upd = JSON.parse(localStorage.getItem(TPL_KEY) || '[]').filter(x => x.id !== t.id);
-          localStorage.setItem(TPL_KEY, JSON.stringify(upd));
-          this.setState({ ptTab: 'templates' });
-          this.showToast('Template deleted');
+          this.confirmAction({
+            title: "Delete Template?", message: `Delete "${t.name}"? This can't be undone.`, confirmLabel: "Delete",
+            onConfirm: () => {
+              const upd = JSON.parse(localStorage.getItem(TPL_KEY) || '[]').filter(x => x.id !== t.id);
+              localStorage.setItem(TPL_KEY, JSON.stringify(upd));
+              this.setState({ ptTab: 'templates' });
+              this.showToast('Template deleted');
+            }
+          });
         }
       })),
 
@@ -6863,21 +6990,26 @@ class Component extends DCLogic {
       onGenerate: () => {
         if (!ptGenTplId) { this.showToast('Select a template first'); return; }
         if (this.state.printGenerating) return; // BUG-PRINT-01: block a second run while one is in flight
-        this.setState({ printGenerating: true, printProgress: 0, printDone: false });
-        // ponytail: fake progress, real impl would poll a job endpoint
-        const iv = setInterval(() => {
-          const cur = (this.state.printProgress || 0);
-          if (cur >= 100) {
-            clearInterval(iv);
-            const hist = JSON.parse(localStorage.getItem(HIST_KEY) || '[]');
-            const tpl  = templates.find(t => String(t.id) === String(ptGenTplId)) || { name: 'Unknown' };
-            hist.unshift({ id: Date.now(), date: new Date().toLocaleString(), template: tpl.name, programme: ptGenProg, count: ptMatchCount, generatedBy: 'admin@geta.ai', status: 'Completed' });
-            localStorage.setItem(HIST_KEY, JSON.stringify(hist));
-            this.setState({ printGenerating: false, printProgress: 100, printDone: true });
-          } else {
-            this.setState({ printProgress: Math.min(cur + 10, 100) });
+        this.confirmAction({
+          title: "Generate Documents?", message: `Generate documents for ${ptMatchCount} matching candidate(s)?`, confirmLabel: "Generate",
+          onConfirm: () => {
+            this.setState({ printGenerating: true, printProgress: 0, printDone: false });
+            // ponytail: fake progress, real impl would poll a job endpoint
+            const iv = setInterval(() => {
+              const cur = (this.state.printProgress || 0);
+              if (cur >= 100) {
+                clearInterval(iv);
+                const hist = JSON.parse(localStorage.getItem(HIST_KEY) || '[]');
+                const tpl  = templates.find(t => String(t.id) === String(ptGenTplId)) || { name: 'Unknown' };
+                hist.unshift({ id: Date.now(), date: new Date().toLocaleString(), template: tpl.name, programme: ptGenProg, count: ptMatchCount, generatedBy: 'admin@geta.ai', status: 'Completed' });
+                localStorage.setItem(HIST_KEY, JSON.stringify(hist));
+                this.setState({ printGenerating: false, printProgress: 100, printDone: true });
+              } else {
+                this.setState({ printProgress: Math.min(cur + 10, 100) });
+              }
+            }, 200);
           }
-        }, 200);
+        });
       },
 
       onDownloadZip: () => this.showToast('POC: In production this would download a ZIP file'),
@@ -6976,7 +7108,7 @@ class Component extends DCLogic {
       onCreateYear: () => this.onCreateYear(),
       academicYearsRows: years.map((y) => ({
         label: y.label, statusLabel: y.status, tagCls: `tag ${y.status === "Active" ? "tag-accent" : "tag-neutral"}`,
-        canActivate: y.status !== "Active", onActivate: () => this.activateYear(y.id)
+        canActivate: y.status !== "Active", onActivate: () => this.activateYear(y.id, y.label)
       }))
     };
   }
@@ -7403,14 +7535,22 @@ class Component extends DCLogic {
     const { slFilter, slRankField, slMode, slValue } = this.state;
     const pid = this.state.data.activeProgrammeId, ayid = this.state.data.activeAcademicYearByProgramme[pid];
     const cid = this.engine.activeCycleId(this.state.data, pid, ayid);
-    this.mutate((ds) => this.engine.confirmShortlist(ds, {
-      programmeId: pid, academicYearId: ayid, cycleId: cid,
-      filter: slFilter, rankField: slRankField || null, mode: slMode, value: slMode === "all" ? null : Number(slValue)
-    }), (res) => res.list ? `${res.list.id} created with ${res.count} candidate(s). Director approval required next.` : "No eligible candidates matched — nothing shortlisted.");
-    this.setState({ slPreviewed: false });
+    this.confirmAction({
+      title: "Create Shortlist?", message: "Create a shortlist from the criteria above? This starts the approval chain.", confirmLabel: "Create Shortlist",
+      onConfirm: () => {
+        this.mutate((ds) => this.engine.confirmShortlist(ds, {
+          programmeId: pid, academicYearId: ayid, cycleId: cid,
+          filter: slFilter, rankField: slRankField || null, mode: slMode, value: slMode === "all" ? null : Number(slValue)
+        }), (res) => res.list ? `${res.list.id} created with ${res.count} candidate(s). Director approval required next.` : "No eligible candidates matched — nothing shortlisted.");
+        this.setState({ slPreviewed: false });
+      }
+    });
   }
   onRevertShortlist(listId) {
-    this.mutate((ds) => this.engine.revertShortlist(ds, listId), (r) => r.error ? r.error : `Shortlist reverted — ${r.count} candidate(s) set to Draft.`);
+    this.confirmAction({
+      title: "Revert Shortlist?", message: `Revert ${listId}? Its candidates will be set back to Draft.`, confirmLabel: "Revert",
+      onConfirm: () => this.mutate((ds) => this.engine.revertShortlist(ds, listId), (r) => r.error ? r.error : `Shortlist reverted — ${r.count} candidate(s) set to Draft.`)
+    });
   }
   buildShortlist(d) {
     const pid = d.activeProgrammeId;
@@ -7670,13 +7810,18 @@ class Component extends DCLogic {
       programmeId: pid, academicYearId: ayid, cycleId: this.engine.activeCycleId(this.state.data, pid, ayid),
       assessmentId: f.sfAssessmentId, date: f.sfFromDate, startTime, endTime, reportingTime, capacity: Number(f.sfCapacity)
     };
-    const res = this.mutate((ds) => this.engine.createSession(ds, form, f.sfGroupDrafts), (r) => r.error ? r.error : "Session created.");
-    if (res && res.ok) {
-      this.setState({
-        sfStep: "form", sfFromDate: "", sfFromTime: "", sfToDate: "", sfToTime: "",
-        sfReportingMinutes: "", sfCapacity: "", sfGroups: "", sfGroupDrafts: [], sfAutoGroupNames: false, sfAssessmentId: ""
-      });
-    }
+    this.confirmAction({
+      title: "Create Session?", message: `Create this PI session with ${f.sfGroupDrafts.length} group(s)?`, confirmLabel: "Create",
+      onConfirm: () => {
+        const res = this.mutate((ds) => this.engine.createSession(ds, form, f.sfGroupDrafts), (r) => r.error ? r.error : "Session created.");
+        if (res && res.ok) {
+          this.setState({
+            sfStep: "form", sfFromDate: "", sfFromTime: "", sfToDate: "", sfToTime: "",
+            sfReportingMinutes: "", sfCapacity: "", sfGroups: "", sfGroupDrafts: [], sfAutoGroupNames: false, sfAssessmentId: ""
+          });
+        }
+      }
+    });
   }
   buildSessions(d) {
     const pid = d.activeProgrammeId;
@@ -7840,9 +7985,14 @@ class Component extends DCLogic {
   onGcgMoveStudents() {
     const { gcgSelectedIds, gcgTargetGroupId, gcgTargetSessionId } = this.state;
     if (!gcgSelectedIds.length || !gcgTargetGroupId) return;
-    const res = this.mutate((ds) => this.engine.moveCandidatesAllocation(ds, gcgSelectedIds, gcgTargetSessionId, gcgTargetGroupId),
-      (r) => r.error ? r.error : `Moved ${r.moved} candidate(s).`);
-    if (res && res.ok) this.setState({ gcgStep: null, gcgSelectedIds: [], gcgTargetGroupId: null, gcgTargetSessionId: null });
+    this.confirmAction({
+      title: "Move Candidates?", message: `Move ${gcgSelectedIds.length} candidate(s) to the selected group?`, confirmLabel: "Move",
+      onConfirm: () => {
+        const res = this.mutate((ds) => this.engine.moveCandidatesAllocation(ds, gcgSelectedIds, gcgTargetSessionId, gcgTargetGroupId),
+          (r) => r.error ? r.error : `Moved ${r.moved} candidate(s).`);
+        if (res && res.ok) this.setState({ gcgStep: null, gcgSelectedIds: [], gcgTargetGroupId: null, gcgTargetSessionId: null });
+      }
+    });
   }
 
   onCaFilterCategory(e) { this.setState({ caFilterCategory: e.target.value, caSelectedIds: [] }); }
@@ -7860,9 +8010,14 @@ class Component extends DCLogic {
   onCaAllocateManual() {
     const { caSelectedIds, caSessionId, caGroupId } = this.state;
     if (!caSelectedIds.length || !caSessionId || !caGroupId) return;
-    const res = this.mutate((ds) => this.engine.allocateCandidatesBatch(ds, caSelectedIds, caSessionId, caGroupId),
-      (r) => r.error ? r.error : `${r.allocated} candidate(s) allocated.${r.errors && r.errors.length ? ` ${r.errors.length} failed: ${r.errors.join("; ")}` : ""}`);
-    if (res && res.ok) this.setState({ caSelectedIds: [] });
+    this.confirmAction({
+      title: "Allocate Candidates?", message: `Allocate ${caSelectedIds.length} candidate(s) to the selected group?`, confirmLabel: "Allocate",
+      onConfirm: () => {
+        const res = this.mutate((ds) => this.engine.allocateCandidatesBatch(ds, caSelectedIds, caSessionId, caGroupId),
+          (r) => r.error ? r.error : `${r.allocated} candidate(s) allocated.${r.errors && r.errors.length ? ` ${r.errors.length} failed: ${r.errors.join("; ")}` : ""}`);
+        if (res && res.ok) this.setState({ caSelectedIds: [] });
+      }
+    });
   }
   computeAutoAllocatePreview(d, candidateIds, sessionId) {
     const session = d.sessions.find((s) => s.id === sessionId);
@@ -7904,9 +8059,14 @@ class Component extends DCLogic {
     if (!preview) return;
     const placements = preview.groups.filter((g) => g.assigned.length).map((g) => ({ groupId: g.id, candidateIds: g.assigned.map((c) => c.id) }));
     const unplacedCount = preview.unplaced.length;
-    const res = this.mutate((ds) => this.engine.commitAutoAllocation(ds, preview.sessionId, placements),
-      (r) => `${r.allocated} candidate(s) allocated.${unplacedCount ? ` ${unplacedCount} left unplaced.` : ""}${r.errors && r.errors.length ? ` ${r.errors.length} failed: ${r.errors.join("; ")}` : ""}`);
-    if (res && res.ok) this.setState({ aaMode: false, aaPreview: null, caSelectedIds: [], caGroupSelectedIds: [] });
+    this.confirmAction({
+      title: "Commit Auto-Allocation?", message: `Allocate these candidates across groups as previewed?${unplacedCount ? ` ${unplacedCount} will be left unplaced.` : ""}`, confirmLabel: "Commit",
+      onConfirm: () => {
+        const res = this.mutate((ds) => this.engine.commitAutoAllocation(ds, preview.sessionId, placements),
+          (r) => `${r.allocated} candidate(s) allocated.${unplacedCount ? ` ${unplacedCount} left unplaced.` : ""}${r.errors && r.errors.length ? ` ${r.errors.length} failed: ${r.errors.join("; ")}` : ""}`);
+        if (res && res.ok) this.setState({ aaMode: false, aaPreview: null, caSelectedIds: [], caGroupSelectedIds: [] });
+      }
+    });
   }
   onCaGroupCardToggle(id) {
     const ids = this.state.caGroupSelectedIds;
@@ -8022,19 +8182,35 @@ class Component extends DCLogic {
   onAssignPanelist(sessionId, groupId) {
     const panelistId = this.state.pickMap[groupId];
     if (!panelistId) return;
-    this.mutate((ds) => this.engine.assignPanelist(ds, sessionId, groupId, panelistId), (r) => (r && r.error) ? r.error : "Panelist assigned to group.");
-    this.setPick(groupId, "");
+    const panelist = this.state.data.panelists.find((p) => p.id === panelistId);
+    this.confirmAction({
+      title: "Assign Panelist?", message: `Assign ${panelist ? panelist.name : "this panelist"} to the group?`, confirmLabel: "Assign",
+      onConfirm: () => {
+        this.mutate((ds) => this.engine.assignPanelist(ds, sessionId, groupId, panelistId), (r) => (r && r.error) ? r.error : "Panelist assigned to group.");
+        this.setPick(groupId, "");
+      }
+    });
   }
   onUnassignPanelist(sessionId, groupId, panelistId) {
-    this.mutate((ds) => this.engine.unassignPanelist(ds, sessionId, groupId, panelistId), (r) => (r && r.error) ? r.error : "Panelist unassigned from group.");
+    const panelist = this.state.data.panelists.find((p) => p.id === panelistId);
+    this.confirmAction({
+      title: "Unassign Panelist?", message: `Unassign ${panelist ? panelist.name : "this panelist"} from the group?`, confirmLabel: "Unassign",
+      onConfirm: () => this.mutate((ds) => this.engine.unassignPanelist(ds, sessionId, groupId, panelistId), (r) => (r && r.error) ? r.error : "Panelist unassigned from group.")
+    });
   }
   onSaveZoomLink(sessionId, groupId) {
     const link = (this.state.zrLinkDrafts && this.state.zrLinkDrafts[groupId]) || "";
-    this.mutate((ds) => this.engine.setZoomRoomLink(ds, sessionId, groupId, link), (r) => r.error ? r.error : "Zoom Room link saved.");
+    this.confirmAction({
+      title: "Save Zoom Room Link?", message: "Save this Zoom Room link for the group?", confirmLabel: "Save",
+      onConfirm: () => this.mutate((ds) => this.engine.setZoomRoomLink(ds, sessionId, groupId, link), (r) => r.error ? r.error : "Zoom Room link saved.")
+    });
   }
   onSendGroupMeetingNotification(sessionId, groupId) {
-    this.mutate((ds) => this.engine.sendGroupMeetingNotification(ds, sessionId, groupId),
-      (r) => r.error ? r.error : `Demo notification recorded for ${r.sent} candidate(s) (placeholder addresses) — see Sent Mail.`);
+    this.confirmAction({
+      title: "Send Meeting Notification?", message: "Send the Zoom meeting notification to every candidate in this group?", confirmLabel: "Send",
+      onConfirm: () => this.mutate((ds) => this.engine.sendGroupMeetingNotification(ds, sessionId, groupId),
+        (r) => r.error ? r.error : `Demo notification recorded for ${r.sent} candidate(s) (placeholder addresses) — see Sent Mail.`)
+    });
   }
   buildZoomRooms(d) {
     const pid = d.activeProgrammeId;
@@ -8061,7 +8237,12 @@ class Component extends DCLogic {
     };
   }
 
-  approvePanelistAction(id, levelIndex, decision) { this.mutate((ds) => this.engine.approvePanelist(ds, id, levelIndex, decision), `Panelist level ${levelIndex + 1} ${decision}.`); }
+  approvePanelistAction(id, levelIndex, decision) {
+    this.confirmAction({
+      title: decision === "approved" ? "Approve Panelist?" : "Reject Panelist?", message: `Mark this panelist as ${decision} at level ${levelIndex + 1}?`, confirmLabel: decision === "approved" ? "Approve" : "Reject",
+      onConfirm: () => this.mutate((ds) => this.engine.approvePanelist(ds, id, levelIndex, decision), `Panelist level ${levelIndex + 1} ${decision}.`)
+    });
+  }
   // Shared by the Panelists list and Panelist Detail: one row of {name, tag, showActions, onApprove,
   // onReject} per configured panelist-approval level, sequential-gated (level i+1 can't act until i is
   // approved) the same way the old hardcoded director-then-registrar toggle was.
@@ -8131,9 +8312,14 @@ class Component extends DCLogic {
       instituteId: f.auth && f.auth.instituteId, imageDataUrl: f.pfImageDataUrl, remarks: f.pfRemarks.trim()
     };
     const existingId = f.pfEditId;
-    const res = this.mutate((ds) => this.engine.savePanelist(ds, form, existingId),
-      (r) => r.error ? r.error : (existingId ? "Panelist updated." : "Panelist registered \u2014 pending Director approval."));
-    if (res && res.ok) this.resetPanelistForm();
+    this.confirmAction({
+      title: existingId ? "Update Panelist?" : "Register Panelist?", message: `${form.name} \u2014 ${existingId ? "save changes" : "register them"}?`, confirmLabel: existingId ? "Update" : "Register",
+      onConfirm: () => {
+        const res = this.mutate((ds) => this.engine.savePanelist(ds, form, existingId),
+          (r) => r.error ? r.error : (existingId ? "Panelist updated." : "Panelist registered \u2014 pending Director approval."));
+        if (res && res.ok) this.resetPanelistForm();
+      }
+    });
   }
   buildPanelists(d) {
     const s = this.state;
@@ -8580,8 +8766,11 @@ class Component extends DCLogic {
     const { cvModalCandidateId, cvModalRemarks } = this.state;
     const pid = this.state.data.activeProgrammeId, ayid = this.state.data.activeAcademicYearByProgramme[pid];
     const cid = this.engine.activeCycleId(this.state.data, pid, ayid);
-    this.mutate((ds) => this.engine.setVerification(ds, cvModalCandidateId, docKey, status, cvModalRemarks, pid, ayid, cid),
-      status === "valid" ? "Marked Valid." : "Marked Invalid.");
+    this.confirmAction({
+      title: status === "valid" ? "Mark Document Valid?" : "Mark Document Invalid?", message: `Mark this document as ${status === "valid" ? "Valid" : "Invalid"}?`, confirmLabel: "Confirm",
+      onConfirm: () => this.mutate((ds) => this.engine.setVerification(ds, cvModalCandidateId, docKey, status, cvModalRemarks, pid, ayid, cid),
+        status === "valid" ? "Marked Valid." : "Marked Invalid.")
+    });
   }
   // Modeled on the institute's real Category Document Status screen: a filterable list of every candidate
   // in the programme (not just PI-completed ones, since category eligibility can be reviewed at any
@@ -8670,10 +8859,13 @@ class Component extends DCLogic {
     const { mpCategory, mpCriteria, mpCount, mpCutoff, mpWaitingSize } = this.state;
     const pid = this.state.data.activeProgrammeId, ayid = this.state.data.activeAcademicYearByProgramme[pid];
     const cid = this.engine.activeCycleId(this.state.data, pid, ayid);
-    this.mutate((ds) => this.engine.runMeritProcessing(ds, {
-      programmeId: pid, academicYearId: ayid, cycleId: cid,
-      category: mpCategory, criteria: mpCriteria, value: mpCriteria === "count" ? Number(mpCount) : Number(mpCutoff), waitingSize: Number(mpWaitingSize)
-    }), (r) => r.error ? r.error : `Merit processing complete: ${r.merit} Merit, ${r.waiting} Waiting, ${r.rejected} Rejected.${r.batch ? ` Batch ${r.batch.id} created for approval.` : ""}`);
+    this.confirmAction({
+      title: "Run Merit Processing?", message: `Run merit processing for category ${mpCategory}? This bands candidates into Merit/Waiting/Rejected and can't be easily undone.`, confirmLabel: "Run",
+      onConfirm: () => this.mutate((ds) => this.engine.runMeritProcessing(ds, {
+        programmeId: pid, academicYearId: ayid, cycleId: cid,
+        category: mpCategory, criteria: mpCriteria, value: mpCriteria === "count" ? Number(mpCount) : Number(mpCutoff), waitingSize: Number(mpWaitingSize)
+      }), (r) => r.error ? r.error : `Merit processing complete: ${r.merit} Merit, ${r.waiting} Waiting, ${r.rejected} Rejected.${r.batch ? ` Batch ${r.batch.id} created for approval.` : ""}`)
+    });
   }
   buildMeritProcessing(d) {
     const pid = d.activeProgrammeId, ayid = d.activeAcademicYearByProgramme[pid], cat = this.state.mpCategory;
@@ -8815,8 +9007,11 @@ class Component extends DCLogic {
   onDecideApproval(requestId, decision) {
     const staffId = this.state.auth.staffId;
     const comments = this.state.paRemarks[requestId] || "";
-    this.mutate((ds) => this.engine.decideApproval(ds, requestId, staffId, decision, comments),
-      (r) => (r && r.error) ? r.error : (decision === "approved" ? "Approved." : "Denied."));
+    this.confirmAction({
+      title: decision === "approved" ? "Approve Request?" : "Deny Request?", message: `${decision === "approved" ? "Approve" : "Deny"} this request?`, confirmLabel: decision === "approved" ? "Approve" : "Deny",
+      onConfirm: () => this.mutate((ds) => this.engine.decideApproval(ds, requestId, staffId, decision, comments),
+        (r) => (r && r.error) ? r.error : (decision === "approved" ? "Approved." : "Denied."))
+    });
   }
 
   onMrDateChange(batchId, field, value) {
@@ -8829,19 +9024,27 @@ class Component extends DCLogic {
   }
   onReleaseBatch(batchId) {
     const draft = this.state.mrDates[batchId] || {};
-    const res = this.mutate((ds) => this.engine.releaseMeritBatch(ds, batchId, draft.lastFeeDate, draft.nextReleaseDate),
-      (r) => r.error ? r.error : `Release ${r.release.id} created with ${r.release.count} candidate(s).`);
-    if (res && res.ok) {
-      const mrDates = { ...this.state.mrDates };
-      delete mrDates[batchId];
-      this.setState({ mrDates });
-    }
+    this.confirmAction({
+      title: "Release Merit Batch?", message: "Release this merit batch? Candidates will be notified their merit status.", confirmLabel: "Release",
+      onConfirm: () => {
+        const res = this.mutate((ds) => this.engine.releaseMeritBatch(ds, batchId, draft.lastFeeDate, draft.nextReleaseDate),
+          (r) => r.error ? r.error : `Release ${r.release.id} created with ${r.release.count} candidate(s).`);
+        if (res && res.ok) {
+          const mrDates = { ...this.state.mrDates };
+          delete mrDates[batchId];
+          this.setState({ mrDates });
+        }
+      }
+    });
   }
   onReleaseWaitingList() {
     const f = this.state, pid = this.state.data.activeProgrammeId, ayid = this.state.data.activeAcademicYearByProgramme[pid];
     const cid = this.engine.activeCycleId(this.state.data, pid, ayid);
-    this.mutate((ds) => this.engine.releaseFromWaitingList(ds, { programmeId: pid, academicYearId: ayid, cycleId: cid, category: f.mrWlCategory, count: Number(f.mrWlCount), lastFeeDate: f.mrWlLastFeeDate, nextReleaseDate: f.mrWlNextDate }),
-      (r) => r.error ? r.error : `Release ${r.release.id} created with ${r.release.count} candidate(s).`);
+    this.confirmAction({
+      title: "Release from Waiting List?", message: `Promote ${f.mrWlCount || "the selected"} candidate(s) from the ${f.mrWlCategory} waiting list?`, confirmLabel: "Release",
+      onConfirm: () => this.mutate((ds) => this.engine.releaseFromWaitingList(ds, { programmeId: pid, academicYearId: ayid, cycleId: cid, category: f.mrWlCategory, count: Number(f.mrWlCount), lastFeeDate: f.mrWlLastFeeDate, nextReleaseDate: f.mrWlNextDate }),
+        (r) => r.error ? r.error : `Release ${r.release.id} created with ${r.release.count} candidate(s).`)
+    });
   }
   buildMeritReleases(d) {
     const activeTabStyle = 'color:var(--color-accent-700);border-bottom:2px solid var(--color-accent-700);font-weight:600;background:none;border-top:none;border-left:none;border-right:none;padding:8px 16px;cursor:pointer';
@@ -9135,7 +9338,7 @@ class Component extends DCLogic {
           activeYears: d.academicYears.filter((y) => progIds.includes(y.programmeId) && y.status === "Active").length,
           sessions: d.sessions.filter((s) => progIds.includes(s.programmeId)).length,
           statusLabel: inst.status, tagCls: `tag ${inst.status === "Active" ? "tag-accent" : "tag-neutral"}`,
-          onToggle: () => this.toggleInstituteStatus(inst.id, inst.status === "Active" ? "Inactive" : "Active"),
+          onToggle: () => this.toggleInstituteStatus(inst.id, inst.status === "Active" ? "Inactive" : "Active", inst.name),
           toggleLabel: inst.status === "Active" ? "Deactivate" : "Activate"
         };
       })
@@ -9200,9 +9403,14 @@ class Component extends DCLogic {
     this.setState({ pgFeeDraft: { ...this.state.pgFeeDraft, [field]: value } });
   }
   onSavePgFee() {
-    const res = this.mutate((ds) => this.engine.setProgrammeFeeConfig(ds, this.state.pgFeeProgrammeId, this.state.pgFeeDraft),
-      (r) => r.error ? r.error : "Fee structure saved.");
-    if (res && res.ok) this.goTo("programmes");
+    this.confirmAction({
+      title: "Save Fee Structure?", message: "Save this fee structure?", confirmLabel: "Save",
+      onConfirm: () => {
+        const res = this.mutate((ds) => this.engine.setProgrammeFeeConfig(ds, this.state.pgFeeProgrammeId, this.state.pgFeeDraft),
+          (r) => r.error ? r.error : "Fee structure saved.");
+        if (res && res.ok) this.goTo("programmes");
+      }
+    });
   }
   buildProgrammeFees(d) {
     const p = d.programmes.find((x) => x.id === this.state.pgFeeProgrammeId);
@@ -9230,7 +9438,12 @@ class Component extends DCLogic {
   }
   resetRdForm() { this.setState({ rdEditId: null, rdLabel: "", rdSeq: "", rdCategories: [] }); }
   onRdEdit(row) { this.setState({ rdEditId: row.id, rdLabel: row.label, rdSeq: String(row.seq), rdCategories: row.appliesToCategories.slice() }); }
-  onRdDelete(id) { this.mutate((ds) => this.engine.deleteRequiredDocument(ds, this.state.rdProgrammeId, id), "Document removed."); }
+  onRdDelete(id) {
+    this.confirmAction({
+      title: "Delete Document Requirement?", message: "This can't be undone.", confirmLabel: "Delete",
+      onConfirm: () => this.mutate((ds) => this.engine.deleteRequiredDocument(ds, this.state.rdProgrammeId, id), "Document removed.")
+    });
+  }
   onRdToggleCategory(catId) {
     const cur = this.state.rdCategories || [];
     this.setState({ rdCategories: cur.includes(catId) ? cur.filter((c) => c !== catId) : [...cur, catId] });
@@ -9239,8 +9452,13 @@ class Component extends DCLogic {
     const s = this.state;
     const form = { label: s.rdLabel, seq: s.rdSeq, appliesToCategories: s.rdCategories || [] };
     const wasEdit = !!s.rdEditId;
-    const res = this.mutate((ds) => this.engine.saveRequiredDocument(ds, s.rdProgrammeId, s.rdEditId, form), (r) => (r && r.error) ? r.error : (wasEdit ? "Document updated." : "Document added."));
-    if (res && res.ok) this.resetRdForm();
+    this.confirmAction({
+      title: wasEdit ? "Update Document Requirement?" : "Add Document Requirement?", message: `${form.label || "This requirement"} — ${wasEdit ? "save changes" : "add it"}?`, confirmLabel: wasEdit ? "Update" : "Add",
+      onConfirm: () => {
+        const res = this.mutate((ds) => this.engine.saveRequiredDocument(ds, s.rdProgrammeId, s.rdEditId, form), (r) => (r && r.error) ? r.error : (wasEdit ? "Document updated." : "Document added."));
+        if (res && res.ok) this.resetRdForm();
+      }
+    });
   }
   buildRequiredDocuments(d) {
     const p = d.programmes.find((x) => x.id === this.state.rdProgrammeId);
@@ -9272,15 +9490,22 @@ class Component extends DCLogic {
   resetAcForm() { this.setState({ acEditId: null, acRoleId: "", acSeq: "" }); }
   onAcEdit(row) { this.setState({ acEditId: row.id, acRoleId: row.roleId || "", acSeq: String(row.seq) }); }
   onAcDelete(id) {
-    const res = this.mutate((ds) => this.engine.deleteApprovalLevel(ds, this.state.acProgrammeId, id), (r) => (r && r.error) ? r.error : "Approval level removed.");
-    return res;
+    this.confirmAction({
+      title: "Delete Approval Level?", message: "This can't be undone.", confirmLabel: "Delete",
+      onConfirm: () => this.mutate((ds) => this.engine.deleteApprovalLevel(ds, this.state.acProgrammeId, id), (r) => (r && r.error) ? r.error : "Approval level removed.")
+    });
   }
   onAcAdd() {
     const s = this.state;
     const form = { roleId: s.acRoleId, seq: s.acSeq };
     const wasEdit = !!s.acEditId;
-    const res = this.mutate((ds) => this.engine.saveApprovalLevel(ds, s.acProgrammeId, s.acEditId, form), (r) => (r && r.error) ? r.error : (wasEdit ? "Approval level updated." : "Approval level added."));
-    if (res && res.ok) this.resetAcForm();
+    this.confirmAction({
+      title: wasEdit ? "Update Approval Level?" : "Add Approval Level?", message: wasEdit ? "Save changes to this approval level?" : "Add this approval level?", confirmLabel: wasEdit ? "Update" : "Add",
+      onConfirm: () => {
+        const res = this.mutate((ds) => this.engine.saveApprovalLevel(ds, s.acProgrammeId, s.acEditId, form), (r) => (r && r.error) ? r.error : (wasEdit ? "Approval level updated." : "Approval level added."));
+        if (res && res.ok) this.resetAcForm();
+      }
+    });
   }
   buildApprovalChain(d) {
     const p = d.programmes.find((x) => x.id === this.state.acProgrammeId);
@@ -9306,14 +9531,22 @@ class Component extends DCLogic {
   resetPacForm() { this.setState({ pacEditId: null, pacName: "", pacSeq: "" }); }
   onPacEdit(row) { this.setState({ pacEditId: row.id, pacName: row.name, pacSeq: String(row.seq) }); }
   onPacDelete(id) {
-    this.mutate((ds) => this.engine.deletePanelistApprovalLevel(ds, id), (r) => (r && r.error) ? r.error : "Approval level removed.");
+    this.confirmAction({
+      title: "Delete Approval Level?", message: "This can't be undone.", confirmLabel: "Delete",
+      onConfirm: () => this.mutate((ds) => this.engine.deletePanelistApprovalLevel(ds, id), (r) => (r && r.error) ? r.error : "Approval level removed.")
+    });
   }
   onPacAdd() {
     const s = this.state;
     const form = { name: s.pacName, seq: s.pacSeq };
     const wasEdit = !!s.pacEditId;
-    const res = this.mutate((ds) => this.engine.savePanelistApprovalLevel(ds, s.pacEditId, form), (r) => (r && r.error) ? r.error : (wasEdit ? "Approval level updated." : "Approval level added."));
-    if (res && res.ok) this.resetPacForm();
+    this.confirmAction({
+      title: wasEdit ? "Update Approval Level?" : "Add Approval Level?", message: `${form.name || "This level"} — ${wasEdit ? "save changes" : "add it"}?`, confirmLabel: wasEdit ? "Update" : "Add",
+      onConfirm: () => {
+        const res = this.mutate((ds) => this.engine.savePanelistApprovalLevel(ds, s.pacEditId, form), (r) => (r && r.error) ? r.error : (wasEdit ? "Approval level updated." : "Approval level added."));
+        if (res && res.ok) this.resetPacForm();
+      }
+    });
   }
   buildPanelistApprovalChain(d) {
     const levels = this.engine.effectivePanelistApprovalChain(d);
