@@ -117,16 +117,18 @@ a:hover{color:var(--color-accent);text-decoration:underline}
         <sc-if value="{{ breadcrumbTrail }}"><div style="font-size:12px;opacity:0.55;margin-top:4px">{{ breadcrumbTrail }}</div></sc-if>
       </div>
       <div style="display:flex;align-items:center;gap:var(--space-3)">
-        <sc-if value="{{ roleIsInstitute }}"><div class="field" style="margin:0"><select class="input" value="{{ activeAcademicYearId }}" onChange="{{ onChangeAcademicYear }}">
-          <sc-for list="{{ academicYearOptions }}" as="ay" hint-placeholder-count="2"><option value="{{ ay.id }}" selected="{{ ay.selected }}">{{ ay.label }}</option></sc-for>
-        </select></div>
-        <div class="field" style="margin:0"><select class="input" value="{{ activeProgrammeId }}" onChange="{{ onChangeProgramme }}">
-          <sc-for list="{{ programmeOptions }}" as="pr" hint-placeholder-count="2"><option value="{{ pr.id }}" selected="{{ pr.selected }}">{{ pr.name }}</option></sc-for>
-        </select></div>
-        <div class="field" style="margin:0"><select class="input" value="{{ activeCycleId }}" onChange="{{ onChangeCycle }}">
-          <sc-if value="{{ noCycleOption }}"><option value="">No Cycle — create one</option></sc-if>
-          <sc-for list="{{ cycleOptions }}" as="cy" hint-placeholder-count="2"><option value="{{ cy.id }}" selected="{{ cy.selected }}">{{ cy.name }}</option></sc-for>
-        </select></div></sc-if>
+        <sc-if value="{{ roleIsInstitute }}"><div class="header-filters">
+          <div class="header-filter"><i data-lucide="calendar-range" style="width:14px;height:14px"></i><select class="input" value="{{ activeAcademicYearId }}" onChange="{{ onChangeAcademicYear }}">
+            <sc-for list="{{ academicYearOptions }}" as="ay" hint-placeholder-count="2"><option value="{{ ay.id }}" selected="{{ ay.selected }}">{{ ay.label }}</option></sc-for>
+          </select></div>
+          <div class="header-filter"><i data-lucide="book-open" style="width:14px;height:14px"></i><select class="input" value="{{ activeProgrammeId }}" onChange="{{ onChangeProgramme }}">
+            <sc-for list="{{ programmeOptions }}" as="pr" hint-placeholder-count="2"><option value="{{ pr.id }}" selected="{{ pr.selected }}">{{ pr.name }}</option></sc-for>
+          </select></div>
+          <div class="header-filter"><i data-lucide="flag" style="width:14px;height:14px"></i><select class="input" value="{{ activeCycleId }}" onChange="{{ onChangeCycle }}">
+            <sc-if value="{{ noCycleOption }}"><option value="">No Cycle — create one</option></sc-if>
+            <sc-for list="{{ cycleOptions }}" as="cy" hint-placeholder-count="2"><option value="{{ cy.id }}" selected="{{ cy.selected }}">{{ cy.name }}</option></sc-for>
+          </select></div>
+        </div></sc-if>
         <sc-if value="{{ notFileConnected }}"><span class="tag tag-accent" title="Changes are not being saved to disk">Not Saving</span></sc-if>
       </div>
     </header>
