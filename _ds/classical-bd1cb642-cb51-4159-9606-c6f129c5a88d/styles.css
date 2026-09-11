@@ -162,8 +162,8 @@ figcaption {
 .btn-secondary { background: var(--color-surface); border-color: var(--color-divider); }
 .btn-secondary:hover { background: var(--color-neutral-100); }
 .btn-secondary:active { background: var(--color-neutral-200); }
-.btn-ghost { color: var(--color-text); }
-.btn-ghost:hover { background: var(--color-neutral-100); }
+.btn-ghost { color: var(--color-accent-700); background: var(--color-surface); border-color: var(--color-divider); }
+.btn-ghost:hover { background: var(--color-neutral-100); border-color: var(--color-neutral-400); }
 .btn-ghost:active { background: var(--color-neutral-200); }
 .btn-icon { width: 36px; height: 36px; padding: 0; }
 .btn-block { width: 100%; margin-top: var(--space-2); }
