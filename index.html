@@ -155,18 +155,39 @@ a:hover{color:var(--color-accent);text-decoration:underline}
               </div>
             </sc-for>
           </div>
-          <div class="card elev-sm" style="padding:var(--space-4);margin-bottom:var(--space-6)">
-            <div class="card-title" style="margin-bottom:var(--space-4)">Admission Funnel &mdash; {{ activeProgrammeName }}</div>
-            <div style="display:flex;align-items:stretch;gap:var(--space-2);flex-wrap:wrap">
-              <sc-for list="{{ funnel }}" as="step" hint-placeholder-count="7">
-                <div style="display:flex;align-items:center;gap:var(--space-2)">
-                  <div style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:var(--space-3) var(--space-4);min-width:120px;text-align:center;background:var(--color-neutral-100)">
-                    <div style="font-family:var(--font-heading);color:var(--color-accent-700);font-size:26px;font-variant-numeric:tabular-nums">{{ step.value }}</div>
-                    <div style="font-size:12px;opacity:0.65">{{ step.label }}</div>
+          <div style="display:grid;grid-template-columns:2fr 1fr;gap:var(--space-4);margin-bottom:var(--space-6);align-items:stretch">
+            <div class="card elev-sm" style="padding:var(--space-4)">
+              <div class="card-title" style="margin-bottom:var(--space-4)">Admission Funnel &mdash; {{ activeProgrammeName }}</div>
+              <div style="display:flex;align-items:stretch;gap:var(--space-2);flex-wrap:wrap">
+                <sc-for list="{{ funnel }}" as="step" hint-placeholder-count="7">
+                  <div style="display:flex;align-items:center;gap:var(--space-2)">
+                    <div style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:var(--space-3) var(--space-4);min-width:120px;text-align:center;background:var(--color-neutral-100)">
+                      <div style="font-family:var(--font-heading);color:var(--color-accent-700);font-size:26px;font-variant-numeric:tabular-nums">{{ step.value }}</div>
+                      <div style="font-size:12px;opacity:0.65;margin-bottom:2px">{{ step.label }}</div>
+                      <div class="funnel-bar-track"><div class="funnel-bar-fill" style="width:{{ step.barPct }}%"></div></div>
+                    </div>
+                    <sc-if value="{{ step.hasArrow }}"><i data-lucide="chevron-right" style="width:16px;height:16px;opacity:0.4;flex:none"></i></sc-if>
                   </div>
-                  <sc-if value="{{ step.hasArrow }}"><i data-lucide="chevron-right" style="width:16px;height:16px;opacity:0.4;flex:none"></i></sc-if>
+                </sc-for>
+              </div>
+            </div>
+            <div class="card elev-sm" style="padding:var(--space-4)">
+              <div class="card-title" style="margin-bottom:var(--space-4)">Candidates by Category</div>
+              <div style="display:flex;align-items:center;gap:var(--space-4)">
+                <div class="donut" style="background:{{ categoryDonutGradient }}"><div class="donut-hole">
+                  <div style="font-family:var(--font-heading);font-size:19px">{{ categoryDonutTotal }}</div>
+                  <div style="font-size:9px;opacity:0.55">Candidates</div>
+                </div></div>
+                <div style="display:flex;flex-direction:column;gap:7px;flex:1;min-width:0">
+                  <sc-for list="{{ categoryDonut }}" as="dseg" hint-placeholder-count="5">
+                    <div style="display:flex;align-items:center;gap:6px;font-size:12px">
+                      <span class="donut-legend-dot" style="background:{{ dseg.swatchColor }}"></span>
+                      <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ dseg.label }}</span>
+                      <span style="opacity:0.6">{{ dseg.pct }}%</span>
+                    </div>
+                  </sc-for>
                 </div>
-              </sc-for>
+              </div>
             </div>
           </div>
           <div class="card elev-sm" style="padding:var(--space-4)">
@@ -6875,7 +6896,8 @@ class Component extends DCLogic {
       ["Approved", count((c) => c.shortlistStatus === "shortlist-approved" || !!c.allocation)], ["Allocated", count((c) => !!c.allocation)],
       ["PI Completed", count((c) => c.piAttendance === "present")], ["Merit Processed", count((c) => !!c.meritCategory)]
     ];
-    const funnel = funnelDef.map(([label, value], i) => ({ label, value, hasArrow: i < funnelDef.length - 1 }));
+    const funnelMax = Math.max(...funnelDef.map(([, value]) => value), 1);
+    const funnel = funnelDef.map(([label, value], i) => ({ label, value, hasArrow: i < funnelDef.length - 1, barPct: Math.round((value / funnelMax) * 100) }));
     const categoryBreakdown = d.categories.map((cat) => {
       const cc = cands.filter((c) => c.category === cat.id);
       return {
@@ -6888,7 +6910,21 @@ class Component extends DCLogic {
         ineligible: cc.filter((c) => c.outcome === "ineligible").length
       };
     });
-    return { kpis, funnel, categoryBreakdown };
+    // Donut of candidates by category — capped at 5 slices per chart-selection guidance
+    // (categories beyond that would need a stacked-bar fallback instead).
+    const donutColors = ["#2563eb", "#0d9f88", "#e08a10", "#d93a63", "#7c3aed"];
+    const totalAll = categoryBreakdown.reduce((s, c) => s + c.total, 0) || 1;
+    let acc = 0;
+    const gradientStops = [];
+    const categoryDonut = categoryBreakdown.map((c, i) => {
+      const color = donutColors[i % donutColors.length];
+      const pct = (c.total / totalAll) * 100;
+      gradientStops.push(`${color} ${acc}% ${acc + pct}%`);
+      acc += pct;
+      return { label: c.label, total: c.total, pct: Math.round(pct), swatchColor: color };
+    });
+    const categoryDonutGradient = `conic-gradient(${gradientStops.join(", ")})`;
+    return { kpis, funnel, categoryBreakdown, categoryDonut, categoryDonutGradient, categoryDonutTotal: categoryBreakdown.reduce((s, c) => s + c.total, 0) };
   }
 
   buildAcademicYear(d) {
