@@ -2,3 +2,7 @@ node_modules/
 test-results/
 playwright-report/
 playwright/.cache/
+_shot.mjs
+_batch.mjs
+_batch2.mjs
+_console_check.mjs

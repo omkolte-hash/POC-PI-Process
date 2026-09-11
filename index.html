@@ -138,10 +138,10 @@ a:hover{color:var(--color-accent);text-decoration:underline}
         <sc-if value="{{ pageIsDashboard }}"><div>
           <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:var(--space-3);margin-bottom:var(--space-6)">
             <sc-for list="{{ kpis }}" as="kpi" hint-placeholder-count="10">
-              <div class="card elev-sm" style="padding:var(--space-4)">
+              <div class="{{ kpi.cardClass }}" style="padding:var(--space-4)">
                 <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-2)">
                   <div class="card-kicker" style="line-height:1.4">{{ kpi.label }}</div>
-                  <div style="{{ kpi.badgeStyle }}">
+                  <div class="{{ kpi.iconClass }}" style="{{ kpi.iconStyle }}">
                     <i data-lucide="{{ kpi.icon }}" style="width:15px;height:15px"></i>
                   </div>
                 </div>
@@ -5688,16 +5688,16 @@ class Component extends DCLogic {
     // Status badge class helper
     const statusCls = (s) => {
       if (s === "Completed")   return "tag tag-accent";
-      if (s === "In Progress") return "badge bg-warning text-dark";
-      if (s === "Failed")      return "tag tag-neutral";
-      return "badge bg-secondary"; // Pending
+      if (s === "In Progress") return "tag tag-warning";
+      if (s === "Failed")      return "tag tag-danger";
+      return "tag tag-neutral"; // Pending
     };
 
     // Step dot colour
     const dotColor = (s) => {
       if (s === "Completed")   return "var(--color-accent)";
-      if (s === "In Progress") return "#f59e0b";
-      if (s === "Failed")      return "#ef4444";
+      if (s === "In Progress") return "var(--color-warning-600)";
+      if (s === "Failed")      return "var(--color-danger-600)";
       return "var(--color-divider)";
     };
 
@@ -6602,7 +6602,7 @@ class Component extends DCLogic {
       return {
         ...h,
         deliveryLabel: `${h.delivered}/${h.sent} (${rate}%)`,
-        deliveryBadgeStyle: isGood ? 'background:#dcfce7;color:#14532d' : rate >= 85 ? 'background:#fef9c3;color:#713f12' : 'background:#fee2e2;color:#991b1b',
+        deliveryBadgeStyle: isGood ? 'background:var(--color-success-100);color:var(--color-success-700)' : rate >= 85 ? 'background:var(--color-warning-100);color:var(--color-warning-700)' : 'background:var(--color-danger-100);color:var(--color-danger-700)',
         onViewDetails: () => {
           ui = { ...ui, detailHistId: h.id };
           save();
@@ -6629,7 +6629,7 @@ class Component extends DCLogic {
       etDetailRecipients = seedNames.slice(0, count).map((pair, i) => ({
         num: i + 1, name: pair[0], email: pair[1],
         status: i < detailEntry.delivered ? 'Delivered' : 'Failed',
-        statusStyle: i < detailEntry.delivered ? 'background:#dcfce7;color:#14532d' : 'background:#fee2e2;color:#991b1b'
+        statusStyle: i < detailEntry.delivered ? 'background:var(--color-success-100);color:var(--color-success-700)' : 'background:var(--color-danger-100);color:var(--color-danger-700)'
       }));
     }
 
@@ -6836,15 +6836,19 @@ class Component extends DCLogic {
       "accent-2": { bg: "var(--color-accent-2-100)", fg: "var(--color-accent-2-700)" },
       neutral: { bg: "var(--color-neutral-200)", fg: "var(--color-neutral-700)" }
     };
-    const kpi = (label, value, icon, tone) => ({
-      label, value, icon,
-      badgeStyle: `width:30px;height:30px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;flex:none;background:${tones[tone].bg};color:${tones[tone].fg}`
-    });
+    // Hero KPIs (first 4) get the gradient stat-card treatment — one deliberately bold
+    // row; the rest stay plain neutral cards so the page doesn't turn into a wall of color.
+    const kpi = (label, value, icon, tone, hero) => hero
+      ? { label, value, icon, cardClass: `card stat-card stat-${hero}`, iconClass: "stat-icon", iconStyle: "" }
+      : {
+          label, value, icon, cardClass: "card elev-sm", iconClass: "",
+          iconStyle: `width:30px;height:30px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;flex:none;background:${tones[tone].bg};color:${tones[tone].fg}`
+        };
     const kpis = [
-      kpi("SLAT Candidates (seeded)", cands.length, "users", "accent"),
-      kpi("Paid (SLAT, univ. system)", staticStats.paid, "wallet", "accent"),
-      kpi("Appeared (SLAT)", staticStats.appeared, "file-check", "accent"),
-      kpi("Yet to be Shortlisted", count((c) => c.shortlistStatus === "draft" || c.shortlistStatus === "doc-verified"), "clock", "neutral"),
+      kpi("SLAT Candidates (seeded)", cands.length, "users", "accent", "blue"),
+      kpi("Paid (SLAT, univ. system)", staticStats.paid, "wallet", "accent", "teal"),
+      kpi("Appeared (SLAT)", staticStats.appeared, "file-check", "accent", "amber"),
+      kpi("Yet to be Shortlisted", count((c) => c.shortlistStatus === "draft" || c.shortlistStatus === "doc-verified"), "clock", "neutral", "coral"),
       // Collapsed from 2 level-specific cards ("First/Second Level Approved") into one "Pending Approval"
       // + "Fully Approved" pair — a candidate's exact chain level lives on their shortlist record, and
       // different programmes can configure different chain lengths, so a truly per-level breakdown would
