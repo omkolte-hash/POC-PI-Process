@@ -313,6 +313,14 @@ textarea.input { min-height: 90px; resize: vertical; }
 .pa-chevron-wrap { transition: transform .15s ease; }
 .pa-chevron-collapsed { transform: rotate(-90deg); }
 
+/* Bare icon button for removing a chip inline — the chip pill is already the visible
+   container, so this doesn't need its own button box. */
+.chip-remove-btn {
+  display: inline-flex; background: none; border: none; padding: 0; margin: 0;
+  cursor: pointer; color: inherit; opacity: 0.65; transition: opacity .15s ease;
+}
+.chip-remove-btn:hover { opacity: 1; }
+
 .header-filters { display: inline-flex; align-items: stretch; border: 1px solid var(--color-divider); border-radius: var(--radius-md); overflow: hidden; background: var(--color-surface); }
 .header-filters .header-filter { display: flex; align-items: center; gap: 6px; padding: 0 10px; }
 .header-filters .header-filter + .header-filter { border-left: 1px solid var(--color-divider); }
