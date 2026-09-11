@@ -343,8 +343,11 @@ a:hover{color:var(--color-accent);text-decoration:underline}
         </div></sc-if>
         <sc-if value="{{ pageIsImportJobs }}"><div>
           <div class="card elev-sm" style="padding:var(--space-4);margin-bottom:var(--space-4)">
-            <p style="opacity:0.75;margin-top:0">Build a candidate dataset for <strong>{{ activeProgrammeName }}</strong> &middot; {{ importActiveYearLabel }} from one or more data sources &mdash; join, map, filter, and preview before committing. Imported candidates start as <strong>Yet to Shortlist</strong>.</p>
-            <button type="button" class="btn btn-primary" onClick="{{ onNewImportJob }}"><i data-lucide="plus" style="width:15px;height:15px"></i>New Import</button>
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <h5 class="mb-0 fw-semibold">Import Candidates</h5>
+              <button type="button" class="btn btn-primary btn-sm" onClick="{{ onNewImportJob }}"><i data-lucide="plus" style="width:14px;height:14px"></i> New Import</button>
+            </div>
+            <p style="opacity:0.75;margin-top:0;margin-bottom:0">Build a candidate dataset for <strong>{{ activeProgrammeName }}</strong> &middot; {{ importActiveYearLabel }} from one or more data sources &mdash; join, map, filter, and preview before committing. Imported candidates start as <strong>Yet to Shortlist</strong>.</p>
           </div>
           <sc-if value="{{ ijConfigRows }}"><div class="card elev-sm" style="padding:var(--space-4);margin-bottom:var(--space-4)">
             <div class="card-title" style="margin-bottom:var(--space-3)">Saved Configurations</div>
@@ -1026,8 +1029,8 @@ a:hover{color:var(--color-accent);text-decoration:underline}
         </div></sc-if>
         <sc-if value="{{ pageIsPanelists }}"><div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-3)">
-            <button type="button" class="btn btn-primary" onClick="{{ onOpenPanelistDialog }}">Create Panelist</button>
             <button type="button" class="btn btn-ghost" onClick="{{ onOpenPanelistApprovalChain }}">Configure Approval Levels</button>
+            <button type="button" class="btn btn-primary" onClick="{{ onOpenPanelistDialog }}">Create Panelist</button>
           </div>
           <table class="table"><thead><tr><th>Panelist ID</th><th>Name</th><th>Type</th><th style="text-align:right">Experience</th><sc-for list="{{ panelistLevelColumns }}" as="col" hint-placeholder-count="2"><th>{{ col.name }}</th></sc-for><th></th></tr></thead><tbody>
             <sc-for list="{{ panelistRows }}" as="p" hint-placeholder-count="8">
@@ -1748,7 +1751,10 @@ a:hover{color:var(--color-accent);text-decoration:underline}
           </tbody></table>
         </div></sc-if>
         <sc-if value="{{ pageIsProgrammes }}"><div>
-          <button type="button" class="btn btn-primary" style="margin-bottom:var(--space-4)" onClick="{{ onNpOpen }}"><i data-lucide="circle-plus" style="width:15px;height:15px"></i>Create Programme</button>
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h4 class="mb-0">Programmes</h4>
+            <button type="button" class="btn btn-primary btn-sm" onClick="{{ onNpOpen }}"><i data-lucide="circle-plus" style="width:14px;height:14px"></i> Create Programme</button>
+          </div>
           <table class="table"><thead><tr><th>Programme</th><th>Academic Years</th><th>Status</th><th></th></tr></thead><tbody>
             <sc-for list="{{ programmeRows }}" as="p" hint-placeholder-count="3">
               <tr><td>{{ p.name }}</td><td>{{ p.academicYears }}</td><td><span class="{{ p.tagCls }}">{{ p.statusLabel }}</span></td>
