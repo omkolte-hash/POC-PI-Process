@@ -1361,10 +1361,10 @@ a:hover{color:var(--color-accent);text-decoration:underline}
             </div>
           </div>
 
-          <sc-if value="{{ cvModalOpen }}"><div class="dialog-backdrop">
-            <div class="dialog" style="width:min(720px,100%);max-height:90vh;overflow-y:auto">
+          <sc-if value="{{ cvModalOpen }}"><div class="dialog-backdrop" style="padding:0">
+            <div class="dialog" style="width:100vw;height:100vh;max-width:100vw;max-height:100vh;border-radius:0;margin:0;display:flex;flex-direction:column">
               <div class="dialog-title">{{ cvModal.candidateName }} &middot; {{ cvModal.candidateId }}</div>
-              <div class="dialog-body">
+              <div class="dialog-body" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;min-height:0">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-2)">
                   <div style="font-weight:600">{{ cvModal.docTypeLabel }}</div>
                   <div style="display:flex;align-items:center;gap:var(--space-2)">
@@ -1372,7 +1372,7 @@ a:hover{color:var(--color-accent);text-decoration:underline}
                     <span style="font-size:12px;opacity:0.6">{{ cvModal.docProgressLabel }}</span>
                   </div>
                 </div>
-                <sc-if value="{{ cvModal.hasDoc }}"><iframe src="{{ cvModal.dataUrl }}" title="Document preview" style="width:100%;height:280px;border:1px solid var(--color-divider);border-radius:var(--radius-md);margin-bottom:var(--space-3)"></iframe></sc-if>
+                <sc-if value="{{ cvModal.hasDoc }}"><iframe src="{{ cvModal.dataUrl }}" title="Document preview" style="width:100%;flex:1;min-height:300px;border:1px solid var(--color-divider);border-radius:var(--radius-md);margin-bottom:var(--space-3)"></iframe></sc-if>
                 <sc-if value="{{ cvModal.noDoc }}"><div style="padding:var(--space-4);text-align:center;opacity:0.5;border:1px dashed var(--color-divider);border-radius:var(--radius-md);margin-bottom:var(--space-3)">No document uploaded</div></sc-if>
 
                 <div class="field" style="margin-bottom:var(--space-3)">
