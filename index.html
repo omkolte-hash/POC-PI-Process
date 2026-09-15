@@ -5164,7 +5164,14 @@ class Component extends DCLogic {
     const d = this.state.data;
     const role = d && (d.roles || []).find((r) => r.id === auth.roleId);
     const pages = (role ? role.pages : []).filter((p) => p !== "roles-mgmt" && p !== "user-memberships");
-    return new Set(["dashboard", ...pages]);
+    const allowed = new Set(["dashboard", ...pages]);
+    // "View" detail pages (shortlist/merit-batch/panelist) are reached by clicking a row on their
+    // parent list page, never from the nav itself, so no role.pages entry ever names them directly —
+    // without this they'd bounce straight back to Dashboard for every non-Institute-Admin login the
+    // moment "View" was clicked. Grant each one exactly when its parent list page is already allowed.
+    const DETAIL_PAGE_PARENTS = { "shortlist-detail": "shortlist-approvals", "merit-batch-detail": "merit-approval", "panelist-detail": "panelists" };
+    Object.entries(DETAIL_PAGE_PARENTS).forEach(([detail, parent]) => { if (allowed.has(parent)) allowed.add(detail); });
+    return allowed;
   }
   navSpec() {
     const auth = this.state.auth;
