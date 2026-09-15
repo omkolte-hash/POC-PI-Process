@@ -7729,11 +7729,17 @@ class Component extends DCLogic {
       sdId: l.id, sdCriteriaLabel: criteriaLabel,
       sdCreatedOn: this.engine.fmtDate(l.createdOn), sdCount: l.candidateIds.length,
       sdTagCls: meta.cls, sdStatusLabel: meta.label,
-      sdApprovalLevels: chain.map((lvl, i) => ({
-        name: this.approvalLevelLabel(d, lvl),
+      // Rows come from l.approvals (the chain length frozen onto this shortlist at confirmShortlist
+      // time), not the programme's current chain \u2014 editing the approval chain later never changes
+      // how many approvals an already-created shortlist needs (see approveShortlistList's isLast check,
+      // which also keys off l.approvals.length). Mapping over the live chain instead would under- or
+      // over-count these rows the moment an admin edits the chain while this shortlist is mid-flight,
+      // which is exactly what makes a later level look like it came from nowhere.
+      sdApprovalLevels: l.approvals.map((approval, i) => ({
+        name: this.approvalLevelLabel(d, chain[i]) || `Level ${i + 1}`,
         // decidedAt is only present on approvals recorded after timestamp capture was added; older/seed
         // records fall back to the date-only value rather than fabricating a time (see approveShortlistList).
-        statusLabel: l.approvals[i] ? `${l.approvals[i].status} \u00b7 ${l.approvals[i].decidedAt ? this.engine.fmtDateTime(l.approvals[i].decidedAt) : l.approvals[i].date}` : (i === l.currentLevelIndex && l.status === "pending" ? "Pending" : "\u2014")
+        statusLabel: approval ? `${approval.status} \u00b7 ${approval.decidedAt ? this.engine.fmtDateTime(approval.decidedAt) : approval.date}` : (i === l.currentLevelIndex && l.status === "pending" ? "Pending" : "\u2014")
       })),
       sdShowSend: btn.showSend && l.status !== "rejected", sdApprovalTagLabel: btn.tagLabel,
       sdOnSendForApproval: () => this.onSendForApproval("shortlist", l.id, l.programmeId, l.academicYearId, l.cycleId, `Shortlist ${l.id} \u2014 ${criteriaLabel}, ${l.candidateIds.length} candidate(s)`),
@@ -9048,9 +9054,11 @@ class Component extends DCLogic {
       mbFound: true, mbNotFound: false, onBackToMeritApproval: () => this.goTo("merit-approval"),
       mbId: b.id, mbCategory: b.category, mbCreatedOn: this.engine.fmtDate(b.createdOn), mbCount: b.candidateIds.length,
       mbTagCls: meta.cls, mbStatusLabel: meta.label,
-      mbApprovalLevels: chain.map((lvl, i) => ({
-        name: this.approvalLevelLabel(d, lvl),
-        statusLabel: b.approvals[i] ? `${b.approvals[i].status} \u00b7 ${b.approvals[i].decidedAt ? this.engine.fmtDateTime(b.approvals[i].decidedAt) : b.approvals[i].date}` : (i === b.currentLevelIndex && b.status === "pending" ? "Pending" : "\u2014")
+      // Same reasoning as buildShortlistDetail's sdApprovalLevels: rows must track b.approvals (the
+      // chain length frozen at runMeritProcessing time), not the programme's current chain.
+      mbApprovalLevels: b.approvals.map((approval, i) => ({
+        name: this.approvalLevelLabel(d, chain[i]) || `Level ${i + 1}`,
+        statusLabel: approval ? `${approval.status} \u00b7 ${approval.decidedAt ? this.engine.fmtDateTime(approval.decidedAt) : approval.date}` : (i === b.currentLevelIndex && b.status === "pending" ? "Pending" : "\u2014")
       })),
       mbShowSend: btn.showSend && b.status !== "rejected", mbApprovalTagLabel: btn.tagLabel,
       mbOnSendForApproval: () => this.onSendForApproval("merit", b.id, b.programmeId, b.academicYearId, b.cycleId, `Merit List ${b.id} \u2014 ${b.category}, ${b.candidateIds.length} candidate(s)`),
