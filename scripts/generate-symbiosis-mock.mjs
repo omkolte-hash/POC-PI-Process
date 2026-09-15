@@ -3,7 +3,7 @@
 // (1 member each, per institute), all logins on password "admin@123".
 // Run with: node scripts/generate-symbiosis-mock.mjs
 import { writeFileSync } from "node:fs";
-import { CATEGORIES, DEFAULT_INSTITUTE_ROLES } from "../js/admission-engine.js";
+import { DEFAULT_INSTITUTE_ROLES, DEFAULT_REQUIRED_DOCUMENTS, buildCandidateDocuments, verificationComplete } from "../js/admission-engine.js";
 
 function mulberry32(seed) {
   return function () {
@@ -137,17 +137,28 @@ INSTITUTES.forEach((inst, instIdx) => {
 
     const total = candidateCounts[prog.id];
     for (let n = 1; n <= total; n++) {
+      const id = `${prog.id}-${String(n).padStart(4, "0")}`;
       const { name, gender } = makeCandidateName();
       const category = weighted([["OPEN", 50], ["SC", 15], ["ST", 10], ["DA", 10], ["KM", 15]]);
-      const shortlistStatus = weighted([["draft", 25], ["doc-verified", 25], ["shortlisted-pending", 30], ["shortlist-approved", 20]]);
+      // Mirrors commitImportJob in js/import-engine.js exactly, so these candidates sit at the same
+      // just-imported stage a real CSV import would leave them at, ready for the institute to shortlist
+      // themselves instead of having a pre-decided status baked in.
+      const documents = buildCandidateDocuments(id, category, DEFAULT_REQUIRED_DOCUMENTS);
+      const shortlistStatus = verificationComplete({ category, verification: { documents } }, DEFAULT_REQUIRED_DOCUMENTS) ? "doc-verified" : "draft";
       ds.candidates.push({
-        id: `${prog.id}-${String(n).padStart(4, "0")}`,
-        name, gender, programmeId: prog.id, academicYearId: ayId, cycleId,
-        category, educationBackground: pick(EDUCATION),
+        id, programmeId: prog.id, academicYearId: ayId, cycleId, category,
+        name, gender, educationBackground: pick(EDUCATION),
         tenthPct: randInt(55, 98), twelfthPct: randInt(55, 98),
         slatScore: randInt(40, 100), slatPercentile: randInt(10, 99),
-        shortlistStatus,
-        timeline: [{ label: "Imported", date: ISSUED_ON }]
+        shortlistStatus, shortlistId: null,
+        allocation: null, piId: null,
+        registrationAttendance: "pending", piAttendance: "pending",
+        piScores: {}, piNotes: {}, piScoreLocked: {}, piTotal: null, apvScore: null,
+        verification: { documents },
+        outcome: null, finalScore: null, meritCategory: null, meritBatchId: null, rank: null, waitingListNumber: null,
+        meritApproval: [], meritListReleaseId: null,
+        timeline: [{ label: "Imported", date: ISSUED_ON }],
+        importLineage: null
       });
     }
   });
