@@ -3869,7 +3869,7 @@ a:hover{color:var(--color-accent);text-decoration:underline}
         <sc-if value="{{ pnCandidate }}"><div>
           <div class="field" style="max-width:420px;margin-bottom:var(--space-4)">
             <label>Candidate</label>
-            <select class="input" onChange="{{ onPnCandidateSelect }}">
+            <select class="input" value="{{ pnSelectedCandidateId }}" onChange="{{ onPnCandidateSelect }}">
               <sc-for list="{{ pnCandidateOptions }}" as="opt" hint-placeholder-count="6">
                 <option value="{{ opt.id }}" selected="{{ opt.selected }}">{{ opt.label }}</option>
               </sc-for>
@@ -8785,6 +8785,7 @@ class Component extends DCLogic {
     base.pnProgress = `${scoredCount} of ${queue.length} scored`;
     base.pnAllScored = queue.length > 0 && scoredCount === queue.length;
     const selectedId = (s.pnSelectedCandidateId && queue.some((x) => x.id === s.pnSelectedCandidateId)) ? s.pnSelectedCandidateId : queue[0].id;
+    base.pnSelectedCandidateId = selectedId;
     base.pnCandidateOptions = queue.map((x) => {
       const xLocked = !!(x.piScoreLocked && x.piScoreLocked[panelist.id]);
       const statusWord = xLocked ? "Scored" : x.piAttendance === "present" ? "Present, not yet scored" : x.piAttendance === "absent" ? "Absent" : "Not marked present";
