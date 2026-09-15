@@ -121,10 +121,16 @@ INSTITUTES.forEach((inst, instIdx) => {
     };
   }));
 
+  const directorRoleId = instRoles.find((r) => r.name === "Director").id;
   inst.programmes.forEach((prog) => {
     ds.programmes.push({
       id: prog.id, instituteId: inst.id, name: prog.name, code: prog.code, description: "", status: "Active",
-      city: inst.city, centre: inst.city
+      city: inst.city, centre: inst.city,
+      // Explicit single-level chain (Director only), instead of leaving this to normalizeDataset's
+      // DEFAULT_APPROVAL_CHAIN fallback — that default's second level is "SIU", a role this demo
+      // deliberately doesn't seed (see STAFF_ROLE_TEMPLATE), so it would resolve to roleId: null and
+      // permanently dead-end any shortlist/merit/assessment-params approval that reaches it.
+      approvalChain: [{ id: `AC-${prog.id}-1`, seq: 1, roleId: directorRoleId }]
     });
     const ayId = `AY2026-${prog.id}`;
     ds.academicYears.push({ id: ayId, programmeId: prog.id, label: "2026–27", status: "Active" });
