@@ -3809,6 +3809,23 @@ a:hover{color:var(--color-accent);text-decoration:underline}
         </div>
       </div>
     </div></sc-if>
+    <sc-if value="{{ paViewOpen }}"><div class="dialog-backdrop">
+      <div class="dialog" style="width:min(560px,100%)">
+        <div class="dialog-title">{{ paViewTitle }}</div>
+        <div class="dialog-body">
+          <sc-if value="{{ paViewIsDraft }}"><p style="font-size:12px;opacity:0.6;margin-top:0">Showing the pending draft &mdash; not yet approved.</p></sc-if>
+          <sc-if value="{{ paViewNoRows }}"><p style="font-size:13px;opacity:0.6">No parameters defined.</p></sc-if>
+          <sc-if value="{{ paViewHasRows }}"><table class="table"><thead><tr><th>#</th><th>Name</th><th>Seq</th><th style="text-align:right">Max</th><th>Allow Zero</th></tr></thead><tbody>
+            <sc-for list="{{ paViewRows }}" as="p" hint-placeholder-count="5">
+              <tr><td>{{ p.sno }}</td><td>{{ p.name }}</td><td>{{ p.seq }}</td><td style="text-align:right">{{ p.max }}</td><td>{{ p.allowZero }}</td></tr>
+            </sc-for>
+          </tbody></table></sc-if>
+        </div>
+        <div class="dialog-actions">
+          <button type="button" class="btn btn-ghost" onClick="{{ onClosePaView }}">Close</button>
+        </div>
+      </div>
+    </div></sc-if>
   </div></sc-if>
   <sc-if value="{{ showPanelistPortal }}"><div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
     <header style="flex:none;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--space-3) var(--space-4);padding:var(--space-3) var(--space-6);border-bottom:1px solid var(--color-divider);background:var(--color-surface)">
@@ -4281,6 +4298,7 @@ class WorkflowBuilder {
 class Component extends DCLogic {
   state = {
     page: "dashboard", loaded: false, data: null, toast: null, confirmDialog: null, openNavGroup: null, wfDraft: null,
+    paViewSubjectId: null,
     needsFileConnect: false, needsFileReconnect: false, reconnectFileName: "", fileName: "",
     ij: null, ijStep: "sources", ijNewName: "", ijPasteText: "", ijDatasetFileName: "", ijSourceError: "",
     ijConfigIssues: [], ijMappingError: "", ijSaveConfigName: "", ijCommittedSummary: null,
@@ -4664,6 +4682,28 @@ class Component extends DCLogic {
       return this.engine.assignApprover(ds, req.id, s.sfaStaffId);
     }, (r) => (r && r.error) ? r.error : "Sent for approval.");
     if (res && !res.error) this.setState({ sfaOpen: false });
+  }
+  // Read-only preview for the "assessment-params" row's "View" button on Pending Approvals. That
+  // request's actual home page (assessment-parameter) lives under Settings, which is permanently
+  // Institute-Admin-only (see instituteNavGroups/allowedPagesForAuth) — so a staff approver (e.g.
+  // Director) can never be sent there to inspect what they're deciding on. This popup shows the same
+  // rubric rows without needing page access, so "View" (and therefore Approve/Deny) actually works
+  // for a staff approver, not just Institute Admin.
+  buildPaViewPopup(d) {
+    const subjectId = this.state.paViewSubjectId;
+    if (!subjectId) return { paViewOpen: false };
+    const [pid, type] = subjectId.split(":");
+    const programme = d.programmes.find((p) => p.id === pid);
+    const rows = ((d.assessmentParamsDraft[pid] && d.assessmentParamsDraft[pid][type]) || (d.assessmentParams[pid] && d.assessmentParams[pid][type]) || [])
+      .slice().sort((a, b) => a.seq - b.seq)
+      .map((p, i) => ({ sno: i + 1, name: p.name, seq: p.seq, max: p.max.toFixed(2), allowZero: p.allowZero }));
+    return {
+      paViewOpen: true,
+      paViewTitle: `${programme ? programme.name : pid} — ${type} Assessment Parameters`,
+      paViewIsDraft: !!(d.assessmentParamsDraft[pid] && d.assessmentParamsDraft[pid][type]),
+      paViewRows: rows, paViewHasRows: rows.length > 0, paViewNoRows: rows.length === 0,
+      onClosePaView: () => this.setState({ paViewSubjectId: null })
+    };
   }
   buildSendForApprovalPopup() {
     const s = this.state;
@@ -5444,6 +5484,7 @@ class Component extends DCLogic {
     // navigating to a separate Candidate Profile page.
     Object.assign(base, this.buildCandidateDrawer(d));
     Object.assign(base, this.buildSendForApprovalPopup());
+    Object.assign(base, this.buildPaViewPopup(d));
     return base;
   }
 
@@ -9062,9 +9103,10 @@ class Component extends DCLogic {
           onRemarksChange: (e) => this.setState({ paRemarks: { ...this.state.paRemarks, [r.id]: e.target.value } }),
           onApprove: () => this.onDecideApproval(r.id, "approved"),
           onReject: () => this.onDecideApproval(r.id, "rejected"),
-          // Assessment Parameter's rubric is per-programme+tab now, so a plain goTo(meta.page) could land on
-          // an unrelated programme/tab — deep-link to the one this request is actually for.
-          onView: () => this.goTo(meta.page, r.subjectType === "assessment-params" ? { apProgrammeId: r.programmeId, apTab: r.subjectId.split(":")[1], apBannerDismissed: false } : null)
+          // Assessment Parameter's own page lives under Settings, which staff logins can never reach
+          // (see buildPaViewPopup) — show its rows in a popup instead of navigating there. Shortlist/Merit
+          // do have a real, non-Settings detail page, so those still deep-link straight to it.
+          onView: () => r.subjectType === "assessment-params" ? this.setState({ paViewSubjectId: r.subjectId }) : this.goTo(meta.page)
         };
       })
     };
