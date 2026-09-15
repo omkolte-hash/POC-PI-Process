@@ -111,7 +111,7 @@ a:hover{color:var(--color-accent);text-decoration:underline}
     </div>
   </aside>
   <div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
-    <header style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:var(--space-4);padding:var(--space-3) var(--space-6);border-bottom:1px solid var(--color-divider);background:var(--color-surface)">
+    <header style="flex:none;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--space-3) var(--space-4);padding:var(--space-3) var(--space-6);border-bottom:1px solid var(--color-divider);background:var(--color-surface)">
       <div>
         <div style="font-size:11px;letter-spacing:0.06em;text-transform:uppercase;opacity:0.55">{{ breadcrumbGroup }}</div>
         <div style="font-family:var(--font-heading);font-weight:var(--font-heading-weight);font-size:22px">{{ pageTitle }}</div>
@@ -3811,7 +3811,7 @@ a:hover{color:var(--color-accent);text-decoration:underline}
     </div></sc-if>
   </div></sc-if>
   <sc-if value="{{ showPanelistPortal }}"><div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
-    <header style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:var(--space-4);padding:var(--space-3) var(--space-6);border-bottom:1px solid var(--color-divider);background:var(--color-surface)">
+    <header style="flex:none;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--space-3) var(--space-4);padding:var(--space-3) var(--space-6);border-bottom:1px solid var(--color-divider);background:var(--color-surface)">
       <div>
         <div style="font-family:var(--font-heading);font-weight:var(--font-heading-weight);font-size:18px">Panelist Portal</div>
         <div style="font-size:12px;opacity:0.6">{{ pnName }} &middot; Panelist</div>
