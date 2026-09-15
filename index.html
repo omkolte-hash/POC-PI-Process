@@ -8725,11 +8725,15 @@ class Component extends DCLogic {
     if (prevId && prevId !== candidateId) this.pnMaybeLockScore(prevId, panelistId);
     this.setState({ pnSelectedCandidateId: candidateId });
   }
-  onPnScoreField(candidateId, panelistId, fieldKey, val) {
+  // Clamped to [0, max] here — the input's max="" attribute only affects the browser's spinner/
+  // validation UI, it doesn't stop someone from typing a bigger number, and an out-of-range score
+  // would silently inflate piTotal (and therefore merit ranking) once locked.
+  onPnScoreField(candidateId, panelistId, fieldKey, val, max) {
     const { programmeId, academicYearId, cycleId } = this.pnScope();
     const c = this.state.data.candidates.find((x) => x.id === candidateId && x.programmeId === programmeId && x.academicYearId === academicYearId && x.cycleId === cycleId);
     const current = (c.piScores && c.piScores[panelistId]) || {};
-    const updated = { ...current, [fieldKey]: val === "" ? null : Number(val) };
+    const num = val === "" ? null : Math.max(0, Math.min(Number(val), max));
+    const updated = { ...current, [fieldKey]: num };
     this.mutate((ds) => this.engine.submitPanelistScore(ds, candidateId, panelistId, updated, programmeId, academicYearId, cycleId));
   }
   onPnNotes(candidateId, panelistId, text) {
@@ -8825,7 +8829,7 @@ class Component extends DCLogic {
     base.pnScoreEditable = base.pnShowMarking && !locked;
     base.pnFields = base.pnShowMarking ? params.map((r) => ({
       name: r.name, max: r.max, value: scores[r.key] != null ? scores[r.key] : "",
-      onChange: (e) => this.onPnScoreField(c.id, panelist.id, r.key, e.target.value)
+      onChange: (e) => this.onPnScoreField(c.id, panelist.id, r.key, e.target.value, r.max)
     })) : [];
     base.pnNotes = (c.piNotes && c.piNotes[panelist.id]) || "";
     base.onPnNotesChange = (e) => this.onPnNotes(c.id, panelist.id, e.target.value);
