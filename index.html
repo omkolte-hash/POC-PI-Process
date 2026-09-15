@@ -5224,8 +5224,10 @@ class Component extends DCLogic {
     const groups = this.instituteNavGroups();
     const allowed = this.allowedPagesForAuth(auth);
     if (!allowed) return groups;
+    // Settings pages a role has actually been granted (see buildRolesMgmt) now show like any other —
+    // "roles-mgmt"/"user-memberships" still never appear here since allowedPagesForAuth already strips
+    // them out of `allowed` regardless of what a role's pages array claims.
     return groups
-      .filter((g) => g.title !== "Settings")
       .map((g) => ({ ...g, items: g.items.filter(([key]) => allowed.has(key)) }))
       .filter((g) => g.items.length > 0);
   }
@@ -6082,12 +6084,18 @@ class Component extends DCLogic {
   // Institute Admin-only page (enforced by navSpec()/allowedPagesForAuth — staff can never be
   // granted "roles-mgmt"). Permission catalogue = the exact pages a role's members will see in the
   // sidebar (see instituteNavGroups()), so this list can never drift from what the sidebar offers.
+  // Settings pages are included (a role can be granted e.g. Academic Years or Fee Structure) except
+  // "roles-mgmt"/"user-memberships" themselves, which saveRole always strips on save regardless of
+  // what's checked here — leaving them out of the catalogue avoids a checkbox that silently unchecks
+  // itself the moment the role is saved.
   buildRolesMgmt(d) {
     const s = this.state;
     const instituteId = this.state.auth.instituteId;
     const roles = (d.roles || []).filter((r) => r.instituteId === instituteId);
     const staff = (d.staff || []).filter((x) => x.instituteId === instituteId);
-    const navGroups = this.instituteNavGroups().filter((g) => g.title !== "Settings");
+    const navGroups = this.instituteNavGroups().map((g) => g.title !== "Settings" ? g : {
+      ...g, items: g.items.filter(([key]) => key !== "roles-mgmt" && key !== "user-memberships")
+    });
 
     const editId = s.rmEditId || null;
     const formName = s.rmFormName != null ? s.rmFormName : "";
